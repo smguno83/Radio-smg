@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Radio Corrientes Online</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;}
+    body{display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:linear-gradient(180deg,#0f172a,#071127);color:#e6eef8}
+    .container{width:min(800px,96vw);padding:20px;background:rgba(255,255,255,0.05);border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+    h1{text-align:center;margin-bottom:12px;}
+    .station-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;}
+    .station{cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,255,255,0.08);padding:10px;border-radius:12px;transition:all .2s}
+    .station:hover{background:rgba(255,255,255,0.15)}
+    .station img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px;}
+    audio{width:100%;margin-top:10px;}
+    .controls{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;justify-content:center}
+    button{background:rgba(255,255,255,0.1);color:inherit;border:none;border-radius:8px;padding:8px 12px;cursor:pointer;transition:.2s}
+    button:hover{background:rgba(255,255,255,0.25)}
+    .status{text-align:center;margin-top:10px;opacity:.8}
+    .historial{margin-top:20px;background:rgba(255,255,255,0.04);padding:10px;border-radius:12px;}
+    .historial h2{font-size:1rem;margin-bottom:8px}
+    ul{padding-left:16px;margin:0}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📻 Radios de Corrientes Online</h1>
+    <div class="station-list" id="stationList"></div>
+
+    <div class="controls">
+      <button id="playBtn">▶️ Reproducir</button>
+      <button id="stopBtn">⏹ Detener</button>
+      <label>Volumen <input type="range" id="volume" min="0" max="1" step="0.01" value="1"></label>
+      <label><input type="checkbox" id="mute"> Silencio</label>
+    </div>
+
+    <audio id="audio" preload="none" controls></audio>
+    <div class="status" id="status">Estado: detenido</div>
+
+    <div class="historial">
+      <h2>Historial reciente</h2>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+<script>
+const estaciones = [
+  { nombre: 'Radio Dos (Corrientes)', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Radio.svg', url: 'https://stream-1.example.com/stream.mp3' },
+  { nombre: 'Radio Sudamericana', logo: 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Radio_tower_icon.svg', url: 'https://stream-2.example.com/live.aac' },
+  { nombre: 'Dorado FM', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/b3/Radio_mic_icon.svg', url: 'https://stream-3.example.com/audio.mp3' },
+  { nombre: 'Feeling FM', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/97/Headphones_emoji.png', url: 'https://stream-4.example.com/live.mp3' }
+];
+
+const audio = document.getElementById('audio');
+const status = document.getElementById('status');
+const playBtn = document.getElementById('playBtn');
+const stopBtn = document.getElementById('stopBtn');
+const volume = document.getElementById('volume');
+const mute = document.getElementById('mute');
+const stationList = document.getElementById('stationList');
+const historyList = document.getElementById('historyList');
+
+let currentStation = null;
+
+function renderStations(){
+  stationList.innerHTML = '';
+  estaciones.forEach(st => {
+    const div = document.createElement('div');
+    div.className = 'station';
+    div.innerHTML = `<img src="${st.logo}" alt="${st.nombre}"><div>${st.nombre}</div>`;
+    div.onclick = ()=> playStation(st);
+    stationList.appendChild(div);
+  });
+}
+
+function setStatus(text){ status.textContent = 'Estado: ' + text; }
+
+function playStation(st){
+  currentStation = st;
+  audio.src = st.url;
+  audio.play().then(()=> setStatus('Reproduciendo ' + st.nombre))
+    .catch(err=>{
+      console.error(err);
+      alert('No se pudo reproducir la emisora. Puede requerir proxy CORS.');
+      setStatus('Error al reproducir');
+    });
+  addToHistory(st);
+}
+
+function addToHistory(st){
+  let history = JSON.parse(localStorage.getItem('radioHistory') || '[]');
+  history.unshift({nombre: st.nombre, fecha: new Date().toLocaleString()});
+  history = history.slice(0,10);
+  localStorage.setItem('radioHistory', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory(){
+  const history = JSON.parse(localStorage.getItem('radioHistory') || '[]');
+  historyList.innerHTML = history.map(h => `<li>${h.nombre} <small>(${h.fecha})</small></li>`).join('');
+}
+
+playBtn.onclick = ()=>{
+  if(currentStation){ audio.play(); setStatus('Reanudando'); }
+  else alert('Seleccioná una emisora primero.');
+};
+stopBtn.onclick = ()=>{ audio.pause(); setStatus('Detenido'); };
+volume.oninput = ()=> audio.volume = parseFloat(volume.value);
+mute.onchange = ()=> audio.muted = mute.checked;
+audio.onplaying = ()=> setStatus('Reproduciendo ' + (currentStation?.nombre || ''));
+audio.onpause = ()=> setStatus('Pausado');
+audio.onerror = ()=> setStatus('Error de conexión');
+
+renderStations();
+renderHistory();
+</script>
+
+<!-- Cloudflare Worker proxy de ejemplo -->
+<!--
+Código para desplegar en https://workers.cloudflare.com
+
+addEventListener('fetch', event => {
+  event.respondWith(handle(event.request))
+})
+
+async function handle(request){
+  const url = new URL(request.url)
+  const u = url.searchParams.get('u')
+  if(!u) return new Response('Falta parámetro u', {status:400})
+  const res = await fetch(u)
+  const headers = new Headers(res.headers)
+  headers.set('Access-Control-Allow-Origin', '*')
+  return new Response(res.body, {status: res.status, headers})
+}
+
+Luego, para usarlo:
+https://tuworker.workers.dev/?u=https://stream.mp3
+-->
+</body>
+</html>
