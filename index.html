@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproductor de Radios Online</title>
+<title>Radio SMG</title>
 <style>
   body {
-    background-color: #0a0a0a;
+    background: radial-gradient(circle at top, #111, #000);
     color: #fff;
     font-family: "Segoe UI", sans-serif;
     text-align: center;
@@ -31,85 +31,75 @@
     margin-bottom: 20px;
   }
 
-  button {
+  #playButton {
     background: #1db954;
-    color: #fff;
+    color: white;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 16px;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    font-size: 30px;
     cursor: pointer;
-    margin: 10px;
-    transition: background 0.3s;
+    margin-top: 15px;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 0 15px rgba(29,185,84,0.4);
   }
 
-  button:hover {
+  #playButton:hover {
     background: #17a347;
-  }
-
-  audio {
-    width: 90%;
-    max-width: 500px;
-    margin-top: 20px;
+    transform: scale(1.05);
   }
 
   img#stationLogo {
-    width: clamp(120px, 30vw, 180px);
-    height: auto;
+    width: clamp(120px, 35vw, 200px);
     border-radius: 20%;
-    margin: 15px auto;
+    margin: 20px auto;
     display: none;
     object-fit: contain;
     background-color: #111;
     padding: 10px;
-    box-shadow: 0 0 20px rgba(255,255,255,0.1);
-    transition: transform 0.3s ease;
-  }
-
-  img#stationLogo:hover {
-    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255,255,255,0.1);
   }
 
   p#currentStation {
     margin-top: 10px;
     font-size: 18px;
   }
+
+  /* Oculta los controles nativos */
+  audio {
+    display: none;
+  }
 </style>
 </head>
 <body>
-  <h1>🎧 Radios Online</h1>
+  <h1>🎧 Radio SMG</h1>
 
   <select id="radioList">
     <option value="" selected disabled>Seleccioná una emisora</option>
     <option value="https://stream.zeno.fm/zf4duqz2ytzuv" data-logo="https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_FM_Sol_Corrientes.png">FM Sol 107.9</option>
-    <option value="https://server.laradio.online/proxy/fmsudamericana" data-logo="https://static.wixstatic.com/media/09dcb0_4a6df28c5935475d83c04a24f5b2d6c5~mv2.png">FM Sudamericana 100.5</option>
-    <option value="https://radio.streamingcpanel.com:7020/stream" data-logo="https://cdn-profiles.tunein.com/s226427/images/logog.png">Radio Dos 99.3</option>
-    <option value="https://streaming01.shockmedia.com.ar:10960/stream" data-logo="https://upload.wikimedia.org/wikipedia/commons/f/f4/LaRocka_Logo.png">La Rocka 107.5</option>
-    <option value="https://server01.megastreaming.tech/8152/stream" data-logo="https://i.imgur.com/H7M2mZw.png">FM Universidad 90.5</option>
-    <option value="https://streaming.turadio.stream/8050/stream" data-logo="https://i.imgur.com/TPJPKgI.png">Xpress FM 101.3</option>
-    <option value="https://streaming.turadio.stream/8068/stream" data-logo="https://i.imgur.com/etjUETB.png">Radio Chart 94.5</option>
+    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ARGENTINA.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/e/e0/Los40_Logo_2016.svg">Los 40 Buenos Aires</option>
     <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/ASPEN_SC.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/2/2a/Logo_Aspen_102.3.png">Aspen 102.3</option>
-    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ARGENTINA.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/e/e0/Los40_Logo_2016.svg">Los 40 Argentina</option>
-    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/POP_1019_BA.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/a/a8/Radio_Pop_101.5_logo.png">Pop Radio 101.5</option>
   </select>
 
   <div>
     <img id="stationLogo" alt="Logo de emisora">
   </div>
 
-  <div>
-    <audio id="player" controls></audio>
-  </div>
+  <button id="playButton">▶</button>
 
-  <p id="currentStation">Seleccioná una emisora para comenzar 🎶</p>
+  <audio id="player"></audio>
+
+  <p id="currentStation">Seleccioná una emisora 🎶</p>
 
 <script>
   const player = document.getElementById("player");
   const list = document.getElementById("radioList");
   const info = document.getElementById("currentStation");
   const logo = document.getElementById("stationLogo");
+  const playButton = document.getElementById("playButton");
 
-  // --- Cargar emisora guardada ---
+  // Cargar emisora guardada
   window.onload = () => {
     const saved = localStorage.getItem("selectedStation");
     if (saved) {
@@ -121,7 +111,6 @@
     }
   };
 
-  // --- Cambio de emisora ---
   list.addEventListener("change", () => {
     const opt = list.options[list.selectedIndex];
     startStation(opt);
@@ -135,16 +124,26 @@
 
     player.src = url;
     player.play().catch(() => console.log("Esperando interacción del usuario..."));
-
     info.textContent = `🔊 Reproduciendo: ${name}`;
     logo.src = logoUrl;
     logo.style.display = "block";
+    playButton.textContent = "⏸";
   }
 
-  // --- Obtener canción actual ---
+  playButton.addEventListener("click", () => {
+    if (player.src === "") return;
+    if (player.paused) {
+      player.play();
+      playButton.textContent = "⏸";
+    } else {
+      player.pause();
+      playButton.textContent = "▶";
+    }
+  });
+
   async function fetchNowPlaying(url) {
     try {
-      const proxy = "https://api.allorigins.win/raw?url="; // evita CORS
+      const proxy = "https://api.allorigins.win/raw?url=";
       const response = await fetch(proxy + encodeURIComponent(url), {
         method: "GET",
         headers: { "Icy-MetaData": "1" }
@@ -169,4 +168,3 @@
 </script>
 </body>
 </html>
-
