@@ -10,8 +10,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Radio SMG">
   <link rel="apple-touch-icon" href="icon.png">
-
-  <!-- Manifesto para instalación -->
   <link rel="manifest" href="manifest.json">
 
   <style>
@@ -27,15 +25,8 @@
       margin: 0;
       text-align: center;
     }
-    h1 {
-      margin-bottom: 10px;
-      font-size: 2rem;
-    }
-    h2 {
-      font-weight: normal;
-      font-size: 1rem;
-      color: #aaa;
-    }
+    h1 { margin-bottom: 10px; font-size: 2rem; }
+    h2 { font-weight: normal; font-size: 1rem; color: #aaa; }
     select, button {
       background: #222;
       color: #fff;
@@ -47,18 +38,10 @@
       outline: none;
       transition: background 0.2s;
     }
-    button:hover {
-      background: #444;
-      cursor: pointer;
-    }
-    audio {
-      width: 90%;
-      margin-top: 25px;
-      border-radius: 10px;
-    }
+    button:hover { background: #444; cursor: pointer; }
+    audio { width: 90%; margin-top: 25px; border-radius: 10px; }
   </style>
 </head>
-
 <body>
   <h1>🎧 Radio SMG</h1>
   <h2 id="currentStation">Seleccioná una emisora</h2>
@@ -70,7 +53,6 @@
   </select>
 
   <button id="playButton">▶️ Reproducir</button>
-
   <audio id="player" controls></audio>
 
   <script>
@@ -78,6 +60,31 @@
     const list = document.getElementById('stationList');
     const info = document.getElementById('currentStation');
     const playButton = document.getElementById('playButton');
+
+    // Función para iniciar la reproducción
+    function playStation(url, name) {
+      player.pause();
+      player.src = url;
+      player.load();
+      player.play()
+        .then(() => {
+          info.textContent = `🎶 Reproduciendo: ${name}`;
+          playButton.textContent = '⏸️ Pausar';
+          localStorage.setItem('lastStation', url);
+          localStorage.setItem('lastName', name);
+        })
+        .catch(err => {
+          console.error('Error al reproducir:', err);
+          alert("No se pudo reproducir la emisora. Tocá el botón nuevamente.");
+        });
+    }
+
+    // Función para pausar
+    function pauseStation() {
+      player.pause();
+      playButton.textContent = '▶️ Reproducir';
+      info.textContent = '⏸️ Pausado';
+    }
 
     // Cargar última emisora
     const lastStation = localStorage.getItem('lastStation');
@@ -87,19 +94,28 @@
       info.textContent = `Reanudando: ${lastName || 'Última emisora'}`;
     }
 
+    // Click del botón reproducir/pausar
     playButton.addEventListener('click', () => {
+      if (!player.src || player.paused) {
+        const url = list.value;
+        const name = list.options[list.selectedIndex].text;
+        playStation(url, name);
+      } else {
+        pauseStation();
+      }
+    });
+
+    // Cambio de emisora en el select
+    list.addEventListener('change', () => {
       const url = list.value;
       const name = list.options[list.selectedIndex].text;
-      player.src = url;
-      player.play()
-        .then(() => {
-          info.textContent = `🎶 Reproduciendo: ${name}`;
-          localStorage.setItem('lastStation', url);
-          localStorage.setItem('lastName', name);
-        })
-        .catch(() => {
-          alert("Tocá el botón ▶️ para comenzar a escuchar.");
-        });
+      playStation(url, name);
+    });
+
+    // Detectar errores de streaming
+    player.addEventListener('error', () => {
+      alert('Hubo un error al cargar el stream. Probá otra emisora.');
+      pauseStation();
     });
 
     // Instalar service worker
