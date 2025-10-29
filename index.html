@@ -27,7 +27,8 @@
     }
     h1 { margin-bottom: 10px; font-size: 2rem; }
     h2 { font-weight: normal; font-size: 1rem; color: #aaa; }
-    select, button {
+
+    select {
       background: #222;
       color: #fff;
       border: none;
@@ -38,8 +39,44 @@
       outline: none;
       transition: background 0.2s;
     }
-    button:hover { background: #444; cursor: pointer; }
-    audio { width: 90%; margin-top: 25px; border-radius: 10px; }
+    select:hover { background: #444; }
+
+    button {
+      border: none;
+      padding: 12px 18px;
+      margin: 6px;
+      font-size: 1.2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    button span {
+      font-size: 1.4rem;
+      margin-right: 6px;
+    }
+    #playButton {
+      background: #1abc9c;
+      color: #fff;
+    }
+    #prevButton, #nextButton {
+      background: #3498db;
+      color: #fff;
+    }
+    button:hover {
+      transform: scale(1.08);
+      filter: brightness(1.2);
+      cursor: pointer;
+    }
+
+    audio {
+      width: 90%;
+      margin-top: 25px;
+      border-radius: 10px;
+    }
+
     img#stationLogo {
       width: 150px;
       height: 150px;
@@ -109,13 +146,13 @@
 
     <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream-162.zeno.fm/84y7b87p4gruv" data-logo="https://static.mytuner.mobi/media/tvos_radios/640/radio-chamame.73a20784.png">CHAMAME - CORRIENTES</option>
   </select>
-  
-<audio id="player" controls></audio>
+
+  <audio id="player" controls></audio>
 
   <div>
-    <button id="prevButton">⏮️ Anterior</button>
-    <button id="playButton">▶️ Reproducir</button>
-    <button id="nextButton">⏭️ Siguiente</button>
+    <button id="prevButton"><span>⏮️</span> Anterior</button>
+    <button id="playButton"><span>▶️</span> Reproducir</button>
+    <button id="nextButton"><span>⏭️</span> Siguiente</button>
   </div>
 
   <script>
@@ -124,36 +161,37 @@
     const info = document.getElementById('currentStation');
     const playButton = document.getElementById('playButton');
     const logoImg = document.getElementById('stationLogo');
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
 
     function playStation(url, name) {
       const logo = list.options[list.selectedIndex].getAttribute('data-logo');
       player.pause();
       player.src = url;
       player.load();
-      player.play()
-        .then(() => {
-          info.textContent = `🎶 Reproduciendo: ${name}`;
-          playButton.textContent = '⏸️ Pausar';
-          localStorage.setItem('lastStation', url);
-          localStorage.setItem('lastName', name);
-          localStorage.setItem('lastLogo', logo);
-          if (logo) {
-            logoImg.src = logo;
-            logoImg.style.display = 'block';
-          } else {
-            logoImg.style.display = 'none';
-          }
-          updateMediaSession(name, logo);
-        })
-        .catch(err => {
-          console.error('Error al reproducir:', err);
-          alert("No se pudo reproducir la emisora. Tocá el botón nuevamente.");
-        });
+      player.play().then(() => {
+        info.textContent = `🎶 Reproduciendo: ${name}`;
+        playButton.querySelector('span').textContent = '⏸️';
+        playButton.innerHTML = `<span>⏸️</span> Pausar`;
+        localStorage.setItem('lastStation', url);
+        localStorage.setItem('lastName', name);
+        localStorage.setItem('lastLogo', logo);
+        if (logo) {
+          logoImg.src = logo;
+          logoImg.style.display = 'block';
+        } else {
+          logoImg.style.display = 'none';
+        }
+        updateMediaSession(name, logo);
+      }).catch(err => {
+        console.error('Error al reproducir:', err);
+        alert("No se pudo reproducir la emisora. Tocá el botón nuevamente.");
+      });
     }
 
     function pauseStation() {
       player.pause();
-      playButton.textContent = '▶️ Reproducir';
+      playButton.innerHTML = `<span>▶️</span> Reproducir`;
       info.textContent = '⏸️ Pausado';
     }
 
@@ -170,30 +208,43 @@
       }
     }
 
-    // === Botón Play/Pause ===
+    // Play/Pause
     playButton.addEventListener('click', () => {
       if (player.paused) {
         if (!player.src) {
-          const url = list.value;
-          const name = list.options[list.selectedIndex].text;
-          playStation(url, name);
+          playStation(list.value, list.options[list.selectedIndex].text);
         } else {
           player.play();
-          playButton.textContent = '⏸️ Pausar';
+          playButton.innerHTML = `<span>⏸️</span> Pausar`;
           info.textContent = `🎶 Reproduciendo: ${list.options[list.selectedIndex].text}`;
         }
       } else {
         pauseStation();
-        info.textContent = `🎶 Pausado: ${list.options[list.selectedIndex].text}`;
       }
     });
 
-    
-
+    // Cambio de emisora
     list.addEventListener('change', () => {
-      const url = list.value;
-      const name = list.options[list.selectedIndex].text;
-      playStation(url, name);
+      playStation(list.value, list.options[list.selectedIndex].text);
+    });
+
+    // Botones anterior/siguiente
+    function playByIndex(index) {
+      const option = list.options[index];
+      list.selectedIndex = index;
+      playStation(option.value, option.text);
+    }
+
+    nextButton.addEventListener('click', () => {
+      let nextIndex = list.selectedIndex + 1;
+      if (nextIndex >= list.options.length) nextIndex = 0;
+      playByIndex(nextIndex);
+    });
+
+    prevButton.addEventListener('click', () => {
+      let prevIndex = list.selectedIndex - 1;
+      if (prevIndex < 0) prevIndex = list.options.length - 1;
+      playByIndex(prevIndex);
     });
 
     player.addEventListener('error', () => {
@@ -207,7 +258,6 @@
         .catch(err => console.error('Error registrando SW:', err));
     }
 
-    // === Media Session API (CarPlay / iOS) ===
     function updateMediaSession(title, artwork) {
       if ('mediaSession' in navigator) {
         navigator.mediaSession.metadata = new MediaMetadata({
@@ -215,49 +265,15 @@
           artist: 'En vivo',
           artwork: [{ src: artwork || 'icon.png', sizes: '512x512', type: 'image/png' }]
         });
-
-        navigator.mediaSession.setActionHandler('play', () => {
-          player.play();
-          playButton.textContent = '⏸️ Pausar';
-        });
-        navigator.mediaSession.setActionHandler('pause', () => {
-          player.pause();
-          playButton.textContent = '▶️ Reproducir';
-        });
-        try {
-          navigator.mediaSession.setActionHandler('stop', null);
-        } catch (e) {}
+        navigator.mediaSession.setActionHandler('play', () => { player.play(); playButton.innerHTML = `<span>⏸️</span> Pausar`; });
+        navigator.mediaSession.setActionHandler('pause', () => { player.pause(); playButton.innerHTML = `<span>▶️</span> Reproducir`; });
+        try { navigator.mediaSession.setActionHandler('stop', null); } catch(e) {}
       }
     }
-
-    const prevButton = document.getElementById('prevButton');
-const nextButton = document.getElementById('nextButton');
-
-function playByIndex(index) {
-  const option = list.options[index];
-  list.selectedIndex = index;
-  const url = option.value;
-  const name = option.text;
-  playStation(url, name);
-}
-
-// Botón siguiente
-nextButton.addEventListener('click', () => {
-  let nextIndex = list.selectedIndex + 1;
-  if (nextIndex >= list.options.length) nextIndex = 0; // loop al inicio
-  playByIndex(nextIndex);
-});
-
-// Botón anterior
-prevButton.addEventListener('click', () => {
-  let prevIndex = list.selectedIndex - 1;
-  if (prevIndex < 0) prevIndex = list.options.length - 1; // loop al final
-  playByIndex(prevIndex);
-});
-
   </script>
 </body>
 </html>
+
 
 
 
