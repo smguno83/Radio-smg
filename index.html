@@ -40,37 +40,72 @@
     }
     button:hover { background: #444; cursor: pointer; }
     audio { width: 90%; margin-top: 25px; border-radius: 10px; }
+    img#stationLogo {
+      width: 120px;
+      height: 120px;
+      border-radius: 20%;
+      margin: 15px;
+      display: none;
+      object-fit: cover;
+      box-shadow: 0 0 15px rgba(255,255,255,0.2);
+    }
   </style>
 </head>
 <body>
   <h1>🎧 Radio SMG</h1>
   <h2 id="currentStation">Seleccioná una emisora</h2>
+  <img id="stationLogo" src="" alt="Logo emisora">
 
   <select id="stationList">
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://24443.live.streamtheworld.com/FM999_56AAC.aac">La 100-BUENOS AIRES</option>
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://edge02.radiohdvivo.com/los40">LOS 40-BUENOS AIRES</option>
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://26583.live.streamtheworld.com/ROCKANDPOPAAC.aac">ROCK & POP-BUENOS AIRES</option>
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://21933.live.streamtheworld.com/ASPEN.mp3">ASPEN-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://27613.live.streamtheworld.com/AM790_56.mp3">MITRE-BUENOS AIRES
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac">LA RED-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://streaming01.shockmedia.com.ar:10217/stream">DEL PLATA-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://ice2.edge-apps.net/radio1_high-20057.audio">VORTERIX-BUENOS AIRES
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://radios.solumedia.com/6396/stream">Radio Dos-CORRIENTES</option>	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/sudamericana/stream">SUDAMERICANA-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/continental/stream">NORD-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/radiolt7/stream">LT7-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream.unne.edu.ar/radio">UNNE-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/fmcapital953/stream">CAPITAL-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://server7.hostradios.com/8170/stream">FM SOL-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/xpress/stream">XPRESS-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://cdn.instream.audio/:9660/stream">URBANA PLAY-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://24373.live.streamtheworld.com/RIVADAVIAAAC_SC">RIVADAVIA-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://edge05.radiohdvivo.com/stream/radiolatina">LATINA-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream-162.zeno.fm/84y7b87p4gruv">CHAMAME-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=http://cdn.instream.audio:8137/stream">LA ROCKA-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://mega.stweb.tv/mega983/live/l_316_543858005_753276.aac">MEGA-BUENOS AIRES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://streaming01.serverconnectinc.site:9232/stream">OMPACTO-CORRIENTES	
-	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/feelings/stream">FEELING-CORRIENTES	
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://24443.live.streamtheworld.com/FM999_56AAC.aac"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/4/4a/La_100_logo.png">
+      La 100 - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://edge02.radiohdvivo.com/los40"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/9/9e/Los_40_Principales_logo.svg">
+      LOS 40 - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://26583.live.streamtheworld.com/ROCKANDPOPAAC.aac"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/3/31/Rock_%26_Pop_logo.png">
+      ROCK & POP - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://21933.live.streamtheworld.com/ASPEN.mp3"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/3/3d/Aspen_102.3_logo.png">
+      ASPEN - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://27613.live.streamtheworld.com/AM790_56.mp3"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/4/4a/Radio_Mitre_logo.png">
+      MITRE - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/8/89/Radio_La_Red_logo.png">
+      LA RED - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://streaming01.shockmedia.com.ar:10217/stream"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/b/bb/Radio_Del_Plata_logo.png">
+      DEL PLATA - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://ice2.edge-apps.net/radio1_high-20057.audio"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/5/5c/Vorterix_logo.png">
+      VORTERIX - BUENOS AIRES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://radios.solumedia.com/6396/stream"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/d/d0/Radio_dos_corrientes_logo.png">
+      Radio Dos - CORRIENTES
+    </option>
+
+    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream-162.zeno.fm/84y7b87p4gruv"
+            data-logo="https://upload.wikimedia.org/wikipedia/commons/5/55/Chamam%C3%A9_logo.png">
+      CHAMAME - CORRIENTES
+    </option>
   </select>
 
   <button id="playButton">▶️ Reproducir</button>
@@ -81,9 +116,12 @@
     const list = document.getElementById('stationList');
     const info = document.getElementById('currentStation');
     const playButton = document.getElementById('playButton');
+    const logoImg = document.getElementById('stationLogo');
 
     // Función para iniciar la reproducción
     function playStation(url, name) {
+      const logo = list.options[list.selectedIndex].getAttribute('data-logo');
+
       player.pause();
       player.src = url;
       player.load();
@@ -93,6 +131,14 @@
           playButton.textContent = '⏸️ Pausar';
           localStorage.setItem('lastStation', url);
           localStorage.setItem('lastName', name);
+          localStorage.setItem('lastLogo', logo);
+
+          if (logo) {
+            logoImg.src = logo;
+            logoImg.style.display = 'block';
+          } else {
+            logoImg.style.display = 'none';
+          }
         })
         .catch(err => {
           console.error('Error al reproducir:', err);
@@ -110,9 +156,14 @@
     // Cargar última emisora
     const lastStation = localStorage.getItem('lastStation');
     const lastName = localStorage.getItem('lastName');
+    const lastLogo = localStorage.getItem('lastLogo');
     if (lastStation) {
       player.src = lastStation;
       info.textContent = `Reanudando: ${lastName || 'Última emisora'}`;
+      if (lastLogo) {
+        logoImg.src = lastLogo;
+        logoImg.style.display = 'block';
+      }
     }
 
     // Click del botón reproducir/pausar
