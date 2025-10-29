@@ -250,6 +250,24 @@
     player.addEventListener('error', () => {
       alert('Hubo un error al cargar el stream. Probá otra emisora.');
       pauseStation();
+
+      player.addEventListener('error', () => {
+  // Mostrar mensaje en pantalla
+
+  // Actualizar información del MediaSession para reflejar el error
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'Error en la emisora',
+      artist: 'No se pudo reproducir',
+      artwork: [
+        { src: 'icon.png', sizes: '512x512', type: 'image/png' }
+      ]
+    });
+
+    // Cambiar el estado de reproducción del sistema a "pausado"
+    navigator.mediaSession.playbackState = 'none';
+  }
+});
     });
 
     if ('serviceWorker' in navigator) {
@@ -287,7 +305,7 @@
       if (nextIndex >= list.options.length) nextIndex = 0;
       playByIndex(nextIndex);
     });
-
+i
     // ⏮️ Emisora anterior
     navigator.mediaSession.setActionHandler('previoustrack', () => {
       let prevIndex = list.selectedIndex - 1;
