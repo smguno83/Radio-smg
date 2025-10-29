@@ -5,124 +5,70 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Radio SMG</title>
 
-  <!-- iPhone Web App -->
+  <!-- Soporte para modo aplicación iPhone -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Radio SMG">
   <link rel="apple-touch-icon" href="icon.png">
-  <link rel="manifest" href="manifest.json">
 
   <style>
     body {
-      background: linear-gradient(145deg, #0a0a0a, #202020);
+      background: #0a0a0a;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
-      text-align: center;
     }
-    h1 { margin-bottom: 10px; font-size: 2rem; }
-    h2 { font-weight: normal; font-size: 1rem; color: #aaa; }
+    h1 { margin-bottom: 20px; }
     select, button {
       background: #222;
       color: #fff;
       border: none;
-      padding: 10px 15px;
-      border-radius: 12px;
-      margin: 8px;
-      font-size: 1rem;
-      outline: none;
-      transition: background 0.2s;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 5px;
     }
-    button:hover { background: #444; cursor: pointer; }
-    audio { width: 90%; margin-top: 25px; border-radius: 10px; }
+    audio {
+      width: 90%;
+      margin-top: 20px;
+    }
   </style>
 </head>
+
 <body>
   <h1>🎧 Radio SMG</h1>
-  <h2 id="currentStation">Seleccioná una emisora</h2>
-
   <select id="stationList">
-    <option value="https://matiasgutierrez402.workers.dev/?url=https://24443.live.streamtheworld.com/FM999_56AAC.aac">La 100</option>
-    <option value="https://matiasgutierrez402.workers.dev/?url=https://radios.solumedia.com/6396/stream">Radio Dos</option>
+    <option value="https://matiasgutierrez402.workers.dev/? url=https://24443.live.streamtheworld.com/FM999_56AAC.aac">La 100</option>
+    <option value="https://matiasgutierrez402.workers.dev/? url=https://radios.solumedia.com/6396/stream">Radio Dos</option>
     <option value="https://radio.liveradio.es/stream/example3">Ejemplo 3</option>
   </select>
 
-  <button id="playButton">▶️ Reproducir</button>
-  <audio id="player" controls></audio>
+  <button onclick="playSelected()">▶️ Reproducir</button>
+
+  <audio id="player" controls autoplay></audio>
 
   <script>
     const player = document.getElementById('player');
     const list = document.getElementById('stationList');
-    const info = document.getElementById('currentStation');
-    const playButton = document.getElementById('playButton');
 
-    // Función para iniciar la reproducción
-    function playStation(url, name) {
-      player.pause();
-      player.src = url;
-      player.load();
-      player.play()
-        .then(() => {
-          info.textContent = `🎶 Reproduciendo: ${name}`;
-          playButton.textContent = '⏸️ Pausar';
-          localStorage.setItem('lastStation', url);
-          localStorage.setItem('lastName', name);
-        })
-        .catch(err => {
-          console.error('Error al reproducir:', err);
-          alert("No se pudo reproducir la emisora. Tocá el botón nuevamente.");
-        });
-    }
+    // Historial local
+    const history = JSON.parse(localStorage.getItem('radioHistory') || '[]');
 
-    // Función para pausar
-    function pauseStation() {
-      player.pause();
-      playButton.textContent = '▶️ Reproducir';
-      info.textContent = '⏸️ Pausado';
-    }
-
-    // Cargar última emisora
-    const lastStation = localStorage.getItem('lastStation');
-    const lastName = localStorage.getItem('lastName');
-    if (lastStation) {
-      player.src = lastStation;
-      info.textContent = `Reanudando: ${lastName || 'Última emisora'}`;
-    }
-
-    // Click del botón reproducir/pausar
-    playButton.addEventListener('click', () => {
-      if (!player.src || player.paused) {
-        const url = list.value;
-        const name = list.options[list.selectedIndex].text;
-        playStation(url, name);
-      } else {
-        pauseStation();
-      }
-    });
-
-    // Cambio de emisora en el select
-    list.addEventListener('change', () => {
+    function playSelected() {
       const url = list.value;
-      const name = list.options[list.selectedIndex].text;
-      playStation(url, name);
-    });
+      player.src = url;
+      player.play();
 
-    // Detectar errores de streaming
-    player.addEventListener('error', () => {
-      alert('Hubo un error al cargar el stream. Probá otra emisora.');
-      pauseStation();
-    });
-
-    // Instalar service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Error registrando SW:', err));
+      // Guardar historial
+      if (!history.includes(url)) {
+        history.unshift(url);
+        if (history.length > 10) history.pop();
+        localStorage.setItem('radioHistory', JSON.stringify(history));
+      }
     }
   </script>
 </body>
