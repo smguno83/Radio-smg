@@ -258,18 +258,49 @@
         .catch(err => console.error('Error registrando SW:', err));
     }
 
+
     function updateMediaSession(title, artwork) {
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: title || 'Radio SMG',
-          artist: 'En vivo',
-          artwork: [{ src: artwork || 'icon.png', sizes: '512x512', type: 'image/png' }]
-        });
-        navigator.mediaSession.setActionHandler('play', () => { player.play(); playButton.innerHTML = `<span>⏸️</span> Pausar`; });
-        navigator.mediaSession.setActionHandler('pause', () => { player.pause(); playButton.innerHTML = `<span>▶️</span> Reproducir`; });
-        try { navigator.mediaSession.setActionHandler('stop', null); } catch(e) {}
-      }
-    }
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title || 'Radio SMG',
+      artist: 'En vivo',
+      artwork: [
+        { src: artwork || 'icon.png', sizes: '512x512', type: 'image/png' }
+      ]
+    });
+
+    // ▶️ Reproducir
+    navigator.mediaSession.setActionHandler('play', () => {
+      player.play();
+      playButton.innerHTML = `<span>⏸️</span> Pausar`;
+    });
+
+    // ⏸️ Pausar
+    navigator.mediaSession.setActionHandler('pause', () => {
+      player.pause();
+      playButton.innerHTML = `<span>▶️</span> Reproducir`;
+    });
+
+    // ⏭️ Siguiente emisora
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      let nextIndex = list.selectedIndex + 1;
+      if (nextIndex >= list.options.length) nextIndex = 0;
+      playByIndex(nextIndex);
+    });
+
+    // ⏮️ Emisora anterior
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      let prevIndex = list.selectedIndex - 1;
+      if (prevIndex < 0) prevIndex = list.options.length - 1;
+      playByIndex(prevIndex);
+    });
+
+    // 🛑 Algunos navegadores requieren capturar 'stop' aunque no se use
+    try {
+      navigator.mediaSession.setActionHandler('stop', null);
+    } catch (e) {}
+  }
+}
   </script>
 </body>
 </html>
