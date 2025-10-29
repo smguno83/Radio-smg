@@ -5,70 +5,108 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Radio SMG</title>
 
-  <!-- Soporte para modo aplicación iPhone -->
+  <!-- iPhone Web App -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Radio SMG">
   <link rel="apple-touch-icon" href="icon.png">
 
+  <!-- Manifesto para instalación -->
+  <link rel="manifest" href="manifest.json">
+
   <style>
     body {
-      background: #0a0a0a;
+      background: linear-gradient(145deg, #0a0a0a, #202020);
       color: #fff;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
+      text-align: center;
     }
-    h1 { margin-bottom: 20px; }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 2rem;
+    }
+    h2 {
+      font-weight: normal;
+      font-size: 1rem;
+      color: #aaa;
+    }
     select, button {
       background: #222;
       color: #fff;
       border: none;
-      padding: 10px;
-      border-radius: 10px;
-      margin: 5px;
+      padding: 10px 15px;
+      border-radius: 12px;
+      margin: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #444;
+      cursor: pointer;
     }
     audio {
       width: 90%;
-      margin-top: 20px;
+      margin-top: 25px;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
   <h1>🎧 Radio SMG</h1>
+  <h2 id="currentStation">Seleccioná una emisora</h2>
+
   <select id="stationList">
-    <option value="https://matiasgutierrez402.workers.dev/? url=https://24443.live.streamtheworld.com/FM999_56AAC.aac">La 100</option>
-    <option value="https://matiasgutierrez402.workers.dev/? url=https://radios.solumedia.com/6396/stream">Radio Dos</option>
+    <option value="https://matiasgutierrez402.workers.dev/?url=https://24443.live.streamtheworld.com/FM999_56AAC.aac">La 100</option>
+    <option value="https://matiasgutierrez402.workers.dev/?url=https://radios.solumedia.com/6396/stream">Radio Dos</option>
     <option value="https://radio.liveradio.es/stream/example3">Ejemplo 3</option>
   </select>
 
-  <button onclick="playSelected()">▶️ Reproducir</button>
+  <button id="playButton">▶️ Reproducir</button>
 
-  <audio id="player" controls autoplay></audio>
+  <audio id="player" controls></audio>
 
   <script>
     const player = document.getElementById('player');
     const list = document.getElementById('stationList');
+    const info = document.getElementById('currentStation');
+    const playButton = document.getElementById('playButton');
 
-    // Historial local
-    const history = JSON.parse(localStorage.getItem('radioHistory') || '[]');
+    // Cargar última emisora
+    const lastStation = localStorage.getItem('lastStation');
+    const lastName = localStorage.getItem('lastName');
+    if (lastStation) {
+      player.src = lastStation;
+      info.textContent = `Reanudando: ${lastName || 'Última emisora'}`;
+    }
 
-    function playSelected() {
+    playButton.addEventListener('click', () => {
       const url = list.value;
+      const name = list.options[list.selectedIndex].text;
       player.src = url;
-      player.play();
+      player.play()
+        .then(() => {
+          info.textContent = `🎶 Reproduciendo: ${name}`;
+          localStorage.setItem('lastStation', url);
+          localStorage.setItem('lastName', name);
+        })
+        .catch(() => {
+          alert("Tocá el botón ▶️ para comenzar a escuchar.");
+        });
+    });
 
-      // Guardar historial
-      if (!history.includes(url)) {
-        history.unshift(url);
-        if (history.length > 10) history.pop();
-        localStorage.setItem('radioHistory', JSON.stringify(history));
-      }
+    // Instalar service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registrado'))
+        .catch(err => console.error('Error registrando SW:', err));
     }
   </script>
 </body>
