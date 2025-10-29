@@ -102,7 +102,7 @@
       VORTERIX - BUENOS AIRES
     </option>
     <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://cdn.instream.audio/:9660/stream
-        	data-logo="https://https://static.mytuner.mobi/media/radios-150px/742/urbana-play-1043-fm.dc7a029a.png">
+        	data-logo="https://static.mytuner.mobi/media/radios-150px/742/urbana-play-1043-fm.dc7a029a.png">
 	  URBANA PLAY-BUENOS AIRES	
 	  </option>
      
@@ -270,6 +270,34 @@
         .then(() => console.log('Service Worker registrado'))
         .catch(err => console.error('Error registrando SW:', err));
     }
+
+	  async function fetchNowPlaying(url) {
+  try {
+    const proxy = "https://api.allorigins.win/raw?url="; // evita CORS
+    const response = await fetch(proxy + encodeURIComponent(url), {
+      method: "GET",
+      headers: { "Icy-MetaData": "1" }
+    });
+    const text = await response.text();
+
+    // Intenta buscar "StreamTitle='...';"
+    const match = text.match(/StreamTitle='([^']+)'/);
+    if (match && match[1]) {
+      document.getElementById("currentStation").textContent =
+        `🎶 ${match[1]}`;
+    }
+  } catch (err) {
+    console.warn("No se pudo obtener metadatos:", err);
+  }
+}
+
+// Consultar metadatos cada 20 segundos si hay una emisora activa
+setInterval(() => {
+  if (!player.paused && list.value) {
+    fetchNowPlaying(list.value);
+  }
+}, 20000);
+
   </script>
 </body>
 </html>
