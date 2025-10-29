@@ -1,303 +1,172 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Radio SMG</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproductor de Radios Online</title>
+<style>
+  body {
+    background-color: #0a0a0a;
+    color: #fff;
+    font-family: "Segoe UI", sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 30px;
+  }
 
-  <!-- iPhone Web App -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Radio SMG">
-  <link rel="apple-touch-icon" href="icon.png">
-  <link rel="manifest" href="manifest.json">
+  h1 {
+    color: #1db954;
+    margin-bottom: 20px;
+  }
 
-  <style>
-    body {
-      background: linear-gradient(145deg, #0a0a0a, #202020);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-    }
-    h1 { margin-bottom: 10px; font-size: 2rem; }
-    h2 { font-weight: normal; font-size: 1rem; color: #aaa; }
-    select, button {
-      background: #222;
-      color: #fff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 12px;
-      margin: 8px;
-      font-size: 1rem;
-      outline: none;
-      transition: background 0.2s;
-    }
-    button:hover { background: #444; cursor: pointer; }
-    audio { width: 90%; margin-top: 25px; border-radius: 10px; }
+  select {
+    background: #111;
+    color: #fff;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 16px;
+    width: 80%;
+    max-width: 400px;
+    margin-bottom: 20px;
+  }
+
+  button {
+    background: #1db954;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background 0.3s;
+  }
+
+  button:hover {
+    background: #17a347;
+  }
+
+  audio {
+    width: 90%;
+    max-width: 500px;
+    margin-top: 20px;
+  }
+
   img#stationLogo {
-  width: 150px;
-  height: 150px;
-  max-width: 80vw;
-  max-height: 30vh;
-  border-radius: 20%;
-  margin: 15px auto;
-  display: none;
-  object-fit: contain;      /* ✅ mantiene proporciones */
-  background-color: #111;   /* fondo para logos transparentes */
-  padding: 10px;            /* un pequeño marco visual */
-  box-shadow: 0 0 20px rgba(255,255,255,0.1);
-}
+    width: clamp(120px, 30vw, 180px);
+    height: auto;
+    border-radius: 20%;
+    margin: 15px auto;
+    display: none;
+    object-fit: contain;
+    background-color: #111;
+    padding: 10px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    transition: transform 0.3s ease;
+  }
 
-  </style>
+  img#stationLogo:hover {
+    transform: scale(1.05);
+  }
+
+  p#currentStation {
+    margin-top: 10px;
+    font-size: 18px;
+  }
+</style>
 </head>
 <body>
-  <h1>🎧 Radio SMG</h1>
-  <h2 id="currentStation">Seleccioná una emisora</h2>
-  <img id="stationLogo" src="" alt="Logo emisora">
+  <h1>🎧 Radios Online</h1>
 
-   <select id="stationList">
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://24443.live.streamtheworld.com/FM999_56AAC.aac"
-            data-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Logo_La100_Verde.JPG/250px-Logo_La100_Verde.JPG">
-      La 100 - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://edge02.radiohdvivo.com/los40"
-            data-logo="https://los40ar00.epimg.net/los40/iconos/v2.x/v1.0/logos/logo_40_principales_menu.png">
-      LOS 40 - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://26583.live.streamtheworld.com/ROCKANDPOPAAC.aac"
-            data-logo="https://static-media.streema.com/media/cache/26/5b/265b131928eefed943aadc079f109a80.jpg">
-      ROCK & POP - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://21933.live.streamtheworld.com/ASPEN.mp3"
-            data-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Aspen102.jpg/250px-Aspen102.jpg">
-      ASPEN - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://27613.live.streamtheworld.com/AM790_56.mp3"
-            data-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Logo_Mitre_SA.svg/512px-Logo_Mitre_SA.svg.png">
-      MITRE - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://playerservices.streamtheworld.com/api/livestream-redirect/LA_RED_AM910AAC.aac"
-            data-logo="https://argentina.mom-gmr.org/uploads/_processed_/0/3/csm_16036-1639_import_ac85114ef3.png">
-      LA RED - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://streaming01.shockmedia.com.ar:10217/stream"
-            data-logo="https://amdelplata.com/wp-content/uploads/2023/08/logo-negativo.png">
-      DEL PLATA - BUENOS AIRES
-    </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://ice2.edge-apps.net/radio1_high-20057.audio"
-            data-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Vorterix.jpg/250px-Vorterix.jpg">
-      VORTERIX - BUENOS AIRES
-    </option>
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://cdn.instream.audio/:9660/stream
-        	data-logo="https://static.mytuner.mobi/media/radios-150px/742/urbana-play-1043-fm.dc7a029a.png">
-	  URBANA PLAY-BUENOS AIRES	
-	  </option>
-     
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://24373.live.streamtheworld.com/RIVADAVIAAAC_SC
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/448/radio-rivadavia-630-am.ab450f7d.jpg>
-	  RIVADAVIA-BUENOS AIRES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://edge05.radiohdvivo.com/stream/radiolatina
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/207/latina-fm-1011.8f6ab5a0.png">
-	  LATINA-BUENOS AIRES
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://mega.stweb.tv/mega983/live/l_316_543858005_753276.aac
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/835/mega-983-fm.1e31dad1.jpg">
-	  MEGA-BUENOS AIRES	
-	  </option>
-
-    <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://radios.solumedia.com/6396/stream"
-            data-logo="https://cdn.onlineradiobox.com/img/l/7/1937.v8.png">
-      Radio Dos - CORRIENTES
-    </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/sudamericana/stream"
-	        data-logo="https://img.radios.com.br/radio/lg/radio8083_1507635308.jpg">	
-	  SUDAMERICANA-CORRIENTES	
- 	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/continental/stream
-	        data-logo="https://www.continentalcorrientes.com/img/logo-new2.png">
-	  NORD-CORRIENTES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/radiolt7/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/699/lt7-radio-provincia.912dfa43.jpg">
-	  LT7-CORRIENTES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream.unne.edu.ar/radio
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/943/radio-unne-997-fm.6cfbe3bb.jpg">
-	  UNNE-CORRIENTES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/fmcapital953/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/561/fm-capital-953.93a68874.jpg">
-	  CAPITAL-CORRIENTES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://server7.hostradios.com/8170/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/680/radio-sol-fm-1049.9789ab83.png">
-	  FM SOL-CORRIENTES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/xpress/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/941/xpress-fm-1075.b9be821f.png">
-	  XPRESS-CORRIENTES	
-	  </option>
-
-  	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=http://cdn.instream.audio:8137/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/326/rck-895-la-rocka.a5840559.jpg">
-	  LA ROCKA-CORRIENTES	
-	  </option>
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://streaming01.serverconnectinc.site:9232/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/122/compacto-radio-893.a9d3c254.png">
-	  COMPACTO-CORRIENTES	
-
-	  <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://turadioenvivo.com/proxy/feelings/stream
-	        data-logo="https://static.mytuner.mobi/media/radios-150px/891/feeling-fm-919.e344796a.jpg">
-	  FEELING-CORRIENTES
-	  </option>
-
-  	<option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream-162.zeno.fm/84y7b87p4gruv"
-         data-logo="https://static.mytuner.mobi/media/tvos_radios/640/radio-chamame.73a20784.png">
-	  CHAMAME - CORRIENTES
-	  </option>		
-
+  <select id="radioList">
+    <option value="" selected disabled>Seleccioná una emisora</option>
+    <option value="https://stream.zeno.fm/zf4duqz2ytzuv" data-logo="https://upload.wikimedia.org/wikipedia/commons/2/22/Logo_FM_Sol_Corrientes.png">FM Sol 107.9</option>
+    <option value="https://server.laradio.online/proxy/fmsudamericana" data-logo="https://static.wixstatic.com/media/09dcb0_4a6df28c5935475d83c04a24f5b2d6c5~mv2.png">FM Sudamericana 100.5</option>
+    <option value="https://radio.streamingcpanel.com:7020/stream" data-logo="https://cdn-profiles.tunein.com/s226427/images/logog.png">Radio Dos 99.3</option>
+    <option value="https://streaming01.shockmedia.com.ar:10960/stream" data-logo="https://upload.wikimedia.org/wikipedia/commons/f/f4/LaRocka_Logo.png">La Rocka 107.5</option>
+    <option value="https://server01.megastreaming.tech/8152/stream" data-logo="https://i.imgur.com/H7M2mZw.png">FM Universidad 90.5</option>
+    <option value="https://streaming.turadio.stream/8050/stream" data-logo="https://i.imgur.com/TPJPKgI.png">Xpress FM 101.3</option>
+    <option value="https://streaming.turadio.stream/8068/stream" data-logo="https://i.imgur.com/etjUETB.png">Radio Chart 94.5</option>
+    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/ASPEN_SC.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/2/2a/Logo_Aspen_102.3.png">Aspen 102.3</option>
+    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40_ARGENTINA.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/e/e0/Los40_Logo_2016.svg">Los 40 Argentina</option>
+    <option value="https://playerservices.streamtheworld.com/api/livestream-redirect/POP_1019_BA.mp3" data-logo="https://upload.wikimedia.org/wikipedia/commons/a/a8/Radio_Pop_101.5_logo.png">Pop Radio 101.5</option>
   </select>
 
-  <button id="playButton">▶️ Reproducir</button>
-  <audio id="player" controls></audio>
+  <div>
+    <img id="stationLogo" alt="Logo de emisora">
+  </div>
 
-  <script>
-    const player = document.getElementById('player');
-    const list = document.getElementById('stationList');
-    const info = document.getElementById('currentStation');
-    const playButton = document.getElementById('playButton');
-    const logoImg = document.getElementById('stationLogo');
+  <div>
+    <audio id="player" controls></audio>
+  </div>
 
-    // Función para iniciar la reproducción
-    function playStation(url, name) {
-      const logo = list.options[list.selectedIndex].getAttribute('data-logo');
+  <p id="currentStation">Seleccioná una emisora para comenzar 🎶</p>
 
-      player.pause();
-      player.src = url;
-      player.load();
-      player.play()
-        .then(() => {
-          info.textContent = `🎶 Reproduciendo: ${name}`;
-          playButton.textContent = '⏸️ Pausar';
-          localStorage.setItem('lastStation', url);
-          localStorage.setItem('lastName', name);
-          localStorage.setItem('lastLogo', logo);
+<script>
+  const player = document.getElementById("player");
+  const list = document.getElementById("radioList");
+  const info = document.getElementById("currentStation");
+  const logo = document.getElementById("stationLogo");
 
-          if (logo) {
-            logoImg.src = logo;
-            logoImg.style.display = 'block';
-          } else {
-            logoImg.style.display = 'none';
-          }
-        })
-        .catch(err => {
-          console.error('Error al reproducir:', err);
-          alert("No se pudo reproducir la emisora. Tocá el botón nuevamente.");
-        });
-    }
-
-    // Función para pausar
-    function pauseStation() {
-      player.pause();
-      playButton.textContent = '▶️ Reproducir';
-      info.textContent = '⏸️ Pausado';
-    }
-
-    // Cargar última emisora
-    const lastStation = localStorage.getItem('lastStation');
-    const lastName = localStorage.getItem('lastName');
-    const lastLogo = localStorage.getItem('lastLogo');
-    if (lastStation) {
-      player.src = lastStation;
-      info.textContent = `Reanudando: ${lastName || 'Última emisora'}`;
-      if (lastLogo) {
-        logoImg.src = lastLogo;
-        logoImg.style.display = 'block';
+  // --- Cargar emisora guardada ---
+  window.onload = () => {
+    const saved = localStorage.getItem("selectedStation");
+    if (saved) {
+      const opt = Array.from(list.options).find(o => o.value === saved);
+      if (opt) {
+        list.value = saved;
+        startStation(opt);
       }
     }
+  };
 
-    // Click del botón reproducir/pausar
-    playButton.addEventListener('click', () => {
-      if (!player.src || player.paused) {
-        const url = list.value;
-        const name = list.options[list.selectedIndex].text;
-        playStation(url, name);
-      } else {
-        pauseStation();
+  // --- Cambio de emisora ---
+  list.addEventListener("change", () => {
+    const opt = list.options[list.selectedIndex];
+    startStation(opt);
+    localStorage.setItem("selectedStation", opt.value);
+  });
+
+  function startStation(opt) {
+    const url = opt.value;
+    const name = opt.text;
+    const logoUrl = opt.getAttribute("data-logo");
+
+    player.src = url;
+    player.play().catch(() => console.log("Esperando interacción del usuario..."));
+
+    info.textContent = `🔊 Reproduciendo: ${name}`;
+    logo.src = logoUrl;
+    logo.style.display = "block";
+  }
+
+  // --- Obtener canción actual ---
+  async function fetchNowPlaying(url) {
+    try {
+      const proxy = "https://api.allorigins.win/raw?url="; // evita CORS
+      const response = await fetch(proxy + encodeURIComponent(url), {
+        method: "GET",
+        headers: { "Icy-MetaData": "1" }
+      });
+      const text = await response.text();
+
+      const match = text.match(/StreamTitle='([^']+)'/);
+      if (match && match[1]) {
+        const stationName = list.options[list.selectedIndex].text;
+        info.textContent = `🎶 ${match[1]} — ${stationName}`;
       }
-    });
-
-    // Cambio de emisora en el select
-    list.addEventListener('change', () => {
-      const url = list.value;
-      const name = list.options[list.selectedIndex].text;
-      playStation(url, name);
-    });
-
-    // Detectar errores de streaming
-    player.addEventListener('error', () => {
-      alert('Hubo un error al cargar el stream. Probá otra emisora.');
-      pauseStation();
-    });
-
-    // Instalar service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Error registrando SW:', err));
+    } catch (err) {
+      console.warn("Sin metadatos disponibles:", err);
     }
+  }
 
-	  async function fetchNowPlaying(url) {
-  try {
-    const proxy = "https://api.allorigins.win/raw?url="; // evita CORS
-    const response = await fetch(proxy + encodeURIComponent(url), {
-      method: "GET",
-      headers: { "Icy-MetaData": "1" }
-    });
-    const text = await response.text();
-
-    // Intenta buscar "StreamTitle='...';"
-    const match = text.match(/StreamTitle='([^']+)'/);
-    if (match && match[1]) {
-      document.getElementById("currentStation").textContent =
-        `🎶 ${match[1]}`;
+  setInterval(() => {
+    if (!player.paused && list.value) {
+      fetchNowPlaying(list.value);
     }
-  } catch (err) {
-    console.warn("No se pudo obtener metadatos:", err);
-  }
-}
-
-// Consultar metadatos cada 20 segundos si hay una emisora activa
-setInterval(() => {
-  if (!player.paused && list.value) {
-    fetchNowPlaying(list.value);
-  }
-}, 20000);
-
-  </script>
+  }, 20000);
+</script>
 </body>
 </html>
+
