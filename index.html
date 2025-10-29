@@ -110,8 +110,11 @@
     <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://stream-162.zeno.fm/84y7b87p4gruv" data-logo="https://static.mytuner.mobi/media/tvos_radios/640/radio-chamame.73a20784.png">CHAMAME - CORRIENTES</option>
   </select>
 
-  <button id="playButton">▶️ Reproducir</button>
-  <audio id="player" controls></audio>
+  <div>
+    <button id="prevButton">⏮️ Anterior</button>
+    <button id="playButton">▶️ Reproducir</button>
+    <button id="nextButton">⏭️ Siguiente</button>
+  </div>
 
   <script>
     const player = document.getElementById('player');
@@ -183,6 +186,8 @@
       }
     });
 
+    
+
     list.addEventListener('change', () => {
       const url = list.value;
       const name = list.options[list.selectedIndex].text;
@@ -222,6 +227,32 @@
         } catch (e) {}
       }
     }
+
+    const prevButton = document.getElementById('prevButton');
+const nextButton = document.getElementById('nextButton');
+
+function playByIndex(index) {
+  const option = list.options[index];
+  list.selectedIndex = index;
+  const url = option.value;
+  const name = option.text;
+  playStation(url, name);
+}
+
+// Botón siguiente
+nextButton.addEventListener('click', () => {
+  let nextIndex = list.selectedIndex + 1;
+  if (nextIndex >= list.options.length) nextIndex = 0; // loop al inicio
+  playByIndex(nextIndex);
+});
+
+// Botón anterior
+prevButton.addEventListener('click', () => {
+  let prevIndex = list.selectedIndex - 1;
+  if (prevIndex < 0) prevIndex = list.options.length - 1; // loop al final
+  playByIndex(prevIndex);
+});
+
   </script>
 </body>
 </html>
