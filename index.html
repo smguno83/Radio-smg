@@ -40,20 +40,19 @@
     }
     button:hover { background: #444; cursor: pointer; }
     audio { width: 90%; margin-top: 25px; border-radius: 10px; }
-  img#stationLogo {
-  width: 150px;
-  height: 150px;
-  max-width: 80vw;
-  max-height: 30vh;
-  border-radius: 20%;
-  margin: 15px auto;
-  display: none;
-  object-fit: contain;      /* ✅ mantiene proporciones */
-  background-color: #111;   /* fondo para logos transparentes */
-  padding: 10px;            /* un pequeño marco visual */
-  box-shadow: 0 0 20px rgba(255,255,255,0.1);
-}
-
+    img#stationLogo {
+      width: 150px;
+      height: 150px;
+      max-width: 80vw;
+      max-height: 30vh;
+      border-radius: 20%;
+      margin: 15px auto;
+      display: none;
+      object-fit: contain;
+      background-color: #111;
+      padding: 10px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+    }
   </style>
 </head>
 <body>
@@ -61,7 +60,7 @@
   <h2 id="currentStation">Seleccioná una emisora</h2>
   <img id="stationLogo" src="" alt="Logo emisora">
 
-   <select id="stationList">
+    <select id="stationList">
     <option value="https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=https://24443.live.streamtheworld.com/FM999_56AAC.aac"
             data-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Logo_La100_Verde.JPG/250px-Logo_La100_Verde.JPG">
       La 100 - BUENOS AIRES
@@ -192,10 +191,8 @@
     const playButton = document.getElementById('playButton');
     const logoImg = document.getElementById('stationLogo');
 
-    // Función para iniciar la reproducción
     function playStation(url, name) {
       const logo = list.options[list.selectedIndex].getAttribute('data-logo');
-
       player.pause();
       player.src = url;
       player.load();
@@ -206,7 +203,6 @@
           localStorage.setItem('lastStation', url);
           localStorage.setItem('lastName', name);
           localStorage.setItem('lastLogo', logo);
-
           if (logo) {
             logoImg.src = logo;
             logoImg.style.display = 'block';
@@ -220,7 +216,6 @@
         });
     }
 
-    // Función para pausar
     function pauseStation() {
       player.pause();
       playButton.textContent = '▶️ Reproducir';
@@ -240,65 +235,79 @@
       }
     }
 
-    // Click del botón reproducir/pausar
+    // === MODIFICACIÓN SOLO EN EL BOTÓN PLAY/PAUSE ===
     playButton.addEventListener('click', () => {
-      if (!player.src || player.paused) {
-        const url = list.value;
-        const name = list.options[list.selectedIndex].text;
-        playStation(url, name);
+      if (player.paused) {
+        // Si está pausado, reproducir
+        if (!player.src) {
+          // Si no hay emisora cargada, cargar la seleccionada
+          const url = list.value;
+          const name = list.options[list.selectedIndex].text;
+          const logo = list.options[list.selectedIndex].getAttribute('data-logo');
+          player.src = url;
+          if (logo) {
+            logoImg.src = logo;
+            logoImg.style.display = 'block';
+          } else {
+            logoImg.style.display = 'none';
+          }
+          info.textContent = `🎶 Reproduciendo: ${name}`;
+        } else {
+          // Reanudar
+          info.textContent = `🎶 Reproduciendo: ${list.options[list.selectedIndex].text}`;
+        }
+        player.play();
+        playButton.textContent = '⏸️ Pausar';
       } else {
-        pauseStation();
+        // Si está reproduciendo, pausar
+        player.pause();
+        playButton.textContent = '▶️ Reproducir';
+        info.textContent = '⏸️ Pausado';
       }
     });
 
-    // Cambio de emisora en el select
     list.addEventListener('change', () => {
       const url = list.value;
       const name = list.options[list.selectedIndex].text;
       playStation(url, name);
     });
 
-    // Detectar errores de streaming
     player.addEventListener('error', () => {
       alert('Hubo un error al cargar el stream. Probá otra emisora.');
       pauseStation();
     });
 
-    // Instalar service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('Service Worker registrado'))
         .catch(err => console.error('Error registrando SW:', err));
     }
 
-	  async function fetchNowPlaying(url) {
-  try {
-    const proxy = "https://api.allorigins.win/raw?url="; // evita CORS
-    const response = await fetch(proxy + encodeURIComponent(url), {
-      method: "GET",
-      headers: { "Icy-MetaData": "1" }
-    });
-    const text = await response.text();
-
-    // Intenta buscar "StreamTitle='...';"
-    const match = text.match(/StreamTitle='([^']+)'/);
-    if (match && match[1]) {
-      document.getElementById("currentStation").textContent =
-        `🎶 ${match[1]}`;
+    async function fetchNowPlaying(url) {
+      try {
+        const proxy = "https://api.allorigins.win/raw?url=";
+        const response = await fetch(proxy + encodeURIComponent(url), {
+          method: "GET",
+          headers: { "Icy-MetaData": "1" }
+        });
+        const text = await response.text();
+        const match = text.match(/StreamTitle='([^']+)'/);
+        if (match && match[1]) {
+          document.getElementById("currentStation").textContent =
+            `🎶 ${match[1]}`;
+        }
+      } catch (err) {
+        console.warn("No se pudo obtener metadatos:", err);
+      }
     }
-  } catch (err) {
-    console.warn("No se pudo obtener metadatos:", err);
-  }
-}
 
-// Consultar metadatos cada 20 segundos si hay una emisora activa
-setInterval(() => {
-  if (!player.paused && list.value) {
-    fetchNowPlaying(list.value);
-  }
-}, 20000);
-
+    setInterval(() => {
+      if (!player.paused && list.value) {
+        fetchNowPlaying(list.value);
+      }
+    }, 20000);
   </script>
 </body>
 </html>
+
 
