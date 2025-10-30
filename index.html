@@ -247,37 +247,31 @@
       playByIndex(prevIndex);
     });
 
-    player.addEventListener('error', () => {
-      alert('Hubo un error al cargar el stream. Probá otra emisora.');
-      pauseStation();
+    // Manejo de errores
+player.addEventListener('error', () => {
+  alert('Hubo un error al cargar el stream. Probá otra emisora.');
+  pauseStation();
 
-      player.addEventListener('error', () => {
-  // Mostrar mensaje en pantalla
-
-  // Actualizar información del MediaSession para reflejar el error
+  // Mostrar información del error en MediaSession
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: 'Error en la emisora',
-      artist: 'No se pudo reproducir',
-      artwork: [
-        { src: 'icon.png', sizes: '512x512', type: 'image/png' }
-      ]
+      artist: 'No se pudo reproducir la señal',
+      artwork: [{ src: 'icon.png', sizes: '512x512', type: 'image/png' }]
     });
-
-    // Cambiar el estado de reproducción del sistema a "pausado"
     navigator.mediaSession.playbackState = 'paused';
   }
 });
-    });
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(err => console.error('Error registrando SW:', err));
-    }
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log('Service Worker registrado'))
+    .catch(err => console.error('Error registrando SW:', err));
+}
 
-
-    function updateMediaSession(title, artwork) {
+// Media Session API
+function updateMediaSession(title, artwork) {
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title || 'Radio SMG',
@@ -305,7 +299,7 @@
       if (nextIndex >= list.options.length) nextIndex = 0;
       playByIndex(nextIndex);
     });
-i
+
     // ⏮️ Emisora anterior
     navigator.mediaSession.setActionHandler('previoustrack', () => {
       let prevIndex = list.selectedIndex - 1;
@@ -319,6 +313,7 @@ i
     } catch (e) {}
   }
 }
+
   </script>
 </body>
 </html>
