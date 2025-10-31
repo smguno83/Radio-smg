@@ -284,10 +284,9 @@ function updateMediaSession(title, artwork) {
 
   navigator.mediaSession.setActionHandler('play', () => {
     if (player.src) {
-      player.play().catch(err => console.warn('Error al reproducir Smg:', err));
+      player.play().catch(err => console.warn('Error al reproducir:', err));
       playButton.innerHTML = `<span>⏸️</span> Pausar`;
       info.textContent = `🎶 Reproduciendo: ${list.options[list.selectedIndex].text}`;
-      playStation(list.value, list.options[list.selectedIndex].text);
     }
   });
 
