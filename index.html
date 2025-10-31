@@ -272,54 +272,52 @@ if ('serviceWorker' in navigator) {
 
 // Media Session API
 function updateMediaSession(title, artwork) {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: title || 'Radio SMG',
-      artist: list.options[list.selectedIndex]?.text || 'En vivo',
-      artwork: [
-  { src: getSafeLogo(artwork || 'icon.png'), sizes: '512x512', type: 'image/png' }
-]
-    });
+  if (!('mediaSession' in navigator)) return;
 
-    // ▶️ Reproducir
-    navigator.mediaSession.setActionHandler('play', () => {
-      player.play();
+  // Actualizar metadatos
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: title || 'Radio SMG',
+    artist: 'Tu Radio Online',
+    artwork: [
+      { src: getSafeLogo(artwork || 'icon.png'), sizes: '512x512', type: 'image/png' }
+    ]
+  });
+
+  // Acción Play
+  navigator.mediaSession.setActionHandler('play', () => {
+    if (player.src) {
+      player.play().catch(err => console.warn('Error al reproducir desde control:', err));
       playButton.innerHTML = `<span>⏸️</span> Pausar`;
-    });
+      info.textContent = `🎶 Reproduciendo: ${list.options[list.selectedIndex].text}`;
+    }
+  });
 
-    // ⏸️ Pausar
-navigator.mediaSession.setActionHandler('pause', () => {
-  if (!player.paused) {
+  // Acción Pause
+  navigator.mediaSession.setActionHandler('pause', () => {
     player.pause();
     playButton.innerHTML = `<span>▶️</span> Reproducir`;
-  }
-});
-navigator.mediaSession.setActionHandler('play', () => {
-  if (player.src) {
-    player.play().catch(err => console.warn("Reintento de reproducción:", err));
-    playButton.innerHTML = `<span>⏸️</span> Pausar`;
-  }
-});
+    info.textContent = '⏸️ Pausado';
+  });
 
-    // ⏭️ Siguiente emisora
-    navigator.mediaSession.setActionHandler('nexttrack', () => {
-      let nextIndex = list.selectedIndex + 1;
-      if (nextIndex >= list.options.length) nextIndex = 0;
-      playByIndex(nextIndex);
-    });
+  // Siguiente emisora
+  navigator.mediaSession.setActionHandler('nexttrack', () => {
+    let nextIndex = list.selectedIndex + 1;
+    if (nextIndex >= list.options.length) nextIndex = 0;
+    playByIndex(nextIndex);
+  });
 
-    // ⏮️ Emisora anterior
-    navigator.mediaSession.setActionHandler('previoustrack', () => {
-      let prevIndex = list.selectedIndex - 1;
-      if (prevIndex < 0) prevIndex = list.options.length - 1;
-      playByIndex(prevIndex);
-    });
+  // Emisora anterior
+  navigator.mediaSession.setActionHandler('previoustrack', () => {
+    let prevIndex = list.selectedIndex - 1;
+    if (prevIndex < 0) prevIndex = list.options.length - 1;
+    playByIndex(prevIndex);
+  });
 
-    // 🛑 Algunos navegadores requieren capturar 'stop' aunque no se use
-    try {
-      navigator.mediaSession.setActionHandler('stop', null);
-    } catch (e) {}
-  }
+  // Detener (opcional)
+  try {
+    navigator.mediaSession.setActionHandler('stop', () => player.pause());
+  } catch (e) {}
+}
 
  
 
