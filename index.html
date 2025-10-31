@@ -275,10 +275,10 @@ function updateMediaSession(title, artwork) {
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
       title: title || 'Radio SMG',
-      artist: 'En vivo',
+      artist: list.options[list.selectedIndex]?.text || 'En vivo',
       artwork: [
-        { src: artwork || 'icon.png', sizes: '512x512', type: 'image/png' }
-      ]
+  { src: getSafeLogo(artwork || 'icon.png'), sizes: '512x512', type: 'image/png' }
+]
     });
 
     // ▶️ Reproducir
@@ -288,10 +288,18 @@ function updateMediaSession(title, artwork) {
     });
 
     // ⏸️ Pausar
-    navigator.mediaSession.setActionHandler('pause', () => {
-      player.pause();
-      playButton.innerHTML = `<span>▶️</span> Reproducir`;
-    });
+navigator.mediaSession.setActionHandler('pause', () => {
+  if (!player.paused) {
+    player.pause();
+    playButton.innerHTML = `<span>▶️</span> Reproducir`;
+  }
+});
+navigator.mediaSession.setActionHandler('play', () => {
+  if (player.src) {
+    player.play().catch(err => console.warn("Reintento de reproducción:", err));
+    playButton.innerHTML = `<span>⏸️</span> Pausar`;
+  }
+});
 
     // ⏭️ Siguiente emisora
     navigator.mediaSession.setActionHandler('nexttrack', () => {
@@ -314,6 +322,16 @@ function updateMediaSession(title, artwork) {
   }
 }
 
+    function getSafeLogo(url) {
+  try {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = url;
+    return url;
+  } catch (e) {
+    return 'icon.png'; // fallback local
+  }
+}
   </script>
 </body>
 </html>
