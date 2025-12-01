@@ -114,6 +114,28 @@
       100% { transform: translateX(-100%); }
     }
   </style>
+
+  <!-- 🔹 TARJETA DE NOTICIAS AUTOMÁTICAS -->
+<div id="noticiaBox" class="noticia-box">🗞️ Cargando noticias...</div>
+
+<style>
+  .noticia-box {
+    width: 90%;
+    margin-top: 20px;
+    padding: 15px;
+    background: #222;
+    border-radius: 12px;
+    font-size: 16px;
+    animation: fade 0.5s ease;
+    text-align: left;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
 </head>
 <body>
   <h1>🎧 Radio SMG</h1>
@@ -346,29 +368,38 @@ function getSafeLogo(url) {
 }
 
   /* 🔥 CARGAR NOTICIAS EN VIVO */
-    async function cargarNoticias() {
-      const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14";   // 👈 PONÉ TU API ACA
-      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es&category=politics,top`;
+  <script>
+let indiceNoticia = 0;
+let noticias = ["Cargando noticias..."];
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
+async function cargarNoticiasBox() {
+  const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14";  // API gratuita
+  const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`;
 
-        if (data.results && data.results.length > 0) {
-          const titulares = data.results.map(n => n.title).join(" — | ");
-          document.getElementById('ticker').textContent = "🗞️ " + titulares;
-        } else {
-          document.getElementById('ticker').textContent = "⚠️ No hay noticias disponibles en este momento.";
-        }
-      } catch (error) {
-        document.getElementById('ticker').textContent = "⚠️ Error al cargar noticias.";
-      }
-    }
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
 
-    // Cargar al inicio y actualizar cada 5 min
-    cargarNoticias();
-    setInterval(cargarNoticias, 300000);
-  
+    noticias = data.results.map(n => n.title);
+    mostrarNoticias();  // Mostrar la 1° apenas carga
+  } catch {
+    document.getElementById('noticiaBox').textContent =
+      "⚠️ No se pudieron cargar noticias.";
+  }
+}
+
+function mostrarNoticias() {
+  const box = document.getElementById('noticiaBox');
+  box.textContent = "🗞️ " + noticias[indiceNoticia];
+  indiceNoticia = (indiceNoticia + 1) % noticias.length;
+}
+
+// Cambia cada 5 segundos
+setInterval(mostrarNoticias, 5000);
+
+// Cargar al iniciar
+cargarNoticiasBox();
 </script>
+
 </body>
 </html>
