@@ -90,6 +90,24 @@
       padding: 10px;
       box-shadow: 0 0 20px rgba(255,255,255,0.1);
     }
+
+    /* NOTICIAS */
+    .noticias-container {
+      width: 100%;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 8px 0;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+
+    .noticias-ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: mover 20s linear infinite;
+      font-size: 14px;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -315,6 +333,31 @@ function getSafeLogo(url) {
     return 'icon.png';
   }
 }
+
+  /* 🔥 CARGAR NOTICIAS EN VIVO */
+    async function cargarNoticias() {
+      const apiKey = "TU_API_KEY_AQUI";   // 👈 PONÉ TU API ACA
+      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es&category=politics,top`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.results && data.results.length > 0) {
+          const titulares = data.results.map(n => n.title).join(" — | ");
+          document.getElementById('ticker').textContent = "🗞️ " + titulares;
+        } else {
+          document.getElementById('ticker').textContent = "⚠️ No hay noticias disponibles en este momento.";
+        }
+      } catch (error) {
+        document.getElementById('ticker').textContent = "⚠️ Error al cargar noticias.";
+      }
+    }
+
+    // Cargar al inicio y actualizar cada 5 min
+    cargarNoticias();
+    setInterval(cargarNoticias, 300000);
+  
 </script>
 </body>
 </html>
