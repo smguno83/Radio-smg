@@ -89,35 +89,8 @@
       background-color: #111;
       padding: 10px;
       box-shadow: 0 0 20px rgba(255,255,255,0.1);
-    }
-
-    /* NOTICIAS */
-    .noticias-container {
-      width: 100%;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 8px 0;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
-
-    .noticias-ticker {
-      display: inline-block;
-      white-space: nowrap;
-      animation: mover 20s linear infinite;
-      font-size: 14px;
-      color: #fff;
-    }
-     /* ANIMACIÓN QUE FALTABA */
-    @keyframes mover {
-      0% { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
-    }
-  </style>
-
+    }    
   <!-- 🔹 TARJETA DE NOTICIAS AUTOMÁTICAS -->
-<div id="noticiaBox" class="noticia-box">🗞️ Cargando noticias...</div>
-
 <style>
   .noticia-box {
     width: 90%;
@@ -201,9 +174,8 @@
   </div>
 
   <!-- 📰 NOTICIAS EN VIVO -->
-  <div class="noticias-container">
-    <div id="ticker" class="noticias-ticker">🗞️ Cargando noticias en vivo...</div>
-  </div>
+  
+<div id="noticiaBox" class="noticia-box">🗞️ Cargando noticias...</div>
   
 <script>
 const player = document.getElementById('player');
@@ -368,38 +340,40 @@ function getSafeLogo(url) {
 }
 
   /* 🔥 CARGAR NOTICIAS EN VIVO */
+<!-- NOTICIAS EN TARJETAS QUE CAMBIAN -->
   <script>
-let indiceNoticia = 0;
-let noticias = ["Cargando noticias..."];
+    let indiceNoticia = 0;
+    let noticias = ["Cargando noticias..."];
 
-async function cargarNoticiasBox() {
-  const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14";  // API gratuita
-  const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`;
+    async function cargarNoticiasBox() {
+      const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14";
+      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`;
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        noticias = data.results.map(n => n.title);
+        mostrarNoticias();
+      } catch {
+        document.getElementById('noticiaBox').textContent =
+          "⚠️ No se pudieron cargar noticias.";
+      }
+    }
 
-    noticias = data.results.map(n => n.title);
-    mostrarNoticias();  // Mostrar la 1° apenas carga
-  } catch {
-    document.getElementById('noticiaBox').textContent =
-      "⚠️ No se pudieron cargar noticias.";
-  }
-}
+    function mostrarNoticias() {
+      const box = document.getElementById('noticiaBox');
+      box.classList.add("fade-out");
+      setTimeout(() => {
+        box.textContent = "🗞️ " + noticias[indiceNoticia];
+        box.classList.remove("fade-out");
+        box.classList.add("fade-in");
+      }, 300);
+      indiceNoticia = (indiceNoticia + 1) % noticias.length;
+    }
 
-function mostrarNoticias() {
-  const box = document.getElementById('noticiaBox');
-  box.textContent = "🗞️ " + noticias[indiceNoticia];
-  indiceNoticia = (indiceNoticia + 1) % noticias.length;
-}
-
-// Cambia cada 5 segundos
-setInterval(mostrarNoticias, 5000);
-
-// Cargar al iniciar
-cargarNoticiasBox();
-</script>
+    cargarNoticiasBox();
+    setInterval(mostrarNoticias, 5000);
+  </script>
 
 </body>
 </html>
