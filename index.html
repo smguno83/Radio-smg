@@ -77,36 +77,48 @@
     }
 
     /* Tarjeta de noticias */
-    .noticia-box {
-      width: 90%;
-      max-width: 720px;
-      margin-top: 20px;
-      padding: 15px;
-      background: #222;
-      border-radius: 12px;
-      font-size: 16px;
-      text-align: left;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .fade-out { opacity: 0; transform: translateY(8px); }
-    .fade-in  { opacity: 1; transform: translateY(0); }
+     h2 {
+            margin-top: 0;
+        }
 
-    /* Ticker (opcional, no usado activamente) */
-    .noticias-container {
-      width: 100%;
-      overflow: hidden;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 8px 0;
-      margin-top: 12px;
-      border-radius: 10px;
-    }
-    .noticias-ticker { display:inline-block; white-space:nowrap; animation: mover 20s linear infinite; font-size:14px; color:#fff; }
-    @keyframes mover { 0% { transform: translateX(100%);} 100% { transform: translateX(-100%);} }
+        /* Tarjeta de noticias */
+        .news-card {
+            width: 330px;
+            background: BLACK;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .news-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .news-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .news-desc {
+            font-size: 14px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .news-link {
+            display: inline-block;
+            padding: 8px 12px;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
   </style>
 </head>
 <body>
@@ -155,12 +167,13 @@
 </head>
 <body>
 
-<div>
-  <h1>NOTICIAS <i class="fa-solid fa-bullhorn"></i></h1>
-</div>
-
-  <!-- Tarjeta de noticias -->
-  <div id="noticiaBox" class="noticia-box">🗞️ Cargando noticias...</div>
+  <!-- Tarjeta de Noticias -->
+    <div class="news-card" id="newsCard">
+        <img id="newsImg" class="news-img" src="">
+        <div id="newsTitle" class="news-title"></div>
+        <div id="newsDesc" class="news-desc"></div>
+        <a id="newsLink" class="news-link" target="_blank">Ver más</a>
+    </div>
 
 <script>
 /* ---------- RADIO ---------- */
@@ -273,48 +286,37 @@ function updateMediaSession(title, artwork) {
 }
 function getSafeLogo(url) { try { return new URL(url, location.href).href; } catch { return 'icon.png'; } }
 
+/* ===========================
+   NOTICIAS AUTOMÁTICAS DE INFOBAE
+=========================== */
 
-/* ---------- NOTICIAS (tarjeta que cambia cada 5s) ---------- */
-let indiceNoticia = 0;
-let noticias = ["Cargando noticias..."];
+const newsUrl = "https://www.clarin.com/rss/lo-ultimo/"; 
+let noticias = []; 
+let newsIndex = 0; 
+function cargarNoticias() { 
+fetch(newsUrl) 
+.then(response => response.json()) 
+.then(data => { 
+if (!data.items) return; 
+noticias = data.items.map(item => ({ 
+titulo: item.title, 
+descripcion: item.description.replace(/<[^>]+>/g, "").slice(0, 120) + "...", 
+imagen: item.enclosure?.link || 
+"https://picsum.photos/400/250?random=" + Math.random(), link: item.link })); 
+actualizarTarjeta(); 
+}) .catch(error => console.error("Error cargando Infobae:", error)); 
+} 
+function actualizarTarjeta() { if (noticias.length === 0) return; const n = noticias[newsIndex]; document.getElementById("newsImg").src = n.imagen; document.getElementById("newsTitle").innerText = n.titulo; document.getElementById("newsDesc").innerText = n.descripcion; document.getElementById("newsLink").href = n.link; newsIndex = (newsIndex + 1) % noticias.length; }
 
-async function cargarNoticiasBox() {
-  const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14"; // tu API key (puedes cambiarla)
-  const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`;
+// Cargar al inicio
+cargarNoticias();
 
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data && data.results && data.results.length) {
-      noticias = data.results.map(n => n.title).filter(Boolean);
-      // mostrar la primera noticia inmediatamente
-      mostrarNoticias(true);
-    } else {
-      document.getElementById('noticiaBox').textContent = "⚠️ No hay noticias disponibles.";
-    }
-  } catch (err) {
-    console.warn('Error cargando noticias:', err);
-    document.getElementById('noticiaBox').textContent = "⚠️ No se pudieron cargar noticias.";
-  }
-}
+// Cambiar cada 5 segundos
+setInterval(actualizarTarjeta, 5000);
 
-function mostrarNoticias(immediate = false) {
-  const box = document.getElementById('noticiaBox');
-  if (noticias.length === 0) return;
-  // animación fade
-  box.classList.remove('fade-in');
-  box.classList.add('fade-out');
-  setTimeout(() => {
-    box.textContent = noticias[indiceNoticia];
-    box.classList.remove('fade-out');
-    box.classList.add('fade-in');
-    indiceNoticia = (indiceNoticia + 1) % noticias.length;
-  }, immediate ? 100 : 300);
-}
+// Actualizar noticias cada 10 minutos
+setInterval(cargarNoticias, 600000);
 
-// iniciar
-cargarNoticiasBox();
-setInterval(mostrarNoticias, 5000);
 </script>
 </body>
 </html>
