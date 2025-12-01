@@ -290,7 +290,7 @@ function getSafeLogo(url) { try { return new URL(url, location.href).href; } cat
    NOTICIAS AUTOMÁTICAS DE INFOBAE
 =========================== */
 
-const newsUrl = "https://www.clarin.com/rss/lo-ultimo/"; 
+const newsUrl = "https://api.rss2json.com/v1/api.json?rss_url=https://www.clarin.com/rss/lo-ultimo/";
 let noticias = []; 
 let newsIndex = 0; 
 function cargarNoticias() { 
