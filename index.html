@@ -108,6 +108,11 @@
       font-size: 14px;
       color: #fff;
     }
+     /* ANIMACIÓN QUE FALTABA */
+    @keyframes mover {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
@@ -172,6 +177,12 @@
     <button id="playButton"><span>▶️</span> Reproducir</button>
     <button id="nextButton"><span>⏭️</span> </button>
   </div>
+
+  <!-- 📰 NOTICIAS EN VIVO -->
+  <div class="noticias-container">
+    <div id="ticker" class="noticias-ticker">🗞️ Cargando noticias en vivo...</div>
+  </div>
+  
 <script>
 const player = document.getElementById('player');
 const list = document.getElementById('stationList');
