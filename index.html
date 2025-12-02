@@ -23,7 +23,7 @@
       justify-content: start;
       height: 100vh;
       margin: 0;
-      padding-top: 20px;
+      padding-top: 10px;
       text-align: center;
     }
     h1 { margin-bottom: 10px; font-size: 2rem; }
@@ -105,12 +105,12 @@
     }
 
     .news-title {
-      font-size: 18px;
+      font-size: 15px;
       margin-bottom: 10px;
     }
 
     .news-desc {
-      font-size: 14px;
+      font-size: 12px;
       color: #ccc;
       margin-bottom: 10px;
     }
@@ -284,46 +284,76 @@ function updateMediaSession(title, artwork) {
 function getSafeLogo(url) { try { return new URL(url, location.href).href; } catch { return 'icon.png'; } }
 
 
-/* ---------- NOTICIAS (tarjeta que cambia cada 5s) ---------- */
-   // -----------------------------
-    // Noticias desde newsdata.io
-    // -----------------------------
-    let indiceNoticia = 0;
-    let noticias = [{ title: "Cargando...", description: "", image_url: "", link: "#" }];
+/* ---------- NOTICIAS (tarjeta que cambia cada 10s) ---------- */
 
-    async function cargarNoticiasBox() {
-      const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14"; 
-      const url = `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`;
+let noticias = [];
+let indiceNoticia = 0;
 
-      try {
+/* Feeds disponibles */
+const apiKey = "pub_ebffaca675dd4f2a91c4e96e7656ef14";
+
+const rssFeeds = [
+    { 
+        tipo: "rss", 
+        url: "https://api.rss2json.com/v1/api.json?rss_url=https://www.clarin.com/rss/lo-ultimo/" 
+    },
+    { 
+        tipo: "newsdata", 
+        url: `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es` 
+    }
+];
+
+let feedIndex = 0;
+
+/* ---------- Cargar noticias ---------- */
+async function cargarNoticias() {
+    const feed = rssFeeds[feedIndex];
+    let url = feed.url;
+
+    try {
         const resp = await fetch(url);
         const data = await resp.json();
 
-        if (!data.results || data.results.length === 0) {
-          console.warn("Sin noticias disponibles.");
-          return;
+        if (feed.tipo === "newsdata") {
+            if (!data.results) return;
+
+            noticias = data.results.map(n => ({
+                title: n.title || "Sin título",
+                description: (n.description || "").slice(0, 140) + "...",
+                image_url: n.image_url || "https://picsum.photos/600/400?random=" + Math.random(),
+                link: n.link || "#"
+            }));
         }
 
-        noticias = data.results.map(n => ({
-          title: n.title || "Sin título",
-          description: (n.description || "").slice(0, 140) + "...",
-          image_url: n.image_url || "https://picsum.photos/600/400?random=" + Math.random(),
-          link: n.link || "#"
-        }));
+        if (feed.tipo === "rss") {
+            if (!data.items) return;
+
+            noticias = data.items.map(n => ({
+                title: n.title,
+                description: n.description.replace(/<[^>]+>/g, "").slice(0, 140) + "...",
+                image_url: "https://picsum.photos/600/400?random=" + Math.random(),
+                link: n.link
+            }));
+        }
 
         indiceNoticia = 0;
         mostrarNoticia();
-      } catch (error) {
-        console.error("Error cargando noticias:", error);
-      }
+
+    } catch (e) {
+        console.error("Error cargando noticias:", e);
     }
 
-    function mostrarNoticia() {
-      if (noticias.length === 0) return;
+    // Siguiente feed para la próxima carga
+    feedIndex = (feedIndex + 1) % rssFeeds.length;
+}
 
-      const n = noticias[indiceNoticia];
+/* ---------- Mostrar noticia ---------- */
+function mostrarNoticia() {
+    if (noticias.length === 0) return;
 
-      document.getElementById("news-container").innerHTML = `
+    const n = noticias[indiceNoticia];
+
+    document.getElementById("news-container").innerHTML = `
         <div class="news-card">
           <img class="news-img" src="${n.image_url}" alt="Imagen noticia">
           <div class="news-content">
@@ -332,19 +362,16 @@ function getSafeLogo(url) { try { return new URL(url, location.href).href; } cat
             <a class="news-link" href="${n.link}" target="_blank">Ver más</a>
           </div>
         </div>
-      `;
+    `;
 
-      indiceNoticia = (indiceNoticia + 1) % noticias.length;
-    }
+    indiceNoticia = (indiceNoticia + 1) % noticias.length;
+}
 
-    // Cargar al inicio
-    cargarNoticiasBox();
+/* ---------- Ejecutar ---------- */
+cargarNoticias();
+setInterval(mostrarNoticia, 10000);    // cambia cada 10s
+setInterval(cargarNoticias, 60000);    // cambia de fuente cada 1 minuto
 
-    // Cambiar la noticia cada 8 segundos
-    setInterval(mostrarNoticia, 8000);
-
-    // Recargar noticias cada 10 minutos
-    setInterval(cargarNoticiasBox, 600000);
 
 </script>
 </body>
