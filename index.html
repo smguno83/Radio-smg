@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -7,6 +8,7 @@
   <title>Radio SMG</title>
 
   <!-- iPhone Web App -->
+
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Radio SMG">
@@ -15,9 +17,11 @@
   <link rel="manifest" href="manifest.json">
 
   <!-- Supabase -->
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Font Awesome -->
+
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -81,6 +85,38 @@
 
     select:hover {
       background: #444;
+    }
+
+
+    /* ============================================================
+       INFORMACIÓN ACTUAL DE LA RADIO
+       ============================================================ */
+
+    #nowPlaying {
+      width: 95%;
+      max-width: 500px;
+
+      min-height: 22px;
+
+      margin: 3px auto 5px auto;
+
+      font-size: 0.95rem;
+
+      color: #ddd;
+
+      text-align: center;
+
+      box-sizing: border-box;
+    }
+
+
+    #nowPlaying .programa {
+      font-weight: 600;
+    }
+
+
+    #nowPlaying .cancion {
+      font-weight: 600;
     }
 
 
@@ -310,6 +346,14 @@
       }
 
 
+      #nowPlaying {
+
+        width: 96%;
+
+        font-size: 0.9rem;
+      }
+
+
       audio {
 
         width: 96%;
@@ -328,18 +372,16 @@
     }
 
   </style>
+
 </head>
 
-
 <body>
-
 
   <!-- ============================================================
        TITULO
        ============================================================ -->
 
   <h1>🎧 Radio SMG</h1>
-
 
   <!-- ============================================================
        CARGA
@@ -349,20 +391,24 @@
     Cargando emisoras...
   </div>
 
-
   <div id="errorMessage"></div>
-
 
   <!-- ============================================================
        LOGO
        ============================================================ -->
 
-  <img
-    id="stationLogo"
-    src=""
-    alt="Logo emisora"
-  >
+<img
+id="stationLogo"
+src=""
+alt="Logo emisora"
 
+>
+
+  <!-- ============================================================
+       INFORMACIÓN ACTUAL
+       ============================================================ -->
+
+  <div id="nowPlaying"></div>
 
   <!-- ============================================================
        LISTA DE RADIOS
@@ -370,23 +416,22 @@
 
   <select id="stationList">
 
-    <option value="">
-      Seleccioná una emisora
-    </option>
+```
+<option value="">
+  Seleccioná una emisora
+</option>
+```
 
   </select>
-
 
   <!-- ============================================================
        REPRODUCTOR
        ============================================================ -->
 
-  <audio
-    id="player"
-    controls
-    preload="none">
-  </audio>
-
+<audio
+ id="player"
+ controls
+ preload="none"> </audio>
 
   <!-- ============================================================
        BOTONES
@@ -394,30 +439,30 @@
 
   <div>
 
-    <button id="prevButton">
-      <span>⏮️</span>
-    </button>
+```
+<button id="prevButton">
+  <span>⏮️</span>
+</button>
 
 
-    <button id="playButton">
-      <span>▶️</span>
-      Reproducir
-    </button>
+<button id="playButton">
+  <span>▶️</span>
+  Reproducir
+</button>
 
 
-    <button id="nextButton">
-      <span>⏭️</span>
-    </button>
+<button id="nextButton">
+  <span>⏭️</span>
+</button>
+```
 
   </div>
-
 
   <!-- ============================================================
        NOTICIAS
        ============================================================ -->
 
   <div id="news-container"></div>
-
 
 <script>
 
@@ -454,6 +499,31 @@ const LOGOS_BUCKET =
 
 
 /* ============================================================
+   CONFIGURACIÓN DE METADATA
+   ============================================================ */
+
+const TRITON_NOW_PLAYING_URL =
+  "https://np.tritondigital.com/public/nowplaying";
+
+
+/*
+   LA 100 utiliza el mountName FM999_56AAC.
+*/
+
+const METADATA_LA100 =
+  "FM999_56AAC";
+
+
+/*
+   Intervalo de actualización:
+   30 segundos.
+*/
+
+const METADATA_INTERVAL =
+  30000;
+
+
+/* ============================================================
    VARIABLES
    ============================================================ */
 
@@ -487,6 +557,10 @@ const loading =
 
 const errorMessage =
   document.getElementById('errorMessage');
+
+
+const nowPlaying =
+  document.getElementById('nowPlaying');
 
 
 let radios = [];
@@ -645,6 +719,11 @@ async function cargarRadios() {
         );
 
 
+        actualizarMetadata(
+          radio
+        );
+
+
         return;
 
       }
@@ -668,6 +747,11 @@ async function cargarRadios() {
 
       mostrarLogo(
         radio.logo
+      );
+
+
+      actualizarMetadata(
+        radio
       );
 
     }
@@ -769,6 +853,259 @@ function getCurrentRadio() {
 
 
 /* ============================================================
+   METADATA - LA 100
+   ============================================================ */
+
+async function actualizarMetadata(radio) {
+
+  /*
+     Limpiamos la información anterior
+     al cambiar de emisora.
+  */
+
+  nowPlaying.innerHTML = "";
+
+
+  /*
+     Por ahora solamente LA 100.
+  */
+
+  if (
+    !radio ||
+    radio.descripcion.toUpperCase() !== "LA 100"
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const url =
+      `${TRITON_NOW_PLAYING_URL}?mountName=${METADATA_LA100}&numberToFetch=5&eventType=track`;
+
+
+    const response =
+      await fetch(url);
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+
+    }
+
+
+    const xmlText =
+      await response.text();
+
+
+    const parser =
+      new DOMParser();
+
+
+    const xml =
+      parser.parseFromString(
+        xmlText,
+        "application/xml"
+      );
+
+
+    const registros =
+      Array.from(
+        xml.querySelectorAll(
+          "nowplaying-info"
+        )
+      );
+
+
+    if (
+      registros.length === 0
+    ) {
+
+      return;
+
+    }
+
+
+    /*
+       Tomamos el registro más reciente.
+    */
+
+    const primero =
+      registros[0];
+
+
+    const propiedad =
+      primero.querySelector(
+        'property[name="cue_title"]'
+      );
+
+
+    if (!propiedad) {
+
+      return;
+
+    }
+
+
+    let titulo =
+      propiedad.textContent.trim();
+
+
+    if (!titulo) {
+
+      return;
+
+    }
+
+
+    /*
+       ========================================================
+       DETECTAR PROGRAMAS DE LA 100
+       ========================================================
+
+       Ejemplo:
+
+       10-09 14HS AIRE SARASA 002
+
+       Se convierte en:
+
+       SARASA
+    */
+
+
+    const programaMatch =
+      titulo.match(
+        /^\d{2}-\d{2}\s+\d{1,2}HS\s+AIRE\s+(.+?)\s+\d{3}$/i
+      );
+
+
+    if (programaMatch) {
+
+      let programa =
+        programaMatch[1].trim();
+
+
+      /*
+         Evitar mostrar contenido
+         técnico como programa.
+      */
+
+      if (
+        programa.toUpperCase() ===
+        "LOOP 30 SEGUNDOS"
+      ) {
+
+        nowPlaying.innerHTML =
+          "";
+
+        return;
+
+      }
+
+
+      nowPlaying.innerHTML =
+        `<span class="programa">📻 Programa: ${escapeHtml(programa)}</span>`;
+
+
+      return;
+
+    }
+
+
+    /*
+       LOOP no se muestra.
+    */
+
+    if (
+      titulo.toUpperCase().includes(
+        "LOOP"
+      )
+    ) {
+
+      nowPlaying.innerHTML =
+        "";
+
+      return;
+
+    }
+
+
+    /*
+       Si todavía no sabemos interpretar
+       el contenido, no mostramos nada.
+    */
+
+    nowPlaying.innerHTML =
+      "";
+
+  } catch (error) {
+
+    console.warn(
+      "No se pudo obtener metadata de LA 100:",
+      error
+    );
+
+    /*
+       La metadata no debe afectar
+       la reproducción.
+    */
+
+  }
+
+}
+
+
+/* ============================================================
+   ESCAPAR HTML
+   ============================================================ */
+
+function escapeHtml(text) {
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+
+  div.textContent =
+    text;
+
+
+  return div.innerHTML;
+
+}
+
+
+/* ============================================================
+   ACTUALIZAR METADATA PERIÓDICAMENTE
+   ============================================================ */
+
+setInterval(
+  () => {
+
+    const radio =
+      getCurrentRadio();
+
+
+    if (radio) {
+
+      actualizarMetadata(
+        radio
+      );
+
+    }
+
+  },
+  METADATA_INTERVAL
+);
+
+
+/* ============================================================
    REPRODUCIR
    ============================================================ */
 
@@ -809,12 +1146,6 @@ function playStation(radio) {
     .then(() => {
 
 
-      /*
-         Ya NO mostramos el texto
-         "Reproduciendo..."
-      */
-
-
       playButton.innerHTML =
         `<span>⏸️</span> Pausar`;
 
@@ -841,6 +1172,16 @@ function playStation(radio) {
 
       mostrarLogo(
         radio.logo
+      );
+
+
+      /*
+         Actualizar metadata inmediatamente
+         al comenzar la reproducción.
+      */
+
+      actualizarMetadata(
+        radio
       );
 
 
@@ -880,11 +1221,6 @@ function pauseStation() {
 
   playButton.innerHTML =
     `<span>▶️</span> Reproducir`;
-
-
-  /*
-     Ya NO mostramos "Pausado".
-  */
 
 
   if (
@@ -938,6 +1274,10 @@ playButton.addEventListener(
 
             playButton.innerHTML =
               `<span>⏸️</span> Pausar`;
+
+            actualizarMetadata(
+              radio
+            );
 
           })
           .catch(err => {
@@ -1614,3 +1954,4 @@ setInterval(
 
 </body>
 </html>
+
