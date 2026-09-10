@@ -24,71 +24,107 @@
   >
 
   <style>
+
     body {
       background: linear-gradient(145deg, #0a0a0a, #202020);
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
+
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: start;
-      height: 100vh;
+
+      min-height: 100vh;
+
       margin: 0;
       padding-top: 10px;
+
       text-align: center;
     }
 
+
     h1 {
-      margin-bottom: 10px;
+      margin: 0 0 5px 0;
       font-size: 2rem;
     }
 
-    h2 {
-      font-weight: normal;
-      font-size: 1rem;
-      color: #aaa;
-    }
+
+    /* ============================================================
+       SELECTOR DE RADIOS
+       ============================================================ */
 
     select {
       background: #222;
       color: #fff;
+
       border: none;
-      padding: 10px 15px;
+
+      padding: 11px 15px;
+
       border-radius: 12px;
-      margin: 8px;
+
+      margin: 5px auto 5px auto;
+
       font-size: 1rem;
+
       outline: none;
+
       transition: background 0.2s;
-      max-width: 90vw;
+
+      width: 95%;
+      max-width: 500px;
+
+      box-sizing: border-box;
     }
+
 
     select:hover {
       background: #444;
     }
 
+
+    /* ============================================================
+       BOTONES
+       ============================================================ */
+
     button {
       border: none;
+
       padding: 12px 18px;
+
       margin: 6px;
+
       font-size: 1.2rem;
+
       border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      transition: all 0.2s ease;
+
+      box-shadow:
+        0 4px 12px rgba(0,0,0,0.5);
+
+      transition:
+        all 0.2s ease;
+
       display: inline-flex;
+
       align-items: center;
       justify-content: center;
+
       cursor: pointer;
     }
+
 
     button span {
       font-size: 1.4rem;
       margin-right: 6px;
     }
 
+
     #playButton {
       background: #1abc9c;
       color: #fff;
     }
+
 
     #prevButton,
     #nextButton {
@@ -96,105 +132,230 @@
       color: #fff;
     }
 
+
     button:hover {
       transform: scale(1.05);
       filter: brightness(1.05);
     }
 
+
+    /* ============================================================
+       REPRODUCTOR
+       ============================================================ */
+
     audio {
-      width: 90%;
-      margin-top: 10px;
+      width: 95%;
+      max-width: 500px;
+
+      margin-top: 5px;
+
       border-radius: 10px;
     }
 
+
+    /* ============================================================
+       LOGO DE LA EMISORA
+       ============================================================ */
+
     img#stationLogo {
+
       width: 100px;
       height: 100px;
+
       max-width: 80vw;
       max-height: 30vh;
+
       border-radius: 20%;
-      margin: 15px auto;
+
+      margin: 5px auto 5px auto;
+
       display: none;
+
       object-fit: contain;
+
       background-color: #111;
+
       padding: 10px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.1);
+
+      box-shadow:
+        0 0 20px rgba(255,255,255,0.1);
     }
 
-    /* Estado de carga */
+
+    /* ============================================================
+       ESTADO DE CARGA
+       ============================================================ */
+
     #loading {
       color: #aaa;
+
       font-size: 0.9rem;
+
       margin: 5px;
     }
+
 
     #errorMessage {
       color: #ff6b6b;
+
       font-size: 0.9rem;
+
       margin: 5px;
+
       display: none;
     }
 
-    /* Tarjeta de Noticias */
+
+    /* ============================================================
+       TARJETA DE NOTICIAS
+       ============================================================ */
+
     #news-container {
+
       width: 100%;
+
       display: flex;
+
       justify-content: center;
+
       margin-top: 10px;
     }
 
+
     .news-card {
+
       width: 350px;
+
+      max-width: 92%;
+
       background: #111;
+
       color: white;
+
       border-radius: 10px;
-      box-shadow: 0px 0px 12px #555;
+
+      box-shadow:
+        0px 0px 12px #555;
+
       overflow: hidden;
+
       text-align: left;
     }
 
+
     .news-img {
+
       width: 100%;
+
       height: 200px;
+
       object-fit: cover;
     }
 
+
     .news-content {
+
       padding: 15px;
     }
 
+
     .news-title {
+
       font-size: 15px;
+
       margin-bottom: 10px;
     }
+
 
     .news-desc {
+
       font-size: 12px;
+
       color: #ccc;
+
       margin-bottom: 10px;
     }
 
+
     .news-link {
+
       color: #4da3ff;
+
       text-decoration: none;
+
       font-weight: bold;
     }
+
+
+    /* ============================================================
+       AJUSTES PARA CELULARES
+       ============================================================ */
+
+    @media (max-width: 500px) {
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+
+      select {
+
+        width: 96%;
+
+        max-width: none;
+
+        font-size: 0.95rem;
+
+        padding: 11px 12px;
+      }
+
+
+      audio {
+
+        width: 96%;
+      }
+
+
+      img#stationLogo {
+
+        width: 90px;
+        height: 90px;
+
+        margin-top: 3px;
+        margin-bottom: 3px;
+      }
+
+    }
+
   </style>
 </head>
 
+
 <body>
+
+
+  <!-- ============================================================
+       TITULO
+       ============================================================ -->
 
   <h1>🎧 Radio SMG</h1>
 
-  <h2 id="currentStation">
-    Seleccioná una emisora
-  </h2>
+
+  <!-- ============================================================
+       CARGA
+       ============================================================ -->
 
   <div id="loading">
     Cargando emisoras...
   </div>
 
+
   <div id="errorMessage"></div>
+
+
+  <!-- ============================================================
+       LOGO
+       ============================================================ -->
 
   <img
     id="stationLogo"
@@ -202,12 +363,23 @@
     alt="Logo emisora"
   >
 
-  <!-- LISTA DE RADIOS -->
+
+  <!-- ============================================================
+       LISTA DE RADIOS
+       ============================================================ -->
+
   <select id="stationList">
+
     <option value="">
       Seleccioná una emisora
     </option>
+
   </select>
+
+
+  <!-- ============================================================
+       REPRODUCTOR
+       ============================================================ -->
 
   <audio
     id="player"
@@ -215,26 +387,40 @@
     preload="none">
   </audio>
 
+
+  <!-- ============================================================
+       BOTONES
+       ============================================================ -->
+
   <div>
+
     <button id="prevButton">
       <span>⏮️</span>
     </button>
+
 
     <button id="playButton">
       <span>▶️</span>
       Reproducir
     </button>
 
+
     <button id="nextButton">
       <span>⏭️</span>
     </button>
+
   </div>
 
-  <!-- Contenedor donde se cargan las noticias -->
+
+  <!-- ============================================================
+       NOTICIAS
+       ============================================================ -->
+
   <div id="news-container"></div>
 
 
 <script>
+
 
 /* ============================================================
    SUPABASE
@@ -243,81 +429,65 @@
 const SUPABASE_URL =
   "https://kzcnkktttazibhnqfxvq.supabase.co";
 
+
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_stHEaVggW8TWfKMrTOW0OQ_QoOB4y8f";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
 
 
 /* ============================================================
    CONFIGURACIÓN
    ============================================================ */
 
-/*
-   Worker utilizado actualmente para reproducir los streams.
-
-   El enlace original de la radio se obtiene desde Supabase
-   y se envía al Worker.
-*/
-
 const WORKER_URL =
   "https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=";
 
 
-/*
-   Bucket que utilizaremos posteriormente para los logos.
-
-   Todavía no es necesario crearlo.
-
-   Cuando lo creemos, los archivos estarán por ejemplo:
-
-   logos/logo_la100.png
-   logos/logo_los40.png
-   logos/logo_rockypop.png
-*/
-
-const LOGOS_BUCKET = "logos";
+const LOGOS_BUCKET =
+  "logos";
 
 
 /* ============================================================
-   VARIABLES RADIO
+   VARIABLES
    ============================================================ */
 
 const player =
   document.getElementById('player');
 
+
 const list =
   document.getElementById('stationList');
 
-const info =
-  document.getElementById('currentStation');
 
 const playButton =
   document.getElementById('playButton');
 
+
 const logoImg =
   document.getElementById('stationLogo');
+
 
 const prevButton =
   document.getElementById('prevButton');
 
+
 const nextButton =
   document.getElementById('nextButton');
+
 
 const loading =
   document.getElementById('loading');
 
+
 const errorMessage =
   document.getElementById('errorMessage');
 
-
-/*
-   Array donde guardamos las radios obtenidas
-   desde Supabase.
-*/
 
 let radios = [];
 
@@ -332,45 +502,47 @@ function getLogoUrl(nombreLogo) {
     return null;
   }
 
-  /*
-     Si en el futuro ponemos una URL completa
-     directamente en Supabase, también funcionará.
-  */
 
   if (
     nombreLogo.startsWith("http://") ||
     nombreLogo.startsWith("https://")
   ) {
+
     return nombreLogo;
+
   }
 
 
-  /*
-     Preparado para Supabase Storage.
-
-     Cuando creemos el bucket público "logos",
-     esta URL funcionará automáticamente.
-  */
-
   return `${SUPABASE_URL}/storage/v1/object/public/${LOGOS_BUCKET}/${encodeURIComponent(nombreLogo)}`;
+
 }
 
 
 /* ============================================================
-   CARGAR RADIOS DESDE SUPABASE
+   CARGAR RADIOS
    ============================================================ */
 
 async function cargarRadios() {
 
-  loading.style.display = "block";
-  errorMessage.style.display = "none";
+  loading.style.display =
+    "block";
+
+  errorMessage.style.display =
+    "none";
+
 
   try {
 
-    const { data, error } = await supabaseClient
-      .from("radios")
-      .select("id, descripcion, provincia, enlace, logo, codigo")
-      .order("codigo", { ascending: true });
+    const { data, error } =
+      await supabaseClient
+        .from("radios")
+        .select(
+          "id, descripcion, provincia, enlace, logo, codigo"
+        )
+        .order(
+          "codigo",
+          { ascending: true }
+        );
 
 
     if (error) {
@@ -378,10 +550,13 @@ async function cargarRadios() {
     }
 
 
-    if (!data || data.length === 0) {
+    if (
+      !data ||
+      data.length === 0
+    ) {
 
       throw new Error(
-        "No se encontraron emisoras en la tabla radios."
+        "No se encontraron emisoras."
       );
 
     }
@@ -390,39 +565,38 @@ async function cargarRadios() {
     radios = data;
 
 
-    /*
-       Limpiar lista actual.
-    */
-
     list.innerHTML = "";
 
 
-    /*
-       Crear las opciones automáticamente
-       desde Supabase.
-    */
-
-    radios.forEach((radio, index) => {
+    radios.forEach((radio) => {
 
       const option =
         document.createElement("option");
 
-      option.value = radio.enlace || "";
+
+      option.value =
+        radio.enlace || "";
+
 
       option.textContent =
         `${radio.descripcion} - ${radio.provincia}`;
 
+
       option.dataset.logo =
         getLogoUrl(radio.logo);
+
 
       option.dataset.id =
         radio.id;
 
+
       option.dataset.codigo =
         radio.codigo;
 
+
       option.dataset.descripcion =
         radio.descripcion;
+
 
       option.dataset.provincia =
         radio.provincia;
@@ -433,53 +607,69 @@ async function cargarRadios() {
     });
 
 
-    loading.style.display = "none";
+    loading.style.display =
+      "none";
 
 
-    /*
-       Intentar recuperar la última radio utilizada.
-    */
+    /* ========================================================
+       RECUPERAR ÚLTIMA RADIO
+       ======================================================== */
 
     const lastStation =
-      localStorage.getItem("lastStation");
+      localStorage.getItem(
+        "lastStation"
+      );
 
 
     if (lastStation) {
 
       const index =
         radios.findIndex(
-          radio => radio.enlace === lastStation
+          radio =>
+            radio.enlace === lastStation
         );
 
 
       if (index >= 0) {
 
-        list.selectedIndex = index;
+        list.selectedIndex =
+          index;
 
-        const radio = radios[index];
 
-        info.textContent =
-          `Reanudando: ${radio.descripcion}`;
+        const radio =
+          radios[index];
 
-        mostrarLogo(radio.logo);
+
+        mostrarLogo(
+          radio.logo
+        );
+
 
         return;
+
       }
+
     }
 
 
-    /*
-       Si no existe una radio guardada,
-       seleccionamos la primera.
-    */
+    /* ========================================================
+       PRIMERA RADIO
+       ======================================================== */
 
     if (radios.length > 0) {
 
-      list.selectedIndex = 0;
+      list.selectedIndex =
+        0;
 
-      const radio = radios[0];
 
-      mostrarLogo(radio.logo);
+      const radio =
+        radios[0];
+
+
+      mostrarLogo(
+        radio.logo
+      );
+
     }
 
 
@@ -490,12 +680,17 @@ async function cargarRadios() {
       error
     );
 
-    loading.style.display = "none";
+
+    loading.style.display =
+      "none";
+
 
     errorMessage.textContent =
       "No se pudieron cargar las emisoras.";
 
-    errorMessage.style.display = "block";
+
+    errorMessage.style.display =
+      "block";
 
   }
 
@@ -515,38 +710,41 @@ function mostrarLogo(nombreLogo) {
   if (!logo) {
 
     logoImg.src = "";
-    logoImg.style.display = "none";
+
+    logoImg.style.display =
+      "none";
 
     return;
+
   }
 
 
-  logoImg.onload = function() {
+  logoImg.onload =
+    function() {
 
-    logoImg.style.display = "block";
+      logoImg.style.display =
+        "block";
 
-  };
-
-
-  logoImg.onerror = function() {
-
-    /*
-       Si el bucket todavía no existe
-       o el archivo no está cargado,
-       simplemente ocultamos el logo.
-    */
-
-    logoImg.style.display = "none";
-
-  };
+    };
 
 
-  logoImg.src = logo;
+  logoImg.onerror =
+    function() {
+
+      logoImg.style.display =
+        "none";
+
+    };
+
+
+  logoImg.src =
+    logo;
+
 }
 
 
 /* ============================================================
-   OBTENER RADIO ACTUAL
+   RADIO ACTUAL
    ============================================================ */
 
 function getCurrentRadio() {
@@ -554,12 +752,16 @@ function getCurrentRadio() {
   const index =
     list.selectedIndex;
 
+
   if (
     index < 0 ||
     index >= radios.length
   ) {
+
     return null;
+
   }
+
 
   return radios[index];
 
@@ -567,39 +769,38 @@ function getCurrentRadio() {
 
 
 /* ============================================================
-   REPRODUCIR EMISORA
+   REPRODUCIR
    ============================================================ */
 
 function playStation(radio) {
 
-  if (!radio || !radio.enlace) {
+  if (
+    !radio ||
+    !radio.enlace
+  ) {
+
     return;
+
   }
 
-
-  /*
-     URL original obtenida desde Supabase.
-  */
 
   const originalUrl =
     radio.enlace;
 
 
-  /*
-     Pasamos el stream por el Worker.
-
-     encodeURIComponent evita problemas
-     cuando la URL contiene parámetros.
-  */
-
   const streamUrl =
     WORKER_URL +
-    encodeURIComponent(originalUrl);
+    encodeURIComponent(
+      originalUrl
+    );
 
 
   player.pause();
 
-  player.src = streamUrl;
+
+  player.src =
+    streamUrl;
+
 
   player.load();
 
@@ -607,26 +808,30 @@ function playStation(radio) {
   player.play()
     .then(() => {
 
-      info.textContent =
-        `🎶 Reproduciendo: ${radio.descripcion}`;
+
+      /*
+         Ya NO mostramos el texto
+         "Reproduciendo..."
+      */
+
 
       playButton.innerHTML =
         `<span>⏸️</span> Pausar`;
 
 
-      /*
-         Guardar información de la última emisora.
-      */
+      /* Guardar radio */
 
       localStorage.setItem(
         "lastStation",
         radio.enlace
       );
 
+
       localStorage.setItem(
         "lastName",
         radio.descripcion
       );
+
 
       localStorage.setItem(
         "lastLogo",
@@ -634,12 +839,16 @@ function playStation(radio) {
       );
 
 
-      mostrarLogo(radio.logo);
+      mostrarLogo(
+        radio.logo
+      );
 
 
       updateMediaSession(
         radio.descripcion,
-        getLogoUrl(radio.logo)
+        getLogoUrl(
+          radio.logo
+        )
       );
 
     })
@@ -649,6 +858,7 @@ function playStation(radio) {
         "Error al reproducir:",
         err
       );
+
 
       alert(
         "No se pudo reproducir la emisora. Tocá el botón nuevamente."
@@ -667,14 +877,19 @@ function pauseStation() {
 
   player.pause();
 
+
   playButton.innerHTML =
     `<span>▶️</span> Reproducir`;
 
-  info.textContent =
-    '⏸️ Pausado';
+
+  /*
+     Ya NO mostramos "Pausado".
+  */
 
 
-  if ('mediaSession' in navigator) {
+  if (
+    'mediaSession' in navigator
+  ) {
 
     navigator.mediaSession.playbackState =
       'paused';
@@ -685,7 +900,7 @@ function pauseStation() {
 
 
 /* ============================================================
-   BOTÓN PLAY / PAUSE
+   PLAY / PAUSE
    ============================================================ */
 
 playButton.addEventListener(
@@ -703,19 +918,18 @@ playButton.addEventListener(
       );
 
       return;
+
     }
 
 
     if (player.paused) {
 
-      /*
-         Si no hay fuente, reproducir
-         la emisora seleccionada.
-      */
 
       if (!player.src) {
 
-        playStation(radio);
+        playStation(
+          radio
+        );
 
       } else {
 
@@ -724,9 +938,6 @@ playButton.addEventListener(
 
             playButton.innerHTML =
               `<span>⏸️</span> Pausar`;
-
-            info.textContent =
-              `🎶 Reproduciendo: ${radio.descripcion}`;
 
           })
           .catch(err => {
@@ -751,7 +962,7 @@ playButton.addEventListener(
 
 
 /* ============================================================
-   CAMBIO DE EMISORA
+   CAMBIO DE RADIO
    ============================================================ */
 
 list.addEventListener(
@@ -761,9 +972,12 @@ list.addEventListener(
     const radio =
       getCurrentRadio();
 
+
     if (radio) {
 
-      playStation(radio);
+      playStation(
+        radio
+      );
 
     }
 
@@ -777,18 +991,29 @@ list.addEventListener(
 
 function playByIndex(index) {
 
-  if (radios.length === 0) {
+  if (
+    radios.length === 0
+  ) {
+
     return;
+
   }
 
 
   if (index < 0) {
-    index = radios.length - 1;
+
+    index =
+      radios.length - 1;
+
   }
 
 
-  if (index >= radios.length) {
+  if (
+    index >= radios.length
+  ) {
+
     index = 0;
+
   }
 
 
@@ -800,12 +1025,16 @@ function playByIndex(index) {
     radios[index];
 
 
-  playStation(radio);
+  playStation(
+    radio
+  );
 
 }
 
 
-/* Siguiente */
+/* ============================================================
+   SIGUIENTE
+   ============================================================ */
 
 nextButton.addEventListener(
   'click',
@@ -814,19 +1043,27 @@ nextButton.addEventListener(
     let nextIndex =
       list.selectedIndex + 1;
 
+
     if (
       nextIndex >= radios.length
     ) {
+
       nextIndex = 0;
+
     }
 
-    playByIndex(nextIndex);
+
+    playByIndex(
+      nextIndex
+    );
 
   }
 );
 
 
-/* Anterior */
+/* ============================================================
+   ANTERIOR
+   ============================================================ */
 
 prevButton.addEventListener(
   'click',
@@ -835,12 +1072,20 @@ prevButton.addEventListener(
     let prevIndex =
       list.selectedIndex - 1;
 
-    if (prevIndex < 0) {
+
+    if (
+      prevIndex < 0
+    ) {
+
       prevIndex =
         radios.length - 1;
+
     }
 
-    playByIndex(prevIndex);
+
+    playByIndex(
+      prevIndex
+    );
 
   }
 );
@@ -858,10 +1103,13 @@ player.addEventListener(
       'Hubo un error al cargar el stream. Probá otra emisora.'
     );
 
+
     pauseStation();
 
 
-    if ('mediaSession' in navigator) {
+    if (
+      'mediaSession' in navigator
+    ) {
 
       navigator.mediaSession.metadata =
         new MediaMetadata({
@@ -873,11 +1121,20 @@ player.addEventListener(
             'No se pudo reproducir la señal',
 
           artwork: [
+
             {
-              src: 'icon.png',
-              sizes: '512x512',
-              type: 'image/png'
+
+              src:
+                'icon.png',
+
+              sizes:
+                '512x512',
+
+              type:
+                'image/png'
+
             }
+
           ]
 
         });
@@ -900,7 +1157,9 @@ function updateMediaSession(
   if (
     !('mediaSession' in navigator)
   ) {
+
     return;
+
   }
 
 
@@ -914,10 +1173,13 @@ function updateMediaSession(
         'Tu Radio Online',
 
       artwork: [
+
         {
+
           src:
             getSafeLogo(
-              artwork || 'icon.png'
+              artwork ||
+              'icon.png'
             ),
 
           sizes:
@@ -925,15 +1187,15 @@ function updateMediaSession(
 
           type:
             'image/png'
+
         }
+
       ]
 
     });
 
 
-  /*
-     Play desde controles del teléfono.
-  */
+  /* PLAY */
 
   navigator.mediaSession.setActionHandler(
     'play',
@@ -941,6 +1203,7 @@ function updateMediaSession(
 
       const radio =
         getCurrentRadio();
+
 
       if (!radio) {
         return;
@@ -953,18 +1216,13 @@ function updateMediaSession(
           playButton.innerHTML =
             `<span>⏸️</span> Pausar`;
 
-          info.textContent =
-            `🎶 Reproduciendo: ${radio.descripcion}`;
-
         });
 
     }
   );
 
 
-  /*
-     Pause desde controles del teléfono.
-  */
+  /* PAUSE */
 
   navigator.mediaSession.setActionHandler(
     'pause',
@@ -976,9 +1234,7 @@ function updateMediaSession(
   );
 
 
-  /*
-     Siguiente desde controles del teléfono.
-  */
+  /* SIGUIENTE */
 
   navigator.mediaSession.setActionHandler(
     'nexttrack',
@@ -987,21 +1243,25 @@ function updateMediaSession(
       let nextIndex =
         list.selectedIndex + 1;
 
+
       if (
         nextIndex >= radios.length
       ) {
+
         nextIndex = 0;
+
       }
 
-      playByIndex(nextIndex);
+
+      playByIndex(
+        nextIndex
+      );
 
     }
   );
 
 
-  /*
-     Anterior desde controles del teléfono.
-  */
+  /* ANTERIOR */
 
   navigator.mediaSession.setActionHandler(
     'previoustrack',
@@ -1010,12 +1270,20 @@ function updateMediaSession(
       let prevIndex =
         list.selectedIndex - 1;
 
-      if (prevIndex < 0) {
+
+      if (
+        prevIndex < 0
+      ) {
+
         prevIndex =
           radios.length - 1;
+
       }
 
-      playByIndex(prevIndex);
+
+      playByIndex(
+        prevIndex
+      );
 
     }
   );
@@ -1024,7 +1292,7 @@ function updateMediaSession(
 
 
 /* ============================================================
-   LOGO SEGURO PARA MEDIA SESSION
+   LOGO SEGURO
    ============================================================ */
 
 function getSafeLogo(url) {
@@ -1049,17 +1317,21 @@ function getSafeLogo(url) {
    SERVICE WORKER
    ============================================================ */
 
-if ('serviceWorker' in navigator) {
+if (
+  'serviceWorker' in navigator
+) {
 
   navigator.serviceWorker
-    .register('service-worker.js')
+    .register(
+      'service-worker.js'
+    )
     .catch(() => {});
 
 }
 
 
 /* ============================================================
-   CARGAR RADIOS AL INICIAR
+   CARGAR RADIOS
    ============================================================ */
 
 cargarRadios();
@@ -1074,28 +1346,30 @@ let noticias = [];
 let indiceNoticia = 0;
 
 
-/* API NewsData */
-
 const apiKey =
   "pub_ebffaca675dd4f2a91c4e96e7656ef14";
 
 
-/* Feeds disponibles */
-
 const rssFeeds = [
 
   {
-    tipo: "rss",
+
+    tipo:
+      "rss",
 
     url:
       "https://api.rss2json.com/v1/api.json?rss_url=https://www.clarin.com/rss/lo-ultimo/"
+
   },
 
   {
-    tipo: "newsdata",
+
+    tipo:
+      "newsdata",
 
     url:
       `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`
+
   }
 
 ];
@@ -1113,6 +1387,7 @@ async function cargarNoticias() {
   const feed =
     rssFeeds[feedIndex];
 
+
   let url =
     feed.url;
 
@@ -1127,83 +1402,104 @@ async function cargarNoticias() {
       await resp.json();
 
 
-    /*
-       NewsData
-    */
+    /* ========================================================
+       NEWSDATA
+       ======================================================== */
 
     if (
-      feed.tipo === "newsdata"
+      feed.tipo ===
+      "newsdata"
     ) {
 
-      if (!data.results) {
+      if (
+        !data.results
+      ) {
+
         return;
+
       }
 
 
       noticias =
-        data.results.map(n => ({
+        data.results.map(
+          n => ({
 
-          title:
-            n.title ||
-            "Sin título",
+            title:
+              n.title ||
+              "Sin título",
 
-          description:
-            (n.description || "")
-              .slice(0, 140) +
-            "...",
+            description:
+              (n.description || "")
+                .slice(0, 140) +
+              "...",
 
-          image_url:
-            n.image_url ||
-            "https://picsum.photos/600/400?random=" +
-            Math.random(),
+            image_url:
+              n.image_url ||
+              "https://picsum.photos/600/400?random=" +
+              Math.random(),
 
-          link:
-            n.link ||
-            "#"
+            link:
+              n.link ||
+              "#"
 
-        }));
+          })
+        );
 
     }
 
 
-    /*
+    /* ========================================================
        RSS
-    */
+       ======================================================== */
 
     if (
-      feed.tipo === "rss"
+      feed.tipo ===
+      "rss"
     ) {
 
-      if (!data.items) {
+      if (
+        !data.items
+      ) {
+
         return;
+
       }
 
 
       noticias =
-        data.items.map(n => ({
+        data.items.map(
+          n => ({
 
-          title:
-            n.title,
+            title:
+              n.title,
 
-          description:
-            n.description
-              .replace(/<[^>]+>/g, "")
-              .slice(0, 140) +
-            "...",
+            description:
+              n.description
+                .replace(
+                  /<[^>]+>/g,
+                  ""
+                )
+                .slice(
+                  0,
+                  140
+                ) +
+              "...",
 
-          image_url:
-            "https://picsum.photos/600/400?random=" +
-            Math.random(),
+            image_url:
+              "https://picsum.photos/600/400?random=" +
+              Math.random(),
 
-          link:
-            n.link
+            link:
+              n.link
 
-        }));
+          })
+        );
 
     }
 
 
     indiceNoticia = 0;
+
 
     mostrarNoticia();
 
@@ -1217,10 +1513,6 @@ async function cargarNoticias() {
 
   }
 
-
-  /*
-     Siguiente feed para la próxima carga.
-  */
 
   feedIndex =
     (feedIndex + 1) %
@@ -1238,7 +1530,9 @@ function mostrarNoticia() {
   if (
     noticias.length === 0
   ) {
+
     return;
+
   }
 
 
@@ -1297,9 +1591,9 @@ function mostrarNoticia() {
 cargarNoticias();
 
 
-/*
-   Cambia noticia cada 10 segundos.
-*/
+/* ============================================================
+   CAMBIAR NOTICIA CADA 10 SEGUNDOS
+   ============================================================ */
 
 setInterval(
   mostrarNoticia,
@@ -1307,9 +1601,9 @@ setInterval(
 );
 
 
-/*
-   Cambia de fuente cada 1 minuto.
-*/
+/* ============================================================
+   CAMBIAR FUENTE CADA 1 MINUTO
+   ============================================================ */
 
 setInterval(
   cargarNoticias,
@@ -1320,5 +1614,3 @@ setInterval(
 
 </body>
 </html>
-
-
