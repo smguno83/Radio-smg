@@ -719,10 +719,13 @@ async function cargarRadios() {
         );
 
 
-        actualizarMetadata(
-          radio
-        );
+        /*
+           IMPORTANTE:
+           NO consultamos metadata acá.
+           La radio todavía no está reproduciendo.
+        */
 
+        nowPlaying.innerHTML = "";
 
         return;
 
@@ -750,9 +753,14 @@ async function cargarRadios() {
       );
 
 
-      actualizarMetadata(
-        radio
-      );
+      /*
+         IMPORTANTE:
+         Solo mostramos el logo.
+         No consultamos metadata porque
+         todavía no se está reproduciendo.
+      */
+
+      nowPlaying.innerHTML = "";
 
     }
 
@@ -859,21 +867,20 @@ function getCurrentRadio() {
 async function actualizarMetadata(radio) {
 
   /*
-     Limpiamos la información anterior
-     al cambiar de emisora.
-  */
+     SI NO ESTÁ REPRODUCIENDO,
+     NO MOSTRAMOS NADA.
 
-  nowPlaying.innerHTML = "";
-
-
-  /*
-     Por ahora solamente LA 100.
+     Esto evita que aparezca el programa
+     apenas se abre la página.
   */
 
   if (
     !radio ||
-    radio.descripcion.toUpperCase() !== "LA 100"
+    radio.descripcion.toUpperCase() !== "LA 100" ||
+    player.paused
   ) {
+
+    nowPlaying.innerHTML = "";
 
     return;
 
@@ -926,6 +933,26 @@ async function actualizarMetadata(radio) {
       registros.length === 0
     ) {
 
+      nowPlaying.innerHTML = "";
+
+      return;
+
+    }
+
+
+    /*
+       Antes de mostrar la metadata,
+       verificamos nuevamente que siga
+       reproduciendo.
+
+       Esto evita que una respuesta tardía
+       aparezca después de haber pausado.
+    */
+
+    if (player.paused) {
+
+      nowPlaying.innerHTML = "";
+
       return;
 
     }
@@ -947,6 +974,8 @@ async function actualizarMetadata(radio) {
 
     if (!propiedad) {
 
+      nowPlaying.innerHTML = "";
+
       return;
 
     }
@@ -958,13 +987,14 @@ async function actualizarMetadata(radio) {
 
     if (!titulo) {
 
+      nowPlaying.innerHTML = "";
+
       return;
 
     }
 
 
-    /*
-       ========================================================
+    /* ========================================================
        DETECTAR PROGRAMAS DE LA 100
        ========================================================
 
@@ -974,7 +1004,7 @@ async function actualizarMetadata(radio) {
 
        Se convierte en:
 
-       SARASA
+       📻 Programa: SARASA
     */
 
 
@@ -1092,6 +1122,14 @@ setInterval(
       getCurrentRadio();
 
 
+    /*
+       La función actualizarMetadata()
+       verifica si realmente está reproduciendo.
+
+       Por lo tanto, este intervalo no mostrará
+       nada mientras la radio esté pausada.
+    */
+
     if (radio) {
 
       actualizarMetadata(
@@ -1119,6 +1157,16 @@ function playStation(radio) {
     return;
 
   }
+
+
+  /*
+     Limpiar inmediatamente la metadata anterior.
+
+     Esto es importante cuando cambiamos
+     de una radio a otra.
+  */
+
+  nowPlaying.innerHTML = "";
 
 
   const originalUrl =
@@ -1176,8 +1224,9 @@ function playStation(radio) {
 
 
       /*
-         Actualizar metadata inmediatamente
-         al comenzar la reproducción.
+         Ahora sí:
+         la radio está reproduciendo,
+         por lo que consultamos metadata.
       */
 
       actualizarMetadata(
@@ -1201,6 +1250,14 @@ function playStation(radio) {
       );
 
 
+      /*
+         Si no pudo comenzar la reproducción,
+         tampoco mostramos metadata.
+      */
+
+      nowPlaying.innerHTML = "";
+
+
       alert(
         "No se pudo reproducir la emisora. Tocá el botón nuevamente."
       );
@@ -1217,6 +1274,13 @@ function playStation(radio) {
 function pauseStation() {
 
   player.pause();
+
+
+  /*
+     Al pausar desaparece el programa.
+  */
+
+  nowPlaying.innerHTML = "";
 
 
   playButton.innerHTML =
@@ -1275,6 +1339,12 @@ playButton.addEventListener(
             playButton.innerHTML =
               `<span>⏸️</span> Pausar`;
 
+
+            /*
+               Ahora que realmente está
+               reproduciendo, consultamos metadata.
+            */
+
             actualizarMetadata(
               radio
             );
@@ -1286,6 +1356,10 @@ playButton.addEventListener(
               "Error:",
               err
             );
+
+
+            nowPlaying.innerHTML =
+              "";
 
           });
 
@@ -1308,6 +1382,14 @@ playButton.addEventListener(
 list.addEventListener(
   'change',
   () => {
+
+    /*
+       Limpiar inmediatamente el programa
+       de la emisora anterior.
+    */
+
+    nowPlaying.innerHTML = "";
+
 
     const radio =
       getCurrentRadio();
@@ -1439,6 +1521,14 @@ player.addEventListener(
   'error',
   () => {
 
+    /*
+       Si hay error, tampoco debe quedar
+       visible el programa anterior.
+    */
+
+    nowPlaying.innerHTML = "";
+
+
     alert(
       'Hubo un error al cargar el stream. Probá otra emisora.'
     );
@@ -1555,6 +1645,16 @@ function updateMediaSession(
 
           playButton.innerHTML =
             `<span>⏸️</span> Pausar`;
+
+          
+          /*
+             También actualizamos metadata
+             cuando se reanuda desde Media Session.
+          */
+
+          actualizarMetadata(
+            radio
+          );
 
         });
 
@@ -1950,8 +2050,10 @@ setInterval(
   60000
 );
 
+
 </script>
 
 </body>
 </html>
+
 
