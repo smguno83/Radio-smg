@@ -19,7 +19,7 @@ jobs:
           echo "Consultando Supabase RADIO..."
 
           RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/RADIOS?select=*&limit=1" \
+            "${SUPABASE_URL}/rest/v1/radios?select=*&limit=1" \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
 
