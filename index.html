@@ -1068,23 +1068,20 @@ const LOGOS_BUCKET =
 
 
 /* ============================================================
-   API FOOTBALL
+   THE SPORTS DB - FÚTBOL
 ============================================================ */
 
-const API_FOOTBALL_KEY =
-  "051cfe2673191f0b2f52f0afadddbe90";
+const THESPORTSDB_BASE =
+  "https://www.thesportsdb.com/api/v1/json/123";
 
-const API_FOOTBALL_BASE =
-  "https://v3.football.api-sports.io";
+const THESPORTSDB_LEAGUE =
+  4406;
 
-const API_FOOTBALL_LEAGUE =
-  128;
-
-const API_FOOTBALL_SEASON =
-  2026;
+const THESPORTSDB_SEASON =
+  "2026";
 
 const FOOTBALL_CACHE_KEY =
-  "radioSMGFootballFixtures";
+  "radioSMGFootballFixturesTSDB";
 
 const FOOTBALL_CACHE_TIME =
   30 * 60 * 1000;
@@ -4307,63 +4304,13 @@ function renderFutbol(
 
 
 /* ============================================================
-   FÚTBOL - ERROR API
+   FÚTBOL - ERROR THE SPORTS DB
 ============================================================ */
 
 function obtenerMensajeErrorFootball(
   data,
   response
 ) {
-
-  if (
-    data &&
-    data.errors
-  ) {
-
-    if (
-      typeof data.errors ===
-      "string"
-    ) {
-
-      return data.errors;
-
-    }
-
-    if (
-      Array.isArray(
-        data.errors
-      )
-    ) {
-
-      return data.errors
-        .map(
-          error =>
-            typeof error === "string"
-              ? error
-              : JSON.stringify(error)
-        )
-        .join(" | ");
-
-    }
-
-    if (
-      typeof data.errors ===
-      "object"
-    ) {
-
-      return Object.entries(
-        data.errors
-      )
-      .map(
-        ([clave, valor]) =>
-          `${clave}: ${valor}`
-      )
-      .join(" | ");
-
-    }
-
-  }
-
 
   if (
     data &&
@@ -4376,7 +4323,6 @@ function obtenerMensajeErrorFootball(
 
   }
 
-
   if (
     response &&
     response.status
@@ -4386,14 +4332,188 @@ function obtenerMensajeErrorFootball(
 
   }
 
-
-  return "Error desconocido de API-Football.";
+  return "Error desconocido de TheSportsDB.";
 
 }
 
 
 /* ============================================================
-   FÚTBOL - CARGAR API
+   FÚTBOL - CONVERTIR DATOS THE SPORTS DB
+============================================================ */
+
+function convertirEventoFootball(
+  evento
+) {
+
+  if (!evento) {
+    return null;
+  }
+
+  const fecha =
+    evento.strTimestamp ||
+    (
+      evento.dateEventLocal &&
+      evento.strTimeLocal
+        ? `${evento.dateEventLocal}T${evento.strTimeLocal}`
+        : evento.dateEvent
+    );
+
+  let status =
+    "NS";
+
+  const estado =
+    String(
+      evento.strStatus ||
+      ""
+    ).toUpperCase();
+
+  if (
+    estado === "FT" ||
+    estado === "AET" ||
+    estado === "PEN" ||
+    estado === "AWD" ||
+    estado === "WO"
+  ) {
+
+    status = estado;
+
+  } else if (
+    estado === "1H" ||
+    estado === "HT" ||
+    estado === "2H" ||
+    estado === "ET" ||
+    estado === "BT" ||
+    estado === "P"
+  ) {
+
+    status = estado;
+
+  } else if (
+    estado === "PST" ||
+    estado === "CANC" ||
+    estado === "ABD"
+  ) {
+
+    status = estado;
+
+  } else if (
+    String(
+      evento.strPostponed ||
+      ""
+    ).toLowerCase() === "yes"
+  ) {
+
+    status = "PST";
+
+  } else {
+
+    status = "NS";
+
+  }
+
+  const golesHome =
+    evento.intHomeScore !== null &&
+    evento.intHomeScore !== undefined &&
+    evento.intHomeScore !== ""
+      ? Number(evento.intHomeScore)
+      : null;
+
+  const golesAway =
+    evento.intAwayScore !== null &&
+    evento.intAwayScore !== undefined &&
+    evento.intAwayScore !== ""
+      ? Number(evento.intAwayScore)
+      : null;
+
+  return {
+
+    fixture: {
+
+      id:
+        evento.idEvent,
+
+      date:
+        fecha,
+
+      status: {
+
+        short:
+          status,
+
+        long:
+          evento.strStatus ||
+          status
+
+      }
+
+    },
+
+    league: {
+
+      id:
+        evento.idLeague,
+
+      name:
+        evento.strLeague ||
+        "Argentinian Primera Division",
+
+      season:
+        evento.strSeason ||
+        THESPORTSDB_SEASON
+
+    },
+
+    teams: {
+
+      home: {
+
+        id:
+          evento.idHomeTeam,
+
+        name:
+          evento.strHomeTeam ||
+          "Local",
+
+        logo:
+          evento.strHomeTeamBadge ||
+          "icon.png"
+
+      },
+
+      away: {
+
+        id:
+          evento.idAwayTeam,
+
+        name:
+          evento.strAwayTeam ||
+          "Visitante",
+
+        logo:
+          evento.strAwayTeamBadge ||
+          "icon.png"
+
+      }
+
+    },
+
+    goals: {
+
+      home:
+        golesHome,
+
+      away:
+        golesAway
+
+    }
+
+  };
+
+}
+
+
+/* ============================================================
+   FÚTBOL - CARGAR THE SPORTS DB
 ============================================================ */
 
 async function cargarFutbol(
@@ -4420,7 +4540,7 @@ async function cargarFutbol(
       );
 
       footballStatus.textContent =
-        `${cache[0]?.league?.name || "Fútbol"} · 2026`;
+        `${cache[0]?.league?.name || "Fútbol"} · ${THESPORTSDB_SEASON}`;
 
       return;
 
@@ -4429,45 +4549,16 @@ async function cargarFutbol(
   }
 
 
-  /*
-     Comprobamos que exista la clave.
-  */
-
-  if (
-    !API_FOOTBALL_KEY ||
-    API_FOOTBALL_KEY.trim() === ""
-  ) {
-
-    footballContainer.innerHTML = `
-      <div class="news-empty">
-        Falta configurar la API de fútbol.
-      </div>
-    `;
-
-    footballStatus.textContent =
-      "Sin API";
-
-    return;
-
-  }
-
-
   try {
 
-    /*
-       La zona horaria hace que las fechas devueltas
-       por la API sean más cómodas para Argentina.
-    */
-
     const url =
-      `${API_FOOTBALL_BASE}/fixtures` +
-      `?league=${API_FOOTBALL_LEAGUE}` +
-      `&season=${API_FOOTBALL_SEASON}` +
-      `&timezone=America/Argentina/Buenos_Aires`;
+      `${THESPORTSDB_BASE}/eventsseason.php` +
+      `?id=${THESPORTSDB_LEAGUE}` +
+      `&s=${THESPORTSDB_SEASON}`;
 
 
     console.log(
-      "API-FOOTBALL:",
+      "THESPORTSDB:",
       url
     );
 
@@ -4480,9 +4571,6 @@ async function cargarFutbol(
 
           headers: {
 
-            "x-apisports-key":
-              API_FOOTBALL_KEY,
-
             "Accept":
               "application/json"
 
@@ -4490,11 +4578,13 @@ async function cargarFutbol(
 
           cache:
             "no-store"
+
         }
       );
 
 
-    let data = null;
+    let data =
+      null;
 
 
     try {
@@ -4505,92 +4595,88 @@ async function cargarFutbol(
     } catch {
 
       throw new Error(
-        `API-Football HTTP ${response.status}: respuesta no válida.`
+        `TheSportsDB HTTP ${response.status}: respuesta no válida.`
       );
 
     }
 
 
     console.log(
-      "API-FOOTBALL RESPONSE:",
+      "THESPORTSDB RESPONSE:",
       data
     );
 
-
-    /*
-       API-Football puede devolver información de error
-       incluso cuando el HTTP es 200.
-    */
-
-    if (
-      data &&
-      data.errors &&
-      (
-        Array.isArray(data.errors)
-          ? data.errors.length > 0
-          : Object.keys(data.errors).length > 0
-      )
-    ) {
-
-      const mensaje =
-        obtenerMensajeErrorFootball(
-          data,
-          response
-        );
-
-      throw new Error(
-        mensaje
-      );
-
-    }
-
-
-    /*
-       Errores HTTP.
-    */
 
     if (
       !response.ok
     ) {
 
-      const mensaje =
+      throw new Error(
         obtenerMensajeErrorFootball(
           data,
           response
-        );
-
-      throw new Error(
-        mensaje
+        )
       );
 
     }
 
 
-    /*
-       Respuesta correcta.
-    */
-
-    const fixtures =
+    const eventos =
       Array.isArray(
-        data.response
+        data?.events
       )
-        ? data.response
+        ? data.events
         : [];
 
 
     console.log(
-      "PARTIDOS RECIBIDOS:",
+      "EVENTOS RECIBIDOS:",
+      eventos.length
+    );
+
+
+    const fixtures =
+      eventos
+        .map(
+          convertirEventoFootball
+        )
+        .filter(
+          partido =>
+            partido &&
+            partido.fixture &&
+            partido.fixture.id &&
+            partido.fixture.date
+        );
+
+
+    console.log(
+      "PARTIDOS CONVERTIDOS:",
       fixtures.length
     );
 
 
-    /*
-       200 + response vacío.
-    */
-
     if (
       fixtures.length === 0
     ) {
+
+      const cacheVencida =
+        leerCacheFutbol(true);
+
+      if (
+        cacheVencida &&
+        cacheVencida.length > 0
+      ) {
+
+        renderFutbol(
+          cacheVencida
+        );
+
+        footballStatus.textContent =
+          "Datos guardados";
+
+        return;
+
+      }
 
       footballContainer.innerHTML = `
         <div class="news-empty">
@@ -4600,15 +4686,14 @@ async function cargarFutbol(
 
           <br><br>
 
-          Liga: ${API_FOOTBALL_LEAGUE}<br>
-          Temporada: ${API_FOOTBALL_SEASON}
+          Liga: ${THESPORTSDB_LEAGUE}<br>
+          Temporada: ${THESPORTSDB_SEASON}
 
           <br><br>
 
           <span style="font-size:10px;color:#697384;">
-            Esto puede indicar que la competencia,
-            temporada o cobertura no está disponible
-            para esta cuenta.
+            No hay partidos disponibles
+            para esta competencia y temporada.
           </span>
 
         </div>
@@ -4623,8 +4708,20 @@ async function cargarFutbol(
 
 
     /*
-       Guardamos los datos.
+       Ordenamos para que el render actual
+       pueda encontrar próximos y recientes.
     */
+
+    fixtures.sort(
+      (a, b) =>
+        new Date(
+          a.fixture.date
+        ) -
+        new Date(
+          b.fixture.date
+        )
+    );
+
 
     guardarCacheFutbol(
       fixtures
@@ -4640,20 +4737,16 @@ async function cargarFutbol(
       `${
         fixtures[0]?.league?.name ||
         "Fútbol"
-      } · 2026`;
+      } · ${THESPORTSDB_SEASON}`;
 
 
   } catch (error) {
 
     console.error(
-      "ERROR COMPLETO API-FOOTBALL:",
+      "ERROR COMPLETO THESPORTSDB:",
       error
     );
 
-
-    /*
-       Intentamos utilizar incluso una caché vencida.
-    */
 
     const cacheVencida =
       leerCacheFutbol(true);
@@ -4671,14 +4764,8 @@ async function cargarFutbol(
       footballStatus.textContent =
         "Datos guardados";
 
-
-      /*
-         Mostramos el error en consola pero no
-         molestamos al usuario si tenemos datos.
-      */
-
       console.warn(
-        "Se utilizaron datos guardados porque la API falló:",
+        "Se utilizaron datos guardados porque TheSportsDB falló:",
         error.message
       );
 
@@ -4686,10 +4773,6 @@ async function cargarFutbol(
 
     }
 
-
-    /*
-       Ahora sí mostramos el error REAL.
-    */
 
     const mensaje =
       error &&
@@ -4729,14 +4812,13 @@ async function cargarFutbol(
             line-height:1.5;
           "
         >
-          Liga: ${API_FOOTBALL_LEAGUE}<br>
-          Temporada: ${API_FOOTBALL_SEASON}
+          Liga: ${THESPORTSDB_LEAGUE}<br>
+          Temporada: ${THESPORTSDB_SEASON}
         </span>
 
       </div>
 
     `;
-
 
     footballStatus.textContent =
       "Error API";
