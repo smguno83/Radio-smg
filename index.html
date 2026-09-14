@@ -301,21 +301,55 @@
       border-color: rgba(25,199,163,0.5);
     }
 
-    .stations-list {
+    .province-filters {
       display: flex;
-      flex-direction: column;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 1px 1px 10px;
+      margin-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .province-filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .province-filter {
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.045);
+      color: #8b95a5;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: 0.18s;
+    }
+
+    .province-filter.active {
+      color: white;
+      border-color: rgba(25,199,163,0.45);
+      background: rgba(25,199,163,0.13);
+    }
+
+    .stations-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
     }
 
     .station-item {
       width: 100%;
+      min-width: 0;
       border: 1px solid rgba(255,255,255,0.055);
       background: rgba(255,255,255,0.045);
       border-radius: 17px;
-      padding: 10px;
+      padding: 9px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 9px;
       cursor: pointer;
       transition: 0.18s;
     }
@@ -335,8 +369,8 @@
     }
 
     .station-logo {
-      width: 52px;
-      height: 52px;
+      width: 46px;
+      height: 46px;
       border-radius: 15px;
       object-fit: contain;
       background: #10141b;
@@ -351,7 +385,7 @@
     }
 
     .station-name {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
       overflow: hidden;
@@ -367,12 +401,13 @@
     .station-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 2px;
+      flex-shrink: 0;
     }
 
     .favorite-button {
-      width: 35px;
-      height: 35px;
+      width: 31px;
+      height: 31px;
       border: 0;
       border-radius: 12px;
       background: transparent;
@@ -386,8 +421,8 @@
     }
 
     .station-play {
-      width: 37px;
-      height: 37px;
+      width: 33px;
+      height: 33px;
       border: 0;
       border-radius: 50%;
       background: #19c7a3;
@@ -411,6 +446,21 @@
       text-align: center;
       font-size: 13px;
       padding: 12px;
+    }
+
+    @media (max-width: 380px) {
+      .stations-list {
+        grid-template-columns: 1fr;
+      }
+
+      .station-logo {
+        width: 50px;
+        height: 50px;
+      }
+
+      .station-name {
+        font-size: 13px;
+      }
     }
 
     .news-categories {
@@ -850,6 +900,11 @@
 
     </div>
 
+    <div
+      id="provinceFilters"
+      class="province-filters"
+    ></div>
+
     <div id="loading">
       Cargando emisoras...
     </div>
@@ -1156,6 +1211,9 @@ const favoritesContainer =
 const stationSearch =
   document.getElementById("stationSearch");
 
+const provinceFilters =
+  document.getElementById("provinceFilters");
+
 const radioCount =
   document.getElementById("radioCount");
 
@@ -1188,6 +1246,9 @@ let indiceNoticia = 0;
 let metadataTimer = null;
 
 let categoriaNoticias =
+  "todas";
+
+let provinciaRadios =
   "todas";
 
 const FAVORITES_KEY =
@@ -1435,6 +1496,8 @@ async function cargarRadios() {
     }
 
     actualizarInterfazRadio();
+
+    renderProvinceFilters();
 
     renderFavorites();
 
@@ -1709,6 +1772,64 @@ favoritesContainer.addEventListener(
    LISTA DE RADIOS
 ============================================================ */
 
+function renderProvinceFilters() {
+
+  const provincias =
+    [...new Set(
+      radios
+        .map(radio =>
+          (radio.provincia || "").trim()
+        )
+        .filter(Boolean)
+    )]
+    .sort((a, b) =>
+      a.localeCompare(b, "es")
+    );
+
+  const botones = [
+    `
+      <button
+        class="province-filter ${
+          provinciaRadios === "todas"
+            ? "active"
+            : ""
+        }"
+        data-province="todas"
+      >
+        Todas (${radios.length})
+      </button>
+    `,
+    ...provincias.map(provincia => {
+
+      const cantidad =
+        radios.filter(
+          radio =>
+            (radio.provincia || "").trim() ===
+            provincia
+        ).length;
+
+      return `
+        <button
+          class="province-filter ${
+            provinciaRadios === provincia
+              ? "active"
+              : ""
+          }"
+          data-province="${escapeAttribute(provincia)}"
+        >
+          ${escapeHtml(provincia)} (${cantidad})
+        </button>
+      `;
+
+    })
+  ];
+
+  provinceFilters.innerHTML =
+    botones.join("");
+
+}
+
+
 function renderStations(searchText = "") {
 
   const text =
@@ -1720,6 +1841,19 @@ function renderStations(searchText = "") {
     radios.filter(
       radio => {
 
+        const provincia =
+          (
+            radio.provincia ||
+            ""
+          ).trim();
+
+        if (
+          provinciaRadios !== "todas" &&
+          provincia !== provinciaRadios
+        ) {
+          return false;
+        }
+
         if (!text) {
           return true;
         }
@@ -1730,15 +1864,12 @@ function renderStations(searchText = "") {
             ""
           ).toLowerCase();
 
-        const provincia =
-          (
-            radio.provincia ||
-            ""
-          ).toLowerCase();
+        const provinciaTexto =
+          provincia.toLowerCase();
 
         return (
           nombre.includes(text) ||
-          provincia.includes(text)
+          provinciaTexto.includes(text)
         );
 
       }
@@ -1749,8 +1880,11 @@ function renderStations(searchText = "") {
   ) {
 
     stationsContainer.innerHTML = `
-      <div class="empty-favorites">
-        No encontramos esa emisora.
+      <div
+        class="empty-favorites"
+        style="grid-column:1/-1;"
+      >
+        No encontramos radios con esos filtros.
       </div>
     `;
 
@@ -1935,6 +2069,33 @@ stationsContainer.addEventListener(
       );
 
     }
+
+  }
+);
+
+
+provinceFilters.addEventListener(
+  "click",
+  event => {
+
+    const button =
+      event.target.closest(
+        ".province-filter"
+      );
+
+    if (!button) {
+      return;
+    }
+
+    provinciaRadios =
+      button.dataset.province ||
+      "todas";
+
+    renderProvinceFilters();
+
+    renderStations(
+      stationSearch.value
+    );
 
   }
 );
