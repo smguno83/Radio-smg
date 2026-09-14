@@ -343,7 +343,7 @@
     .station-item {
       width: 100%;
       min-width: 0;
-      min-height: 116px;
+      min-height: 132px;
       box-sizing: border-box;
       border: 1px solid rgba(255,255,255,0.055);
       background: rgba(255,255,255,0.045);
@@ -351,10 +351,10 @@
       padding: 10px;
       display: grid;
       grid-template-columns: 48px minmax(0, 1fr);
-      grid-template-rows: auto auto;
+      grid-template-rows: 52px auto;
       align-items: start;
       column-gap: 9px;
-      row-gap: 6px;
+      row-gap: 8px;
       position: relative;
       cursor: pointer;
       transition: 0.18s;
@@ -389,7 +389,9 @@
     .station-info {
       min-width: 0;
       text-align: left;
-      padding-right: 2px;
+      padding-right: 0;
+      grid-column: 1 / -1;
+      grid-row: 2;
     }
 
     .station-name {
@@ -423,9 +425,9 @@
       align-items: center;
       justify-content: flex-end;
       gap: 2px;
-      grid-column: 1 / -1;
-      grid-row: 2;
-      margin-top: -2px;
+      grid-column: 2;
+      grid-row: 1;
+      margin-top: 0;
     }
 
     .favorite-button {
@@ -1975,6 +1977,14 @@ function renderStations(searchText = "") {
               <div class="station-actions">
 
                 <button
+                  class="station-play"
+                  data-play-id="${radio.id}"
+                  aria-label="Reproducir"
+                >
+                  <i class="fa-solid fa-play"></i>
+                </button>
+
+                <button
                   class="favorite-button ${favorite ? "active" : ""}"
                   data-favorite-id="${radio.id}"
                   aria-label="Favorito"
@@ -1984,14 +1994,6 @@ function renderStations(searchText = "") {
                       ? "fa-solid"
                       : "fa-regular"
                   } fa-star"></i>
-                </button>
-
-                <button
-                  class="station-play"
-                  data-play-id="${radio.id}"
-                  aria-label="Reproducir"
-                >
-                  <i class="fa-solid fa-play"></i>
                 </button>
 
               </div>
