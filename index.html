@@ -540,6 +540,106 @@
     }
 
     /* =========================================================
+       FOOTBALL
+    ========================================================= */
+
+    .football-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .football-card {
+      background: rgba(255,255,255,0.045);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .football-date {
+      color: #737e8e;
+      font-size: 10px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .football-teams {
+      display: grid;
+      grid-template-columns: 1fr 72px 1fr;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .football-team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .football-team-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      margin-bottom: 6px;
+    }
+
+    .football-team-name {
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .football-score {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .football-score small {
+      display: block;
+      font-size: 9px;
+      font-weight: 600;
+      color: #7d8796;
+      margin-top: 3px;
+    }
+
+    .football-status {
+      display: inline-block;
+      margin-top: 9px;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: rgba(25,199,163,0.12);
+      color: #6fd8c5;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .football-status.live {
+      background: rgba(255,80,80,0.14);
+      color: #ff7d7d;
+    }
+
+    .football-status.finished {
+      background: rgba(255,255,255,0.07);
+      color: #929baa;
+    }
+
+    .football-status.postponed {
+      background: rgba(255,190,70,0.13);
+      color: #ffc85c;
+    }
+
+    .football-more {
+      margin-top: 10px;
+      color: #657080;
+      text-align: center;
+      font-size: 10px;
+    }
+
+    /* =========================================================
        AUDIO
     ========================================================= */
 
@@ -633,6 +733,22 @@
       color: white;
       font-size: 16px;
       box-shadow: 0 5px 18px rgba(25,199,163,0.25);
+    }
+
+    @media (max-width: 430px) {
+
+      .football-teams {
+        grid-template-columns: 1fr 60px 1fr;
+      }
+
+      .football-team-name {
+        font-size: 10px;
+      }
+
+      .football-score {
+        font-size: 16px;
+      }
+
     }
 
   </style>
@@ -781,6 +897,38 @@
 
 
   <!-- =======================================================
+       FÚTBOL
+  ======================================================== -->
+
+  <section class="section">
+
+    <div class="section-header">
+
+      <h2 class="section-title">
+        ⚽ Fútbol
+      </h2>
+
+      <span
+        id="footballStatus"
+        class="section-subtitle"
+      >
+        2026
+      </span>
+
+    </div>
+
+    <div id="footballContainer">
+
+      <div class="news-empty">
+        Cargando partidos...
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =======================================================
        NOTICIAS
   ======================================================== -->
 
@@ -847,6 +995,13 @@
         data-category="espectaculos"
       >
         Espectáculos
+      </button>
+
+      <button
+        class="news-category"
+        data-category="policiales"
+      >
+        Policiales
       </button>
 
     </div>
@@ -961,6 +1116,29 @@ const LOGOS_BUCKET =
 
 
 /* ============================================================
+   API FOOTBALL
+============================================================ */
+
+const API_FOOTBALL_KEY =
+  "051cfe2673191f0b2f52f0afadddbe90";
+
+const API_FOOTBALL_BASE =
+  "https://v3.football.api-sports.io";
+
+const API_FOOTBALL_LEAGUE =
+  128;
+
+const API_FOOTBALL_SEASON =
+  2026;
+
+const FOOTBALL_CACHE_KEY =
+  "radioSMGFootballFixtures";
+
+const FOOTBALL_CACHE_TIME =
+  30 * 60 * 1000;
+
+
+/* ============================================================
    METADATA
 ============================================================ */
 
@@ -1041,6 +1219,12 @@ const newsContainer =
 const newsCategories =
   document.getElementById("newsCategories");
 
+const footballContainer =
+  document.getElementById("footballContainer");
+
+const footballStatus =
+  document.getElementById("footballStatus");
+
 
 /* ============================================================
    VARIABLES
@@ -1052,8 +1236,6 @@ let noticias = [];
 
 let indiceNoticia = 0;
 
-let feedIndex = 0;
-
 let metadataTimer = null;
 
 let categoriaNoticias =
@@ -1061,6 +1243,12 @@ let categoriaNoticias =
 
 const FAVORITES_KEY =
   "radioSMGFavorites";
+
+const NEWS_CACHE_KEY =
+  "radioSMGNewsCache";
+
+const NEWS_CACHE_TIME =
+  10 * 60 * 1000;
 
 
 /* ============================================================
@@ -1832,8 +2020,7 @@ stationSearch.addEventListener(
 
 
 /* ============================================================
-   METADATA
-   NO TOCA EL REPRODUCTOR
+   METADATA LA 100
 ============================================================ */
 
 async function actualizarMetadata(
@@ -2636,36 +2823,51 @@ settingsButton.addEventListener(
 const apiKey =
   "pub_ebffaca675dd4f2a91c4e96e7656ef14";
 
+const NEWS_MAX_ITEMS =
+  60;
 
-const rssFeeds = [
-
-  {
-    tipo: "rss",
-    url:
-      "https://api.rss2json.com/v1/api.json?rss_url=https://www.clarin.com/rss/lo-ultimo/"
-  },
-
-  {
-    tipo: "newsdata",
-    url:
-      `https://newsdata.io/api/1/news?apikey=${apiKey}&country=ar&language=es`
-  }
-
-];
+const NEWS_REFRESH_TIME =
+  10 * 60 * 1000;
 
 
 /* ============================================================
-   CLASIFICAR NOTICIAS
+   NORMALIZAR TEXTO
 ============================================================ */
 
-function clasificarNoticia(
-  noticia
+function limpiarTexto(
+  texto
 ) {
 
-  const texto = (
-    (noticia.title || "") +
-    " " +
-    (noticia.description || "")
+  return String(
+    texto || ""
+  )
+    .replace(
+      /<[^>]*>/g,
+      ""
+    )
+    .replace(
+      /&nbsp;/gi,
+      " "
+    )
+    .replace(
+      /&amp;/gi,
+      "&"
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
+    .trim();
+
+}
+
+
+function normalizarTexto(
+  texto
+) {
+
+  return limpiarTexto(
+    texto
   )
     .toLowerCase()
     .normalize("NFD")
@@ -2674,8 +2876,96 @@ function clasificarNoticia(
       ""
     );
 
+}
 
-  const palabrasPolitica = [
+
+/* ============================================================
+   CLASIFICACIÓN FALLBACK
+============================================================ */
+
+function clasificarPorPalabras(
+  noticia
+) {
+
+  const texto =
+    normalizarTexto(
+      `${noticia.title || ""} ${noticia.description || ""}`
+    );
+
+
+  const deportes = [
+    "futbol",
+    "river",
+    "boca",
+    "racing",
+    "independiente",
+    "san lorenzo",
+    "seleccion",
+    "messi",
+    "deporte",
+    "tenis",
+    "basquet",
+    "nba",
+    "formula 1",
+    "mundial",
+    "champions",
+    "liga"
+  ];
+
+
+  const tecnologia = [
+    "tecnologia",
+    "tecnologico",
+    "inteligencia artificial",
+    "iphone",
+    "android",
+    "apple",
+    "google",
+    "microsoft",
+    "software",
+    "internet",
+    "aplicacion",
+    "celular",
+    "computadora"
+  ];
+
+
+  const espectaculos = [
+    "cine",
+    "pelicula",
+    "musica",
+    "actor",
+    "actriz",
+    "famoso",
+    "famosa",
+    "cantante",
+    "television",
+    "serie",
+    "streaming",
+    "show",
+    "espectaculo",
+    "celebridad"
+  ];
+
+
+  const economia = [
+    "economia",
+    "dolar",
+    "inflacion",
+    "mercado",
+    "banco",
+    "empleo",
+    "salario",
+    "precios",
+    "pymes",
+    "impuestos",
+    "finanzas",
+    "peso",
+    "reservas"
+  ];
+
+
+  const politica = [
     "politica",
     "presidente",
     "gobierno",
@@ -2693,99 +2983,101 @@ function clasificarNoticia(
   ];
 
 
-  const palabrasEconomia = [
-    "economia",
-    "dolar",
-    "inflacion",
-    "mercado",
-    "banco",
-    "empleo",
-    "salario",
-    "precios",
-    "pymes",
-    "impuestos",
-    "finanzas",
-    "peso",
-    "reservas"
+  const policiales = [
+    "policia",
+    "policial",
+    "asesinato",
+    "asesinado",
+    "asesinada",
+    "crimen",
+    "delito",
+    "robo",
+    "ladron",
+    "detenido",
+    "detenida",
+    "accidente",
+    "fiscal",
+    "juez",
+    "violencia"
   ];
-
-
-  const palabrasDeportes = [
-    "futbol",
-    "river",
-    "boca",
-    "racing",
-    "independiente",
-    "san lorenzo",
-    "seleccion",
-    "mess i",
-    "messi",
-    "deporte",
-    "tenis",
-    "basquet",
-    "nba",
-    "formula 1",
-    "mundial",
-    "champions",
-    "liga"
-  ];
-
-
-  const palabrasTecnologia = [
-    "tecnologia",
-    "tecnologico",
-    "inteligencia artificial",
-    "ia ",
-    "iphone",
-    "android",
-    "apple",
-    "google",
-    "microsoft",
-    "software",
-    "internet",
-    "app",
-    "aplicacion",
-    "celular",
-    "computadora"
-  ];
-
-
-  const palabrasEspectaculos = [
-    "cine",
-    "pelicula",
-    "musica",
-    "actor",
-    "actriz",
-    "famoso",
-    "famosa",
-    "cantante",
-    "television",
-    "tv",
-    "serie",
-    "streaming",
-    "show",
-    "espectaculo",
-    "celebridad"
-  ];
-
-
-  function contiene(
-    palabras
-  ) {
-
-    return palabras.some(
-      palabra =>
-        texto.includes(
-          palabra
-        )
-    );
-
-  }
 
 
   if (
-    contiene(
-      palabrasDeportes
+    deportes.some(
+      p => texto.includes(p)
+    )
+  ) {
+    return "deportes";
+  }
+
+  if (
+    tecnologia.some(
+      p => texto.includes(p)
+    )
+  ) {
+    return "tecnologia";
+  }
+
+  if (
+    espectaculos.some(
+      p => texto.includes(p)
+    )
+  ) {
+    return "espectaculos";
+  }
+
+  if (
+    economia.some(
+      p => texto.includes(p)
+    )
+  ) {
+    return "economia";
+  }
+
+  if (
+    politica.some(
+      p => texto.includes(p)
+    )
+  ) {
+    return "politica";
+  }
+
+  if (
+    policiales.some(
+      p => texto.includes(p)
+    )
+  ) {
+    return "policiales";
+  }
+
+  return "actualidad";
+
+}
+
+
+/* ============================================================
+   MAPEAR CATEGORÍAS NEWS DATA
+============================================================ */
+
+function mapearCategoriaNewsData(
+  categorias,
+  noticia
+) {
+
+  const categoriasNormalizadas =
+    Array.isArray(categorias)
+      ? categorias.map(
+          x =>
+            String(x)
+              .toLowerCase()
+              .trim()
+        )
+      : [];
+
+
+  if (
+    categoriasNormalizadas.includes(
+      "sports"
     )
   ) {
     return "deportes";
@@ -2793,26 +3085,17 @@ function clasificarNoticia(
 
 
   if (
-    contiene(
-      palabrasTecnologia
+    categoriasNormalizadas.includes(
+      "politics"
     )
   ) {
-    return "tecnologia";
+    return "politica";
   }
 
 
   if (
-    contiene(
-      palabrasEspectaculos
-    )
-  ) {
-    return "espectaculos";
-  }
-
-
-  if (
-    contiene(
-      palabrasEconomia
+    categoriasNormalizadas.includes(
+      "business"
     )
   ) {
     return "economia";
@@ -2820,15 +3103,213 @@ function clasificarNoticia(
 
 
   if (
-    contiene(
-      palabrasPolitica
+    categoriasNormalizadas.includes(
+      "technology"
     )
   ) {
-    return "politica";
+    return "tecnologia";
   }
 
 
-  return "actualidad";
+  if (
+    categoriasNormalizadas.includes(
+      "entertainment"
+    )
+  ) {
+    return "espectaculos";
+  }
+
+
+  if (
+    categoriasNormalizadas.includes(
+      "crime"
+    )
+  ) {
+    return "policiales";
+  }
+
+
+  return clasificarPorPalabras(
+    noticia
+  );
+
+}
+
+
+/* ============================================================
+   CLAVE ÚNICA DE NOTICIA
+============================================================ */
+
+function obtenerClaveNoticia(
+  noticia
+) {
+
+  const link =
+    String(
+      noticia.link || ""
+    ).trim();
+
+  if (
+    link &&
+    link !== "#"
+  ) {
+
+    return `link:${link}`;
+
+  }
+
+  return `title:${normalizarTexto(
+    noticia.title || ""
+  )}`;
+
+}
+
+
+/* ============================================================
+   CARGAR CACHE NOTICIAS
+============================================================ */
+
+function cargarCacheNoticias() {
+
+  try {
+
+    const raw =
+      localStorage.getItem(
+        NEWS_CACHE_KEY
+      );
+
+    if (!raw) {
+      return;
+    }
+
+    const cache =
+      JSON.parse(raw);
+
+    if (
+      !cache ||
+      !Array.isArray(
+        cache.noticias
+      )
+    ) {
+      return;
+    }
+
+    noticias =
+      cache.noticias;
+
+    indiceNoticia =
+      0;
+
+    mostrarNoticia();
+
+  } catch (error) {
+
+    console.warn(
+      "No se pudo leer caché de noticias:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   GUARDAR CACHE NOTICIAS
+============================================================ */
+
+function guardarCacheNoticias() {
+
+  try {
+
+    localStorage.setItem(
+      NEWS_CACHE_KEY,
+      JSON.stringify({
+        timestamp: Date.now(),
+        noticias: noticias
+      })
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "No se pudo guardar caché de noticias:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   MERGE DE NOTICIAS
+============================================================ */
+
+function fusionarNoticias(
+  nuevasNoticias
+) {
+
+  const mapa =
+    new Map();
+
+
+  noticias.forEach(
+    noticia => {
+
+      mapa.set(
+        obtenerClaveNoticia(
+          noticia
+        ),
+        noticia
+      );
+
+    }
+  );
+
+
+  nuevasNoticias.forEach(
+    noticia => {
+
+      mapa.set(
+        obtenerClaveNoticia(
+          noticia
+        ),
+        noticia
+      );
+
+    }
+  );
+
+
+  noticias =
+    Array.from(
+      mapa.values()
+    )
+    .sort(
+      (a, b) => {
+
+        const fechaA =
+          Date.parse(
+            a.pubDate || ""
+          ) || 0;
+
+        const fechaB =
+          Date.parse(
+            b.pubDate || ""
+          ) || 0;
+
+        return fechaB - fechaA;
+
+      }
+    )
+    .slice(
+      0,
+      NEWS_MAX_ITEMS
+    );
+
+
+  guardarCacheNoticias();
 
 }
 
@@ -2839,152 +3320,273 @@ function clasificarNoticia(
 
 async function cargarNoticias() {
 
-  const feed =
-    rssFeeds[feedIndex];
+  const newsDataUrl =
+    `https://newsdata.io/api/1/latest?apikey=${apiKey}&country=ar&language=es`;
 
-  try {
+  const clarinUrl =
+    "https://api.rss2json.com/v1/api.json?rss_url=https://www.clarin.com/rss/lo-ultimo/";
 
-    const resp =
-      await fetch(
-        feed.url
-      );
+
+  const resultados =
+    await Promise.allSettled([
+
+      fetch(
+        newsDataUrl,
+        {
+          cache: "no-store"
+        }
+      )
+      .then(
+        response => {
+
+          if (!response.ok) {
+            throw new Error(
+              `NewsData HTTP ${response.status}`
+            );
+          }
+
+          return response.json();
+
+        }
+      ),
+
+      fetch(
+        clarinUrl,
+        {
+          cache: "no-store"
+        }
+      )
+      .then(
+        response => {
+
+          if (!response.ok) {
+            throw new Error(
+              `Clarín HTTP ${response.status}`
+            );
+          }
+
+          return response.json();
+
+        }
+      )
+
+    ]);
+
+
+  const nuevasNoticias = [];
+
+
+  /* ==========================================================
+     NEWSDATA
+  ========================================================== */
+
+  const newsDataResult =
+    resultados[0];
+
+
+  if (
+    newsDataResult.status ===
+    "fulfilled"
+  ) {
 
     const data =
-      await resp.json();
+      newsDataResult.value;
 
 
     if (
-      feed.tipo === "newsdata"
+      Array.isArray(
+        data.results
+      )
     ) {
 
-      if (!data.results) {
-        return;
-      }
+      data.results.forEach(
+        n => {
 
-      noticias =
-        data.results.map(
-          n => {
+          const noticia = {
 
-            const noticia = {
-
-              title:
+            title:
+              limpiarTexto(
                 n.title ||
-                "Sin título",
+                "Sin título"
+              ),
 
-              description:
-                (
-                  n.description ||
-                  ""
-                )
-                  .replace(
-                    /<[^>]+>/g,
-                    ""
-                  )
-                  .slice(
-                    0,
-                    140
-                  ) +
-                "...",
+            description:
+              limpiarTexto(
+                n.description ||
+                ""
+              ).slice(
+                0,
+                160
+              ),
 
-              image_url:
-                n.image_url ||
-                "icon.png",
+            image_url:
+              n.image_url ||
+              "icon.png",
 
-              link:
-                n.link ||
-                "#"
+            link:
+              n.link ||
+              "#",
 
-            };
+            pubDate:
+              n.pubDate ||
+              "",
 
-            noticia.categoria =
-              clasificarNoticia(
-                noticia
-              );
+            source:
+              n.source_name ||
+              "NewsData",
 
-            return noticia;
+            categoria:
+              mapearCategoriaNewsData(
+                n.category,
+                n
+              )
 
-          }
-        );
+          };
+
+
+          nuevasNoticias.push(
+            noticia
+          );
+
+        }
+      );
 
     }
+
+  } else {
+
+    console.warn(
+      "NewsData no disponible:",
+      newsDataResult.reason
+    );
+
+  }
+
+
+  /* ==========================================================
+     CLARÍN
+  ========================================================== */
+
+  const clarinResult =
+    resultados[1];
+
+
+  if (
+    clarinResult.status ===
+    "fulfilled"
+  ) {
+
+    const data =
+      clarinResult.value;
 
 
     if (
-      feed.tipo === "rss"
+      Array.isArray(
+        data.items
+      )
     ) {
 
-      if (!data.items) {
-        return;
-      }
+      data.items.forEach(
+        n => {
 
-      noticias =
-        data.items.map(
-          n => {
+          const noticia = {
 
-            const noticia = {
-
-              title:
+            title:
+              limpiarTexto(
                 n.title ||
-                "Sin título",
+                "Sin título"
+              ),
 
-              description:
-                (
-                  n.description ||
-                  ""
-                )
-                  .replace(
-                    /<[^>]+>/g,
-                    ""
-                  )
-                  .slice(
-                    0,
-                    140
-                  ) +
-                "...",
+            description:
+              limpiarTexto(
+                n.description ||
+                ""
+              ).slice(
+                0,
+                160
+              ),
 
-              image_url:
-                "icon.png",
+            image_url:
+              n.thumbnail ||
+              n.enclosure?.link ||
+              "icon.png",
 
-              link:
-                n.link ||
-                "#"
+            link:
+              n.link ||
+              "#",
 
-            };
+            pubDate:
+              n.pubDate ||
+              "",
 
-            noticia.categoria =
-              clasificarNoticia(
-                noticia
-              );
+            source:
+              "Clarín",
 
-            return noticia;
+            /* Clarín queda como actualidad.
+               Así evitamos que una clasificación
+               por palabras vuelva a provocar
+               movimientos impredecibles. */
+            categoria:
+              "actualidad"
 
-          }
-        );
+          };
+
+
+          nuevasNoticias.push(
+            noticia
+          );
+
+        }
+      );
 
     }
 
+  } else {
+
+    console.warn(
+      "Clarín no disponible:",
+      clarinResult.reason
+    );
+
+  }
+
+
+  /* ==========================================================
+     ACTUALIZAR SOLO SI LLEGÓ INFORMACIÓN
+  ========================================================== */
+
+  if (
+    nuevasNoticias.length > 0
+  ) {
+
+    fusionarNoticias(
+      nuevasNoticias
+    );
 
     indiceNoticia =
       0;
 
     mostrarNoticia();
 
+  } else {
 
-  } catch (error) {
+    /* Si falla una consulta,
+       conservamos lo que ya teníamos. */
 
-    console.error(
-      "Error cargando noticias:",
-      error
-    );
+    if (
+      noticias.length === 0
+    ) {
+
+      newsContainer.innerHTML = `
+        <div class="news-empty">
+          No se pudieron cargar las noticias
+          en este momento.
+        </div>
+      `;
+
+    }
 
   }
-
-
-  feedIndex =
-    (
-      feedIndex + 1
-    ) %
-    rssFeeds.length;
 
 }
 
@@ -3077,7 +3679,10 @@ function mostrarNoticia() {
       "Tecnología",
 
     espectaculos:
-      "Espectáculos"
+      "Espectáculos",
+
+    policiales:
+      "Policiales"
 
   };
 
@@ -3119,7 +3724,8 @@ function mostrarNoticia() {
 
         <p class="news-desc">
           ${escapeHtml(
-            n.description
+            n.description ||
+            ""
           )}
         </p>
 
@@ -3236,6 +3842,761 @@ function getSafeLink(
 
 
 /* ============================================================
+   FÚTBOL - CACHE
+============================================================ */
+
+function leerCacheFutbol() {
+
+  try {
+
+    const raw =
+      localStorage.getItem(
+        FOOTBALL_CACHE_KEY
+      );
+
+    if (!raw) {
+      return null;
+    }
+
+    const cache =
+      JSON.parse(raw);
+
+    if (
+      !cache ||
+      !Array.isArray(
+        cache.fixtures
+      )
+    ) {
+      return null;
+    }
+
+    if (
+      Date.now() -
+      Number(
+        cache.timestamp || 0
+      ) >
+      FOOTBALL_CACHE_TIME
+    ) {
+
+      return null;
+
+    }
+
+    return cache.fixtures;
+
+  } catch {
+
+    return null;
+
+  }
+
+}
+
+
+function guardarCacheFutbol(
+  fixtures
+) {
+
+  try {
+
+    localStorage.setItem(
+      FOOTBALL_CACHE_KEY,
+      JSON.stringify({
+
+        timestamp:
+          Date.now(),
+
+        fixtures:
+          fixtures
+
+      })
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "No se pudo guardar caché fútbol:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   FÚTBOL - ESTADO
+============================================================ */
+
+function textoEstadoFutbol(
+  status
+) {
+
+  const estados = {
+
+    NS:
+      "Próximo",
+
+    TBD:
+      "Horario a confirmar",
+
+    "1H":
+      "En vivo",
+
+    HT:
+      "Entretiempo",
+
+    "2H":
+      "En vivo",
+
+    ET:
+      "Tiempo extra",
+
+    BT:
+      "Entretiempo",
+
+    P:
+      "Penales",
+
+    FT:
+      "Finalizado",
+
+    AET:
+      "Finalizado",
+
+    PEN:
+      "Finalizado",
+
+    PST:
+      "Postergado",
+
+    CANC:
+      "Cancelado",
+
+    ABD:
+      "Suspendido",
+
+    AWD:
+      "Finalizado",
+
+    WO:
+      "Finalizado"
+
+  };
+
+  return estados[status] ||
+    status ||
+    "Estado desconocido";
+
+}
+
+
+function esPartidoEnVivo(
+  status
+) {
+
+  return [
+    "1H",
+    "HT",
+    "2H",
+    "ET",
+    "BT",
+    "P"
+  ].includes(
+    status
+  );
+
+}
+
+
+function esPartidoFinalizado(
+  status
+) {
+
+  return [
+    "FT",
+    "AET",
+    "PEN",
+    "AWD",
+    "WO"
+  ].includes(
+    status
+  );
+
+}
+
+
+/* ============================================================
+   FÚTBOL - FECHA
+============================================================ */
+
+function formatearFechaFutbol(
+  fecha
+) {
+
+  try {
+
+    return new Intl.DateTimeFormat(
+      "es-AR",
+      {
+        weekday: "short",
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    ).format(
+      new Date(fecha)
+    );
+
+  } catch {
+
+    return "";
+
+  }
+
+}
+
+
+/* ============================================================
+   FÚTBOL - RENDER
+============================================================ */
+
+function renderFutbol(
+  fixtures
+) {
+
+  if (
+    !Array.isArray(
+      fixtures
+    ) ||
+    fixtures.length === 0
+  ) {
+
+    footballContainer.innerHTML = `
+      <div class="news-empty">
+        No hay partidos disponibles
+        para esta competencia.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const ahora =
+    Date.now();
+
+
+  const ordenados =
+    [...fixtures].sort(
+      (a, b) => {
+
+        const fechaA =
+          new Date(
+            a?.fixture?.date || 0
+          ).getTime();
+
+        const fechaB =
+          new Date(
+            b?.fixture?.date || 0
+          ).getTime();
+
+        return fechaA - fechaB;
+
+      }
+    );
+
+
+  const enVivo =
+    ordenados.filter(
+      partido =>
+        esPartidoEnVivo(
+          partido?.fixture?.status?.short
+        )
+    );
+
+
+  const proximos =
+    ordenados.filter(
+      partido => {
+
+        const fecha =
+          new Date(
+            partido?.fixture?.date || 0
+          ).getTime();
+
+        const status =
+          partido?.fixture?.status?.short;
+
+        return (
+          fecha >= ahora &&
+          !esPartidoEnVivo(
+            status
+          ) &&
+          !esPartidoFinalizado(
+            status
+          )
+        );
+
+      }
+    );
+
+
+  const finalizados =
+    ordenados
+      .filter(
+        partido => {
+
+          const fecha =
+            new Date(
+              partido?.fixture?.date || 0
+            ).getTime();
+
+          return (
+            fecha < ahora &&
+            esPartidoFinalizado(
+              partido?.fixture?.status?.short
+            )
+          );
+
+        }
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            b.fixture.date
+          ) -
+          new Date(
+            a.fixture.date
+          )
+      );
+
+
+  const seleccionados = [
+    ...enVivo,
+    ...proximos.slice(0, 5),
+    ...finalizados.slice(0, 3)
+  ];
+
+
+  const unicos =
+    [];
+
+  const ids =
+    new Set();
+
+
+  seleccionados.forEach(
+    partido => {
+
+      const id =
+        partido?.fixture?.id;
+
+      if (
+        id &&
+        !ids.has(id)
+      ) {
+
+        ids.add(id);
+
+        unicos.push(
+          partido
+        );
+
+      }
+
+    }
+  );
+
+
+  if (
+    unicos.length === 0
+  ) {
+
+    footballContainer.innerHTML = `
+      <div class="news-empty">
+        No hay partidos próximos o recientes
+        para mostrar.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  const nombreLiga =
+    unicos[0]?.league?.name ||
+    "Fútbol";
+
+
+  footballStatus.textContent =
+    `${nombreLiga} · 2026`;
+
+
+  footballContainer.innerHTML = `
+
+    <div class="football-list">
+
+      ${unicos.map(
+        partido => {
+
+          const fixture =
+            partido.fixture || {};
+
+          const home =
+            partido.teams?.home || {};
+
+          const away =
+            partido.teams?.away || {};
+
+          const golesHome =
+            partido.goals?.home;
+
+          const golesAway =
+            partido.goals?.away;
+
+          const status =
+            fixture.status?.short ||
+            "NS";
+
+          const estado =
+            textoEstadoFutbol(
+              status
+            );
+
+          const live =
+            esPartidoEnVivo(
+              status
+            );
+
+          const finished =
+            esPartidoFinalizado(
+              status
+            );
+
+          let score =
+            "vs";
+
+          if (
+            finished ||
+            live
+          ) {
+
+            score =
+              `${golesHome ?? 0} - ${golesAway ?? 0}`;
+
+          }
+
+
+          let statusClass =
+            "";
+
+          if (live) {
+            statusClass =
+              "live";
+          } else if (finished) {
+            statusClass =
+              "finished";
+          } else if (
+            status === "PST" ||
+            status === "CANC" ||
+            status === "ABD"
+          ) {
+            statusClass =
+              "postponed";
+          }
+
+
+          return `
+
+            <article class="football-card">
+
+              <div class="football-date">
+                ${escapeHtml(
+                  formatearFechaFutbol(
+                    fixture.date
+                  )
+                )}
+              </div>
+
+              <div class="football-teams">
+
+                <div class="football-team">
+
+                  <img
+                    class="football-team-logo"
+                    src="${escapeAttribute(
+                      home.logo ||
+                      "icon.png"
+                    )}"
+                    alt=""
+                    onerror="this.src='icon.png'"
+                  >
+
+                  <div class="football-team-name">
+                    ${escapeHtml(
+                      home.name ||
+                      "Local"
+                    )}
+                  </div>
+
+                </div>
+
+
+                <div class="football-score">
+
+                  ${escapeHtml(
+                    score
+                  )}
+
+                  <small>
+                    ${escapeHtml(
+                      estado
+                    )}
+                  </small>
+
+                </div>
+
+
+                <div class="football-team">
+
+                  <img
+                    class="football-team-logo"
+                    src="${escapeAttribute(
+                      away.logo ||
+                      "icon.png"
+                    )}"
+                    alt=""
+                    onerror="this.src='icon.png'"
+                  >
+
+                  <div class="football-team-name">
+                    ${escapeHtml(
+                      away.name ||
+                      "Visitante"
+                    )}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div style="text-align:center;">
+
+                <span class="football-status ${statusClass}">
+                  ${escapeHtml(
+                    estado
+                  )}
+                </span>
+
+              </div>
+
+            </article>
+
+          `;
+
+        }
+      ).join("")}
+
+    </div>
+
+    ${
+      fixtures.length > 8
+        ? `
+          <div class="football-more">
+            Mostrando próximos y últimos partidos.
+          </div>
+        `
+        : ""
+    }
+
+  `;
+
+}
+
+
+/* ============================================================
+   FÚTBOL - CARGAR API
+============================================================ */
+
+async function cargarFutbol(
+  forzar = false
+) {
+
+  footballStatus.textContent =
+    "Cargando...";
+
+
+  if (!forzar) {
+
+    const cache =
+      leerCacheFutbol();
+
+    if (cache) {
+
+      renderFutbol(
+        cache
+      );
+
+      footballStatus.textContent =
+        `${cache[0]?.league?.name || "Fútbol"} · 2026`;
+
+      return;
+
+    }
+
+  }
+
+
+  if (
+    !API_FOOTBALL_KEY ||
+    API_FOOTBALL_KEY.trim() === ""
+  ) {
+
+    footballContainer.innerHTML = `
+      <div class="news-empty">
+        Falta configurar la API de fútbol.
+      </div>
+    `;
+
+    footballStatus.textContent =
+      "Sin API";
+
+    return;
+
+  }
+
+
+  try {
+
+    const url =
+      `${API_FOOTBALL_BASE}/fixtures?league=${API_FOOTBALL_LEAGUE}&season=${API_FOOTBALL_SEASON}`;
+
+
+    const response =
+      await fetch(
+        url,
+        {
+          method: "GET",
+
+          headers: {
+            "x-apisports-key":
+              API_FOOTBALL_KEY,
+
+            "Accept":
+              "application/json"
+          },
+
+          cache:
+            "no-store"
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        `API-Football HTTP ${response.status}`
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if (
+      data.errors &&
+      Object.keys(
+        data.errors
+      ).length > 0
+    ) {
+
+      console.error(
+        "API-Football:",
+        data.errors
+      );
+
+      throw new Error(
+        "API-Football devolvió un error."
+      );
+
+    }
+
+
+    const fixtures =
+      Array.isArray(
+        data.response
+      )
+        ? data.response
+        : [];
+
+
+    guardarCacheFutbol(
+      fixtures
+    );
+
+
+    renderFutbol(
+      fixtures
+    );
+
+
+    footballStatus.textContent =
+      `${
+        fixtures[0]?.league?.name ||
+        "Fútbol"
+      } · 2026`;
+
+
+  } catch (error) {
+
+    console.error(
+      "Error cargando fútbol:",
+      error
+    );
+
+
+    const cache =
+      leerCacheFutbol();
+
+
+    if (cache) {
+
+      renderFutbol(
+        cache
+      );
+
+      footballStatus.textContent =
+        "Datos guardados";
+
+    } else {
+
+      footballContainer.innerHTML = `
+        <div class="news-empty">
+          No se pudieron cargar los partidos.
+          <br><br>
+          Revisá la API key o la disponibilidad
+          de la competencia.
+        </div>
+      `;
+
+      footballStatus.textContent =
+        "Sin conexión";
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
    SERVICE WORKER
 ============================================================ */
 
@@ -3265,10 +4626,18 @@ if (
    INICIO
 ============================================================ */
 
+cargarCacheNoticias();
+
 cargarRadios();
 
 cargarNoticias();
 
+cargarFutbol();
+
+
+/* ============================================================
+   INTERVALOS
+============================================================ */
 
 setInterval(
   mostrarNoticia,
@@ -3278,7 +4647,19 @@ setInterval(
 
 setInterval(
   cargarNoticias,
-  60000
+  NEWS_REFRESH_TIME
+);
+
+
+setInterval(
+  () => {
+
+    cargarFutbol(
+      true
+    );
+
+  },
+  FOOTBALL_CACHE_TIME
 );
 
 </script>
