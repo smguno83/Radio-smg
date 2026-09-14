@@ -346,10 +346,10 @@
       border: 1px solid rgba(255,255,255,0.055);
       background: rgba(255,255,255,0.045);
       border-radius: 17px;
-      padding: 9px;
+      padding: 8px;
       display: flex;
       align-items: center;
-      gap: 9px;
+      gap: 7px;
       cursor: pointer;
       transition: 0.18s;
     }
@@ -369,12 +369,12 @@
     }
 
     .station-logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 15px;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
       object-fit: contain;
       background: #10141b;
-      padding: 6px;
+      padding: 5px;
       flex-shrink: 0;
     }
 
@@ -387,29 +387,35 @@
     .station-name {
       font-size: 12px;
       font-weight: 700;
+      line-height: 1.2;
+      min-height: 29px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+    }
+
+    .station-province {
+      color: #788292;
+      font-size: 10px;
+      margin-top: 3px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .station-province {
-      color: #788292;
-      font-size: 11px;
-      margin-top: 4px;
-    }
-
     .station-actions {
       display: flex;
       align-items: center;
-      gap: 2px;
+      gap: 1px;
       flex-shrink: 0;
     }
 
     .favorite-button {
-      width: 31px;
+      width: 28px;
       height: 31px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 11px;
       background: transparent;
       color: #657080;
       font-size: 15px;
@@ -421,8 +427,8 @@
     }
 
     .station-play {
-      width: 33px;
-      height: 33px;
+      width: 34px;
+      height: 34px;
       border: 0;
       border-radius: 50%;
       background: #19c7a3;
@@ -431,6 +437,7 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
     #loading {
