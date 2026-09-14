@@ -6,7 +6,6 @@
 
   <title>Radio SMG</title>
 
-  <!-- iPhone / PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Radio SMG">
@@ -14,10 +13,8 @@
   <link rel="apple-touch-icon" href="icon.png">
   <link rel="manifest" href="manifest.json">
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Font Awesome -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -448,6 +445,41 @@
        NEWS
     ========================================================= */
 
+    .news-categories {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 1px 10px;
+      scrollbar-width: none;
+    }
+
+    .news-categories::-webkit-scrollbar {
+      display: none;
+    }
+
+    .news-category {
+      border: 1px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.045);
+      color: #8f99a8;
+      border-radius: 20px;
+      padding: 8px 13px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: 0.18s;
+    }
+
+    .news-category.active {
+      background: #19c7a3;
+      border-color: #19c7a3;
+      color: white;
+    }
+
+    .news-category:active {
+      transform: scale(0.95);
+    }
+
     .news-card {
       background: rgba(255,255,255,0.045);
       border: 1px solid rgba(255,255,255,0.06);
@@ -466,6 +498,16 @@
 
     .news-content {
       padding: 15px;
+    }
+
+    .news-category-label {
+      display: inline-block;
+      color: #6fd8c5;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 7px;
     }
 
     .news-title {
@@ -488,8 +530,17 @@
       text-decoration: none;
     }
 
+    .news-empty {
+      padding: 20px;
+      text-align: center;
+      color: #7e8795;
+      font-size: 12px;
+      background: rgba(255,255,255,0.035);
+      border-radius: 17px;
+    }
+
     /* =========================================================
-       HIDDEN AUDIO
+       AUDIO
     ========================================================= */
 
     #player {
@@ -584,288 +635,304 @@
       box-shadow: 0 5px 18px rgba(25,199,163,0.25);
     }
 
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
-
-    @media (min-width: 600px) {
-
-      .topbar {
-        padding-top: 24px;
-      }
-
-      .main {
-        padding-left: 20px;
-        padding-right: 20px;
-      }
-
-      .current-card {
-        padding: 23px;
-      }
-
-    }
-
   </style>
 </head>
 
 <body>
 
-  <!-- =========================================================
-       HEADER
-  ========================================================= -->
+<header class="topbar">
 
-  <header class="topbar">
+  <div class="brand">
 
-    <div class="brand">
+    <div class="brand-icon">
+      <i class="fa-solid fa-radio"></i>
+    </div>
 
-      <div class="brand-icon">
-        <i class="fa-solid fa-radio"></i>
+    <div class="brand-text">
+      <h1>Radio SMG</h1>
+      <span>Tu radio, estés donde estés</span>
+    </div>
+
+  </div>
+
+  <button
+    class="settings-button"
+    id="settingsButton"
+    aria-label="Configuración"
+  >
+    <i class="fa-solid fa-gear"></i>
+  </button>
+
+</header>
+
+
+<main class="main">
+
+  <!-- RADIO ACTUAL -->
+
+  <section class="section">
+
+    <div class="current-card">
+
+      <img
+        id="stationLogo"
+        class="current-logo"
+        src=""
+        alt="Logo emisora"
+      >
+
+      <div class="current-info">
+
+        <div class="current-label">
+          <i class="fa-solid fa-circle"></i>
+          Radio seleccionada
+        </div>
+
+        <div
+          id="currentName"
+          class="current-name"
+        >
+          Seleccioná una emisora
+        </div>
+
+        <div
+          id="currentProvince"
+          class="current-province"
+        >
+          -
+        </div>
+
+        <div
+          id="nowPlaying"
+          class="current-status"
+        >
+          Lista para reproducir
+        </div>
+
       </div>
 
-      <div class="brand-text">
-        <h1>Radio SMG</h1>
-        <span>Tu radio, estés donde estés</span>
+    </div>
+
+  </section>
+
+
+  <!-- FAVORITOS -->
+
+  <section class="section">
+
+    <div class="section-header">
+
+      <h2 class="section-title">
+        ⭐ Tus radios favoritas
+      </h2>
+
+    </div>
+
+    <div
+      id="favoritesContainer"
+      class="favorites-scroll"
+    ></div>
+
+  </section>
+
+
+  <!-- TODAS LAS RADIOS -->
+
+  <section class="section">
+
+    <div class="section-header">
+
+      <h2 class="section-title">
+        📻 Todas las radios
+      </h2>
+
+      <span
+        id="radioCount"
+        class="section-subtitle"
+      ></span>
+
+    </div>
+
+    <div class="search-box">
+
+      <i class="fa-solid fa-magnifying-glass"></i>
+
+      <input
+        type="search"
+        id="stationSearch"
+        placeholder="Buscar emisora..."
+        autocomplete="off"
+      >
+
+    </div>
+
+    <div id="loading">
+      Cargando emisoras...
+    </div>
+
+    <div id="errorMessage"></div>
+
+    <div
+      id="stationsContainer"
+      class="stations-list"
+    ></div>
+
+  </section>
+
+
+  <!-- =======================================================
+       NOTICIAS
+  ======================================================== -->
+
+  <section class="section">
+
+    <div class="section-header">
+
+      <h2 class="section-title">
+        📰 Noticias
+      </h2>
+
+    </div>
+
+
+    <div
+      id="newsCategories"
+      class="news-categories"
+    >
+
+      <button
+        class="news-category active"
+        data-category="todas"
+      >
+        Todas
+      </button>
+
+      <button
+        class="news-category"
+        data-category="actualidad"
+      >
+        Actualidad
+      </button>
+
+      <button
+        class="news-category"
+        data-category="politica"
+      >
+        Política
+      </button>
+
+      <button
+        class="news-category"
+        data-category="economia"
+      >
+        Economía
+      </button>
+
+      <button
+        class="news-category"
+        data-category="deportes"
+      >
+        Deportes
+      </button>
+
+      <button
+        class="news-category"
+        data-category="tecnologia"
+      >
+        Tecnología
+      </button>
+
+      <button
+        class="news-category"
+        data-category="espectaculos"
+      >
+        Espectáculos
+      </button>
+
+    </div>
+
+
+    <div id="news-container"></div>
+
+  </section>
+
+</main>
+
+
+<!-- SELECT OCULTO -->
+
+<select id="stationList">
+  <option value="">Seleccioná una emisora</option>
+</select>
+
+
+<!-- AUDIO -->
+
+<audio
+  id="player"
+  preload="none"
+  playsinline
+></audio>
+
+
+<!-- BOTTOM PLAYER -->
+
+<div class="bottom-player">
+
+  <div class="bottom-player-inner">
+
+    <img
+      id="miniLogo"
+      class="mini-logo"
+      src="icon.png"
+      alt="Radio"
+    >
+
+    <div class="mini-info">
+
+      <div
+        id="miniName"
+        class="mini-name"
+      >
+        Radio SMG
+      </div>
+
+      <div
+        id="miniStatus"
+        class="mini-status"
+      >
+        Seleccioná una emisora
       </div>
 
     </div>
 
     <button
-      class="settings-button"
-      id="settingsButton"
-      aria-label="Configuración"
-      title="Configuración"
+      id="prevButton"
+      class="player-button"
+      aria-label="Radio anterior"
     >
-      <i class="fa-solid fa-gear"></i>
+      <i class="fa-solid fa-backward-step"></i>
     </button>
 
-  </header>
-
-
-  <!-- =========================================================
-       MAIN
-  ========================================================= -->
-
-  <main class="main">
-
-    <!-- RADIO ACTUAL -->
-
-    <section class="section">
-
-      <div class="current-card">
-
-        <img
-          id="stationLogo"
-          class="current-logo"
-          src=""
-          alt="Logo emisora"
-        >
-
-        <div class="current-info">
-
-          <div class="current-label">
-            <i class="fa-solid fa-circle"></i>
-            Radio seleccionada
-          </div>
-
-          <div
-            id="currentName"
-            class="current-name"
-          >
-            Seleccioná una emisora
-          </div>
-
-          <div
-            id="currentProvince"
-            class="current-province"
-          >
-            -
-          </div>
-
-          <div
-            id="nowPlaying"
-            class="current-status"
-          >
-            Lista para reproducir
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- FAVORITOS -->
-
-    <section class="section">
-
-      <div class="section-header">
-
-        <h2 class="section-title">
-          ⭐ Tus radios favoritas
-        </h2>
-
-      </div>
-
-      <div
-        id="favoritesContainer"
-        class="favorites-scroll"
-      ></div>
-
-    </section>
-
-
-    <!-- TODAS LAS RADIOS -->
-
-    <section class="section">
-
-      <div class="section-header">
-
-        <h2 class="section-title">
-          📻 Todas las radios
-        </h2>
-
-        <span
-          id="radioCount"
-          class="section-subtitle"
-        ></span>
-
-      </div>
-
-
-      <div class="search-box">
-
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-        <input
-          type="search"
-          id="stationSearch"
-          placeholder="Buscar emisora..."
-          autocomplete="off"
-        >
-
-      </div>
-
-
-      <div
-        id="loading"
-      >
-        Cargando emisoras...
-      </div>
-
-      <div
-        id="errorMessage"
-      ></div>
-
-
-      <div
-        id="stationsContainer"
-        class="stations-list"
-      ></div>
-
-    </section>
-
-
-    <!-- NOTICIAS -->
-
-    <section class="section">
-
-      <div class="section-header">
-
-        <h2 class="section-title">
-          📰 Noticias
-        </h2>
-
-      </div>
-
-      <div id="news-container"></div>
-
-    </section>
-
-  </main>
-
-
-  <!-- =========================================================
-       SELECT OCULTO
-       Se mantiene porque la lógica original utiliza selectedIndex.
-  ========================================================= -->
-
-  <select id="stationList">
-    <option value="">Seleccioná una emisora</option>
-  </select>
-
-
-  <!-- =========================================================
-       AUDIO
-  ========================================================= -->
-
-  <audio
-    id="player"
-    preload="none"
-    playsinline
-  ></audio>
-
-
-  <!-- =========================================================
-       BOTTOM PLAYER
-  ========================================================= -->
-
-  <div class="bottom-player">
-
-    <div class="bottom-player-inner">
-
-      <img
-        id="miniLogo"
-        class="mini-logo"
-        src="icon.png"
-        alt="Radio"
-      >
-
-      <div class="mini-info">
-
-        <div
-          id="miniName"
-          class="mini-name"
-        >
-          Radio SMG
-        </div>
-
-        <div
-          id="miniStatus"
-          class="mini-status"
-        >
-          Seleccioná una emisora
-        </div>
-
-      </div>
-
-      <button
-        id="prevButton"
-        class="player-button"
-        aria-label="Radio anterior"
-      >
-        <i class="fa-solid fa-backward-step"></i>
-      </button>
-
-      <button
-        id="playButton"
-        class="player-button"
-        aria-label="Reproducir"
-      >
-        <i class="fa-solid fa-play"></i>
-      </button>
-
-      <button
-        id="nextButton"
-        class="player-button"
-        aria-label="Radio siguiente"
-      >
-        <i class="fa-solid fa-forward-step"></i>
-      </button>
-
-    </div>
+    <button
+      id="playButton"
+      class="player-button"
+      aria-label="Reproducir"
+    >
+      <i class="fa-solid fa-play"></i>
+    </button>
+
+    <button
+      id="nextButton"
+      class="player-button"
+      aria-label="Radio siguiente"
+    >
+      <i class="fa-solid fa-forward-step"></i>
+    </button>
 
   </div>
+
+</div>
 
 
 <script>
@@ -889,13 +956,12 @@ const supabaseClient =
 const WORKER_URL =
   "https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=";
 
-const LOGOS_BUCKET = "logos";
+const LOGOS_BUCKET =
+  "logos";
 
 
 /* ============================================================
-   CONFIGURACIÓN DE METADATA
-   IMPORTANTE:
-   La metadata NO controla el reproductor.
+   METADATA
 ============================================================ */
 
 const TRITON_NOW_PLAYING_URL =
@@ -969,6 +1035,12 @@ const radioCount =
 const settingsButton =
   document.getElementById("settingsButton");
 
+const newsContainer =
+  document.getElementById("news-container");
+
+const newsCategories =
+  document.getElementById("newsCategories");
+
 
 /* ============================================================
    VARIABLES
@@ -983,6 +1055,9 @@ let indiceNoticia = 0;
 let feedIndex = 0;
 
 let metadataTimer = null;
+
+let categoriaNoticias =
+  "todas";
 
 const FAVORITES_KEY =
   "radioSMGFavorites";
@@ -1006,6 +1081,7 @@ function getLogoUrl(nombreLogo) {
   }
 
   return `${SUPABASE_URL}/storage/v1/object/public/${LOGOS_BUCKET}/${encodeURIComponent(nombreLogo)}`;
+
 }
 
 
@@ -1018,7 +1094,9 @@ function getFavorites() {
   try {
 
     const data =
-      localStorage.getItem(FAVORITES_KEY);
+      localStorage.getItem(
+        FAVORITES_KEY
+      );
 
     if (!data) {
       return [];
@@ -1036,10 +1114,13 @@ function getFavorites() {
     return [];
 
   }
+
 }
 
 
-function saveFavorites(favorites) {
+function saveFavorites(
+  favorites
+) {
 
   localStorage.setItem(
     FAVORITES_KEY,
@@ -1049,15 +1130,21 @@ function saveFavorites(favorites) {
 }
 
 
-function isFavorite(radioId) {
+function isFavorite(
+  radioId
+) {
 
   return getFavorites()
-    .includes(String(radioId));
+    .includes(
+      String(radioId)
+    );
 
 }
 
 
-function toggleFavorite(radioId) {
+function toggleFavorite(
+  radioId
+) {
 
   const id =
     String(radioId);
@@ -1065,7 +1152,9 @@ function toggleFavorite(radioId) {
   let favorites =
     getFavorites();
 
-  if (favorites.includes(id)) {
+  if (
+    favorites.includes(id)
+  ) {
 
     favorites =
       favorites.filter(
@@ -1078,7 +1167,9 @@ function toggleFavorite(radioId) {
 
   }
 
-  saveFavorites(favorites);
+  saveFavorites(
+    favorites
+  );
 
   renderFavorites();
 
@@ -1131,9 +1222,11 @@ async function cargarRadios() {
 
     }
 
-    radios = data;
+    radios =
+      data;
 
-    list.innerHTML = "";
+    list.innerHTML =
+      "";
 
     radios.forEach(
       radio => {
@@ -1179,11 +1272,6 @@ async function cargarRadios() {
     radioCount.textContent =
       `${radios.length} emisoras`;
 
-    /*
-       Recuperamos la última radio
-       SIN reproducir automáticamente.
-    */
-
     const lastStation =
       localStorage.getItem(
         "lastStation"
@@ -1212,7 +1300,8 @@ async function cargarRadios() {
       radios.length > 0
     ) {
 
-      list.selectedIndex = 0;
+      list.selectedIndex =
+        0;
 
     }
 
@@ -1247,7 +1336,9 @@ async function cargarRadios() {
    LOGO
 ============================================================ */
 
-function mostrarLogo(nombreLogo) {
+function mostrarLogo(
+  nombreLogo
+) {
 
   const logo =
     getLogoUrl(
@@ -1369,7 +1460,7 @@ function actualizarInterfazRadio() {
 
 
 /* ============================================================
-   RENDER FAVORITOS
+   FAVORITOS
 ============================================================ */
 
 function renderFavorites() {
@@ -1448,10 +1539,6 @@ function renderFavorites() {
 }
 
 
-/* ============================================================
-   CLICK FAVORITOS
-============================================================ */
-
 favoritesContainer.addEventListener(
   "click",
   event => {
@@ -1492,18 +1579,12 @@ favoritesContainer.addEventListener(
 
 
 /* ============================================================
-   RENDER RADIOS
+   LISTA DE RADIOS
 ============================================================ */
 
 function renderStations(
   searchText = ""
 ) {
-
-  if (
-    !stationsContainer
-  ) {
-    return;
-  }
 
   const text =
     searchText
@@ -1557,11 +1638,13 @@ function renderStations(
       .map(
         radio => {
 
+          const current =
+            getCurrentRadio();
+
           const active =
-            getCurrentRadio() &&
-            String(
-              getCurrentRadio().id
-            ) === String(radio.id);
+            current &&
+            String(current.id) ===
+            String(radio.id);
 
           const favorite =
             isFavorite(
@@ -1641,10 +1724,6 @@ function renderStations(
 }
 
 
-/* ============================================================
-   EVENTOS LISTA DE RADIOS
-============================================================ */
-
 stationsContainer.addEventListener(
   "click",
   event => {
@@ -1665,7 +1744,6 @@ stationsContainer.addEventListener(
       return;
 
     }
-
 
     const playButtonElement =
       event.target.closest(
@@ -1701,7 +1779,6 @@ stationsContainer.addEventListener(
       return;
 
     }
-
 
     const station =
       event.target.closest(
@@ -1756,11 +1833,7 @@ stationSearch.addEventListener(
 
 /* ============================================================
    METADATA
-   IMPORTANTE:
-   Esta función SOLO consulta información.
-   Nunca cambia player.src.
-   Nunca hace player.load().
-   Nunca detiene el audio.
+   NO TOCA EL REPRODUCTOR
 ============================================================ */
 
 async function actualizarMetadata(
@@ -1771,22 +1844,17 @@ async function actualizarMetadata(
     return;
   }
 
-  /*
-     Por ahora La 100 es la radio
-     que tiene metadata configurada.
-  */
-
   if (
     (
       radio.descripcion ||
       ""
-    ).toUpperCase() !== "LA 100"
+    ).toUpperCase() !==
+    "LA 100"
   ) {
 
     return;
 
   }
-
 
   try {
 
@@ -1827,16 +1895,8 @@ async function actualizarMetadata(
     if (
       registros.length === 0
     ) {
-
       return;
-
     }
-
-    /*
-       Verificamos nuevamente qué radio
-       está activa, pero NO tocamos el
-       reproductor.
-    */
 
     const current =
       getCurrentRadio();
@@ -1845,9 +1905,7 @@ async function actualizarMetadata(
       !current ||
       current.id !== radio.id
     ) {
-
       return;
-
     }
 
     const primero =
@@ -1869,12 +1927,10 @@ async function actualizarMetadata(
       return;
     }
 
-
     const programaMatch =
       titulo.match(
         /^\d{2}-\d{2}\s+\d{1,2}HS\s+AIRE\s+(.+?)\s+\d{3}$/i
       );
-
 
     if (programaMatch) {
 
@@ -1885,9 +1941,7 @@ async function actualizarMetadata(
         programa.toUpperCase() ===
         "LOOP 30 SEGUNDOS"
       ) {
-
         return;
-
       }
 
       nowPlaying.innerHTML =
@@ -1896,29 +1950,9 @@ async function actualizarMetadata(
       miniStatus.textContent =
         `📻 ${programa}`;
 
-      return;
-
     }
 
-
-    /*
-       Si no reconocemos el formato,
-       no hacemos nada con el reproductor.
-    */
-
   } catch (error) {
-
-    /*
-       MUY IMPORTANTE:
-
-       Si falla metadata,
-       la radio sigue reproduciendo.
-
-       No hacemos alert.
-       No pausamos.
-       No cambiamos src.
-       No hacemos load().
-    */
 
     console.warn(
       "Metadata no disponible:",
@@ -1929,10 +1963,6 @@ async function actualizarMetadata(
 
 }
 
-
-/* ============================================================
-   INICIAR / DETENER ACTUALIZACIÓN DE METADATA
-============================================================ */
 
 function iniciarMetadata(
   radio
@@ -1951,11 +1981,6 @@ function iniciarMetadata(
   metadataTimer =
     setInterval(
       () => {
-
-        /*
-           Solamente consultamos metadata
-           si el audio continúa reproduciendo.
-        */
 
         if (!player.paused) {
 
@@ -1987,7 +2012,8 @@ function detenerMetadata() {
       metadataTimer
     );
 
-    metadataTimer = null;
+    metadataTimer =
+      null;
 
   }
 
@@ -1995,8 +2021,7 @@ function detenerMetadata() {
 
 
 /* ============================================================
-   REPRODUCIR RADIO
-   MISMO SISTEMA PARA TODAS LAS RADIOS
+   REPRODUCIR
 ============================================================ */
 
 function playStation(
@@ -2007,24 +2032,11 @@ function playStation(
     !radio ||
     !radio.enlace
   ) {
-
     return;
-
   }
-
-
-  /*
-     Limpiamos solamente la información
-     visual de metadata.
-  */
 
   nowPlaying.innerHTML =
     "";
-
-
-  /*
-     STREAM ÚNICO PARA TODAS LAS RADIOS
-  */
 
   const originalUrl =
     radio.enlace;
@@ -2035,24 +2047,12 @@ function playStation(
       originalUrl
     );
 
-
-  /*
-     Detenemos el audio anterior
-     y cargamos el nuevo stream.
-  */
-
   player.pause();
 
   player.src =
     streamUrl;
 
   player.load();
-
-
-  /*
-     IMPORTANTE:
-     La metadata todavía NO interviene.
-  */
 
   player.play()
     .then(
@@ -2073,18 +2073,14 @@ function playStation(
           radio.logo || ""
         );
 
-
         mostrarLogo(
           radio.logo
         );
 
-
         actualizarInterfazRadio();
-
 
         miniStatus.textContent =
           "Reproduciendo";
-
 
         playButton.innerHTML =
           `<i class="fa-solid fa-pause"></i>`;
@@ -2094,11 +2090,6 @@ function playStation(
           "Pausar"
         );
 
-
-        /*
-           MediaSession
-        */
-
         updateMediaSession(
           radio.descripcion,
           getLogoUrl(
@@ -2106,16 +2097,9 @@ function playStation(
           )
         );
 
-
-        /*
-           Metadata queda completamente
-           separada del reproductor.
-        */
-
         iniciarMetadata(
           radio
         );
-
 
         renderStations(
           stationSearch.value
@@ -2136,11 +2120,6 @@ function playStation(
 
         playButton.innerHTML =
           `<i class="fa-solid fa-play"></i>`;
-
-        playButton.setAttribute(
-          "aria-label",
-          "Reproducir"
-        );
 
       }
     );
@@ -2172,7 +2151,6 @@ function pauseStation() {
   miniStatus.textContent =
     "Pausada";
 
-
   if (
     "mediaSession" in navigator
   ) {
@@ -2186,7 +2164,7 @@ function pauseStation() {
 
 
 /* ============================================================
-   BOTÓN PLAY / PAUSE
+   PLAY / PAUSE
 ============================================================ */
 
 playButton.addEventListener(
@@ -2206,13 +2184,7 @@ playButton.addEventListener(
 
     }
 
-
     if (player.paused) {
-
-      /*
-         Si no hay stream cargado,
-         reproducimos normalmente.
-      */
 
       if (!player.src) {
 
@@ -2223,7 +2195,6 @@ playButton.addEventListener(
         return;
 
       }
-
 
       player.play()
         .then(
@@ -2240,7 +2211,6 @@ playButton.addEventListener(
             miniStatus.textContent =
               "Reproduciendo";
 
-
             updateMediaSession(
               radio.descripcion,
               getLogoUrl(
@@ -2248,19 +2218,8 @@ playButton.addEventListener(
               )
             );
 
-
             iniciarMetadata(
               radio
-            );
-
-          }
-        )
-        .catch(
-          error => {
-
-            console.error(
-              "Error:",
-              error
             );
 
           }
@@ -2302,7 +2261,7 @@ list.addEventListener(
 
 
 /* ============================================================
-   CAMBIAR POR ÍNDICE
+   ANTERIOR / SIGUIENTE
 ============================================================ */
 
 function playByIndex(
@@ -2312,44 +2271,29 @@ function playByIndex(
   if (
     radios.length === 0
   ) {
-
     return;
-
   }
 
-  if (
-    index < 0
-  ) {
-
+  if (index < 0) {
     index =
       radios.length - 1;
-
   }
 
   if (
     index >= radios.length
   ) {
-
     index = 0;
-
   }
 
   list.selectedIndex =
     index;
 
-  const radio =
-    radios[index];
-
   playStation(
-    radio
+    radios[index]
   );
 
 }
 
-
-/* ============================================================
-   SIGUIENTE
-============================================================ */
 
 nextButton.addEventListener(
   "click",
@@ -2361,9 +2305,7 @@ nextButton.addEventListener(
     if (
       nextIndex >= radios.length
     ) {
-
       nextIndex = 0;
-
     }
 
     playByIndex(
@@ -2374,10 +2316,6 @@ nextButton.addEventListener(
 );
 
 
-/* ============================================================
-   ANTERIOR
-============================================================ */
-
 prevButton.addEventListener(
   "click",
   () => {
@@ -2385,13 +2323,9 @@ prevButton.addEventListener(
     let prevIndex =
       list.selectedIndex - 1;
 
-    if (
-      prevIndex < 0
-    ) {
-
+    if (prevIndex < 0) {
       prevIndex =
         radios.length - 1;
-
     }
 
     playByIndex(
@@ -2403,7 +2337,7 @@ prevButton.addEventListener(
 
 
 /* ============================================================
-   ERROR DEL AUDIO
+   AUDIO
 ============================================================ */
 
 player.addEventListener(
@@ -2425,18 +2359,9 @@ player.addEventListener(
     playButton.innerHTML =
       `<i class="fa-solid fa-play"></i>`;
 
-    playButton.setAttribute(
-      "aria-label",
-      "Reproducir"
-    );
-
   }
 );
 
-
-/* ============================================================
-   EVENTOS DEL AUDIO
-============================================================ */
 
 player.addEventListener(
   "play",
@@ -2444,11 +2369,6 @@ player.addEventListener(
 
     playButton.innerHTML =
       `<i class="fa-solid fa-pause"></i>`;
-
-    playButton.setAttribute(
-      "aria-label",
-      "Pausar"
-    );
 
     miniStatus.textContent =
       "Reproduciendo";
@@ -2464,18 +2384,12 @@ player.addEventListener(
     playButton.innerHTML =
       `<i class="fa-solid fa-play"></i>`;
 
-    playButton.setAttribute(
-      "aria-label",
-      "Reproducir"
-    );
-
   }
 );
 
 
 /* ============================================================
    MEDIA SESSION
-   Sistema común para TODAS las radios.
 ============================================================ */
 
 function updateMediaSession(
@@ -2486,11 +2400,8 @@ function updateMediaSession(
   if (
     !("mediaSession" in navigator)
   ) {
-
     return;
-
   }
-
 
   try {
 
@@ -2523,16 +2434,11 @@ function updateMediaSession(
 
       });
 
-
     navigator.mediaSession.playbackState =
       player.paused
         ? "paused"
         : "playing";
 
-
-    /*
-       PLAY
-    */
 
     try {
 
@@ -2570,10 +2476,6 @@ function updateMediaSession(
     } catch {}
 
 
-    /*
-       PAUSE
-    */
-
     try {
 
       navigator.mediaSession.setActionHandler(
@@ -2588,10 +2490,6 @@ function updateMediaSession(
     } catch {}
 
 
-    /*
-       NEXT
-    */
-
     try {
 
       navigator.mediaSession.setActionHandler(
@@ -2604,9 +2502,7 @@ function updateMediaSession(
           if (
             nextIndex >= radios.length
           ) {
-
             nextIndex = 0;
-
           }
 
           playByIndex(
@@ -2618,10 +2514,6 @@ function updateMediaSession(
 
     } catch {}
 
-
-    /*
-       PREVIOUS
-    */
 
     try {
 
@@ -2635,10 +2527,8 @@ function updateMediaSession(
           if (
             prevIndex < 0
           ) {
-
             prevIndex =
               radios.length - 1;
-
           }
 
           playByIndex(
@@ -2649,7 +2539,6 @@ function updateMediaSession(
       );
 
     } catch {}
-
 
   } catch (error) {
 
@@ -2688,7 +2577,7 @@ function getSafeLogo(
 
 
 /* ============================================================
-   ESCAPE HTML
+   ESCAPE
 ============================================================ */
 
 function escapeHtml(
@@ -2733,7 +2622,7 @@ settingsButton.addEventListener(
   () => {
 
     alert(
-      "Configuración de Radio SMG\n\nEsta sección la vamos a desarrollar en la próxima versión."
+      "Configuración de Radio SMG\n\nEsta sección la vamos a desarrollar próximamente."
     );
 
   }
@@ -2765,6 +2654,189 @@ const rssFeeds = [
 ];
 
 
+/* ============================================================
+   CLASIFICAR NOTICIAS
+============================================================ */
+
+function clasificarNoticia(
+  noticia
+) {
+
+  const texto = (
+    (noticia.title || "") +
+    " " +
+    (noticia.description || "")
+  )
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
+
+
+  const palabrasPolitica = [
+    "politica",
+    "presidente",
+    "gobierno",
+    "congreso",
+    "diputado",
+    "senado",
+    "senador",
+    "gobernador",
+    "elecciones",
+    "eleccion",
+    "milei",
+    "peron",
+    "kirchner",
+    "partido"
+  ];
+
+
+  const palabrasEconomia = [
+    "economia",
+    "dolar",
+    "inflacion",
+    "mercado",
+    "banco",
+    "empleo",
+    "salario",
+    "precios",
+    "pymes",
+    "impuestos",
+    "finanzas",
+    "peso",
+    "reservas"
+  ];
+
+
+  const palabrasDeportes = [
+    "futbol",
+    "river",
+    "boca",
+    "racing",
+    "independiente",
+    "san lorenzo",
+    "seleccion",
+    "mess i",
+    "messi",
+    "deporte",
+    "tenis",
+    "basquet",
+    "nba",
+    "formula 1",
+    "mundial",
+    "champions",
+    "liga"
+  ];
+
+
+  const palabrasTecnologia = [
+    "tecnologia",
+    "tecnologico",
+    "inteligencia artificial",
+    "ia ",
+    "iphone",
+    "android",
+    "apple",
+    "google",
+    "microsoft",
+    "software",
+    "internet",
+    "app",
+    "aplicacion",
+    "celular",
+    "computadora"
+  ];
+
+
+  const palabrasEspectaculos = [
+    "cine",
+    "pelicula",
+    "musica",
+    "actor",
+    "actriz",
+    "famoso",
+    "famosa",
+    "cantante",
+    "television",
+    "tv",
+    "serie",
+    "streaming",
+    "show",
+    "espectaculo",
+    "celebridad"
+  ];
+
+
+  function contiene(
+    palabras
+  ) {
+
+    return palabras.some(
+      palabra =>
+        texto.includes(
+          palabra
+        )
+    );
+
+  }
+
+
+  if (
+    contiene(
+      palabrasDeportes
+    )
+  ) {
+    return "deportes";
+  }
+
+
+  if (
+    contiene(
+      palabrasTecnologia
+    )
+  ) {
+    return "tecnologia";
+  }
+
+
+  if (
+    contiene(
+      palabrasEspectaculos
+    )
+  ) {
+    return "espectaculos";
+  }
+
+
+  if (
+    contiene(
+      palabrasEconomia
+    )
+  ) {
+    return "economia";
+  }
+
+
+  if (
+    contiene(
+      palabrasPolitica
+    )
+  ) {
+    return "politica";
+  }
+
+
+  return "actualidad";
+
+}
+
+
+/* ============================================================
+   CARGAR NOTICIAS
+============================================================ */
+
 async function cargarNoticias() {
 
   const feed =
@@ -2791,36 +2863,47 @@ async function cargarNoticias() {
 
       noticias =
         data.results.map(
-          n => ({
+          n => {
 
-            title:
-              n.title ||
-              "Sin título",
+            const noticia = {
 
-            description:
-              (
-                n.description ||
-                ""
-              )
-                .replace(
-                  /<[^>]+>/g,
+              title:
+                n.title ||
+                "Sin título",
+
+              description:
+                (
+                  n.description ||
                   ""
                 )
-                .slice(
-                  0,
-                  140
-                ) +
-              "...",
+                  .replace(
+                    /<[^>]+>/g,
+                    ""
+                  )
+                  .slice(
+                    0,
+                    140
+                  ) +
+                "...",
 
-            image_url:
-              n.image_url ||
-              "icon.png",
+              image_url:
+                n.image_url ||
+                "icon.png",
 
-            link:
-              n.link ||
-              "#"
+              link:
+                n.link ||
+                "#"
 
-          })
+            };
+
+            noticia.categoria =
+              clasificarNoticia(
+                noticia
+              );
+
+            return noticia;
+
+          }
         );
 
     }
@@ -2836,35 +2919,46 @@ async function cargarNoticias() {
 
       noticias =
         data.items.map(
-          n => ({
+          n => {
 
-            title:
-              n.title ||
-              "Sin título",
+            const noticia = {
 
-            description:
-              (
-                n.description ||
-                ""
-              )
-                .replace(
-                  /<[^>]+>/g,
+              title:
+                n.title ||
+                "Sin título",
+
+              description:
+                (
+                  n.description ||
                   ""
                 )
-                .slice(
-                  0,
-                  140
-                ) +
-              "...",
+                  .replace(
+                    /<[^>]+>/g,
+                    ""
+                  )
+                  .slice(
+                    0,
+                    140
+                  ) +
+                "...",
 
-            image_url:
-              "icon.png",
+              image_url:
+                "icon.png",
 
-            link:
-              n.link ||
-              "#"
+              link:
+                n.link ||
+                "#"
 
-          })
+            };
+
+            noticia.categoria =
+              clasificarNoticia(
+                noticia
+              );
+
+            return noticia;
+
+          }
         );
 
     }
@@ -2895,19 +2989,66 @@ async function cargarNoticias() {
 }
 
 
-function mostrarNoticia() {
+/* ============================================================
+   MOSTRAR NOTICIA
+============================================================ */
+
+function obtenerNoticiasFiltradas() {
 
   if (
-    noticias.length === 0
+    categoriaNoticias ===
+    "todas"
   ) {
+
+    return noticias;
+
+  }
+
+  return noticias.filter(
+    noticia =>
+      noticia.categoria ===
+      categoriaNoticias
+  );
+
+}
+
+
+function mostrarNoticia() {
+
+  const noticiasFiltradas =
+    obtenerNoticiasFiltradas();
+
+
+  if (
+    noticiasFiltradas.length ===
+    0
+  ) {
+
+    newsContainer.innerHTML = `
+      <div class="news-empty">
+        No hay noticias disponibles
+        en esta categoría en este momento.
+      </div>
+    `;
 
     return;
 
   }
 
 
+  if (
+    indiceNoticia >=
+    noticiasFiltradas.length
+  ) {
+
+    indiceNoticia =
+      0;
+
+  }
+
+
   const n =
-    noticias[
+    noticiasFiltradas[
       indiceNoticia
     ];
 
@@ -2918,9 +3059,37 @@ function mostrarNoticia() {
     );
 
 
-  document.getElementById(
-    "news-container"
-  ).innerHTML = `
+  const nombresCategorias = {
+
+    actualidad:
+      "Actualidad",
+
+    politica:
+      "Política",
+
+    economia:
+      "Economía",
+
+    deportes:
+      "Deportes",
+
+    tecnologia:
+      "Tecnología",
+
+    espectaculos:
+      "Espectáculos"
+
+  };
+
+
+  const nombreCategoria =
+    nombresCategorias[
+      n.categoria
+    ] ||
+    "Actualidad";
+
+
+  newsContainer.innerHTML = `
 
     <article class="news-card">
 
@@ -2935,6 +3104,12 @@ function mostrarNoticia() {
       >
 
       <div class="news-content">
+
+        <div class="news-category-label">
+          ${escapeHtml(
+            nombreCategoria
+          )}
+        </div>
 
         <h2 class="news-title">
           ${escapeHtml(
@@ -2971,10 +3146,63 @@ function mostrarNoticia() {
     (
       indiceNoticia + 1
     ) %
-    noticias.length;
+    noticiasFiltradas.length;
 
 }
 
+
+/* ============================================================
+   CAMBIO DE CATEGORÍA
+============================================================ */
+
+newsCategories.addEventListener(
+  "click",
+  event => {
+
+    const button =
+      event.target.closest(
+        ".news-category"
+      );
+
+    if (!button) {
+      return;
+    }
+
+
+    document
+      .querySelectorAll(
+        ".news-category"
+      )
+      .forEach(
+        item =>
+          item.classList.remove(
+            "active"
+          )
+      );
+
+
+    button.classList.add(
+      "active"
+    );
+
+
+    categoriaNoticias =
+      button.dataset.category;
+
+
+    indiceNoticia =
+      0;
+
+
+    mostrarNoticia();
+
+  }
+);
+
+
+/* ============================================================
+   LINKS SEGUROS
+============================================================ */
 
 function getSafeLink(
   url
