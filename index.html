@@ -48,10 +48,6 @@
       font-family: inherit;
     }
 
-    /* =========================================================
-       HEADER
-    ========================================================= */
-
     .topbar {
       width: 100%;
       max-width: 700px;
@@ -113,10 +109,6 @@
       transform: scale(0.94);
     }
 
-    /* =========================================================
-       MAIN
-    ========================================================= */
-
     .main {
       width: 100%;
       max-width: 700px;
@@ -146,10 +138,6 @@
       color: #747e8e;
       font-size: 12px;
     }
-
-    /* =========================================================
-       CURRENT RADIO
-    ========================================================= */
 
     .current-card {
       background:
@@ -211,10 +199,6 @@
       font-size: 11px;
       margin-top: 8px;
     }
-
-    /* =========================================================
-       FAVORITES
-    ========================================================= */
 
     .favorites-scroll {
       display: flex;
@@ -284,10 +268,6 @@
       text-align: center;
     }
 
-    /* =========================================================
-       SEARCH
-    ========================================================= */
-
     .search-box {
       position: relative;
       margin-bottom: 12px;
@@ -320,10 +300,6 @@
     #stationSearch:focus {
       border-color: rgba(25,199,163,0.5);
     }
-
-    /* =========================================================
-       STATIONS
-    ========================================================= */
 
     .stations-list {
       display: flex;
@@ -422,10 +398,6 @@
       cursor: pointer;
     }
 
-    /* =========================================================
-       LOADING / ERROR
-    ========================================================= */
-
     #loading {
       text-align: center;
       color: #8993a2;
@@ -440,10 +412,6 @@
       font-size: 13px;
       padding: 12px;
     }
-
-    /* =========================================================
-       NEWS
-    ========================================================= */
 
     .news-categories {
       display: flex;
@@ -556,11 +524,25 @@
       padding: 12px;
     }
 
+    .football-card.live {
+      border-color: rgba(255,80,80,0.35);
+    }
+
     .football-date {
       color: #737e8e;
       font-size: 10px;
       text-align: center;
       margin-bottom: 10px;
+    }
+
+    .football-league {
+      color: #6fd8c5;
+      font-size: 9px;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 5px;
     }
 
     .football-teams {
@@ -639,10 +621,6 @@
       font-size: 10px;
     }
 
-    /* =========================================================
-       AUDIO
-    ========================================================= */
-
     #player {
       display: none;
     }
@@ -650,10 +628,6 @@
     #stationList {
       display: none;
     }
-
-    /* =========================================================
-       BOTTOM PLAYER
-    ========================================================= */
 
     .bottom-player {
       position: fixed;
@@ -784,8 +758,6 @@
 
 <main class="main">
 
-  <!-- RADIO ACTUAL -->
-
   <section class="section">
 
     <div class="current-card">
@@ -832,8 +804,6 @@
   </section>
 
 
-  <!-- FAVORITOS -->
-
   <section class="section">
 
     <div class="section-header">
@@ -851,8 +821,6 @@
 
   </section>
 
-
-  <!-- TODAS LAS RADIOS -->
 
   <section class="section">
 
@@ -896,10 +864,6 @@
   </section>
 
 
-  <!-- =======================================================
-       FÚTBOL
-  ======================================================== -->
-
   <section class="section">
 
     <div class="section-header">
@@ -928,10 +892,6 @@
   </section>
 
 
-  <!-- =======================================================
-       NOTICIAS
-  ======================================================== -->
-
   <section class="section">
 
     <div class="section-header">
@@ -941,7 +901,6 @@
       </h2>
 
     </div>
-
 
     <div
       id="newsCategories"
@@ -1006,7 +965,6 @@
 
     </div>
 
-
     <div id="news-container"></div>
 
   </section>
@@ -1014,14 +972,10 @@
 </main>
 
 
-<!-- SELECT OCULTO -->
-
 <select id="stationList">
   <option value="">Seleccioná una emisora</option>
 </select>
 
-
-<!-- AUDIO -->
 
 <audio
   id="player"
@@ -1029,8 +983,6 @@
   playsinline
 ></audio>
 
-
-<!-- BOTTOM PLAYER -->
 
 <div class="bottom-player">
 
@@ -1306,9 +1258,7 @@ function getFavorites() {
 }
 
 
-function saveFavorites(
-  favorites
-) {
+function saveFavorites(favorites) {
 
   localStorage.setItem(
     FAVORITES_KEY,
@@ -1318,9 +1268,7 @@ function saveFavorites(
 }
 
 
-function isFavorite(
-  radioId
-) {
+function isFavorite(radioId) {
 
   return getFavorites()
     .includes(
@@ -1330,9 +1278,7 @@ function isFavorite(
 }
 
 
-function toggleFavorite(
-  radioId
-) {
+function toggleFavorite(radioId) {
 
   const id =
     String(radioId);
@@ -1355,9 +1301,7 @@ function toggleFavorite(
 
   }
 
-  saveFavorites(
-    favorites
-  );
+  saveFavorites(favorites);
 
   renderFavorites();
 
@@ -1524,9 +1468,7 @@ async function cargarRadios() {
    LOGO
 ============================================================ */
 
-function mostrarLogo(
-  nombreLogo
-) {
+function mostrarLogo(nombreLogo) {
 
   const logo =
     getLogoUrl(
@@ -1770,9 +1712,7 @@ favoritesContainer.addEventListener(
    LISTA DE RADIOS
 ============================================================ */
 
-function renderStations(
-  searchText = ""
-) {
+function renderStations(searchText = "") {
 
   const text =
     searchText
@@ -2023,9 +1963,7 @@ stationSearch.addEventListener(
    METADATA LA 100
 ============================================================ */
 
-async function actualizarMetadata(
-  radio
-) {
+async function actualizarMetadata(radio) {
 
   if (!radio) {
     return;
@@ -2151,9 +2089,7 @@ async function actualizarMetadata(
 }
 
 
-function iniciarMetadata(
-  radio
-) {
+function iniciarMetadata(radio) {
 
   detenerMetadata();
 
@@ -2211,9 +2147,7 @@ function detenerMetadata() {
    REPRODUCIR
 ============================================================ */
 
-function playStation(
-  radio
-) {
+function playStation(radio) {
 
   if (
     !radio ||
@@ -2451,9 +2385,7 @@ list.addEventListener(
    ANTERIOR / SIGUIENTE
 ============================================================ */
 
-function playByIndex(
-  index
-) {
+function playByIndex(index) {
 
   if (
     radios.length === 0
@@ -2743,9 +2675,7 @@ function updateMediaSession(
    LOGO SEGURO
 ============================================================ */
 
-function getSafeLogo(
-  url
-) {
+function getSafeLogo(url) {
 
   try {
 
@@ -2767,9 +2697,7 @@ function getSafeLogo(
    ESCAPE
 ============================================================ */
 
-function escapeHtml(
-  text
-) {
+function escapeHtml(text) {
 
   const div =
     document.createElement(
@@ -2786,9 +2714,7 @@ function escapeHtml(
 }
 
 
-function escapeAttribute(
-  text
-) {
+function escapeAttribute(text) {
 
   return escapeHtml(
     text
@@ -2834,9 +2760,7 @@ const NEWS_REFRESH_TIME =
    NORMALIZAR TEXTO
 ============================================================ */
 
-function limpiarTexto(
-  texto
-) {
+function limpiarTexto(texto) {
 
   return String(
     texto || ""
@@ -2862,9 +2786,7 @@ function limpiarTexto(
 }
 
 
-function normalizarTexto(
-  texto
-) {
+function normalizarTexto(texto) {
 
   return limpiarTexto(
     texto
@@ -2883,15 +2805,12 @@ function normalizarTexto(
    CLASIFICACIÓN FALLBACK
 ============================================================ */
 
-function clasificarPorPalabras(
-  noticia
-) {
+function clasificarPorPalabras(noticia) {
 
   const texto =
     normalizarTexto(
       `${noticia.title || ""} ${noticia.description || ""}`
     );
-
 
   const deportes = [
     "futbol",
@@ -2912,7 +2831,6 @@ function clasificarPorPalabras(
     "liga"
   ];
 
-
   const tecnologia = [
     "tecnologia",
     "tecnologico",
@@ -2928,7 +2846,6 @@ function clasificarPorPalabras(
     "celular",
     "computadora"
   ];
-
 
   const espectaculos = [
     "cine",
@@ -2947,7 +2864,6 @@ function clasificarPorPalabras(
     "celebridad"
   ];
 
-
   const economia = [
     "economia",
     "dolar",
@@ -2963,7 +2879,6 @@ function clasificarPorPalabras(
     "peso",
     "reservas"
   ];
-
 
   const politica = [
     "politica",
@@ -2982,7 +2897,6 @@ function clasificarPorPalabras(
     "partido"
   ];
 
-
   const policiales = [
     "policia",
     "policial",
@@ -3000,7 +2914,6 @@ function clasificarPorPalabras(
     "juez",
     "violencia"
   ];
-
 
   if (
     deportes.some(
@@ -3074,7 +2987,6 @@ function mapearCategoriaNewsData(
         )
       : [];
 
-
   if (
     categoriasNormalizadas.includes(
       "sports"
@@ -3082,7 +2994,6 @@ function mapearCategoriaNewsData(
   ) {
     return "deportes";
   }
-
 
   if (
     categoriasNormalizadas.includes(
@@ -3092,7 +3003,6 @@ function mapearCategoriaNewsData(
     return "politica";
   }
 
-
   if (
     categoriasNormalizadas.includes(
       "business"
@@ -3100,7 +3010,6 @@ function mapearCategoriaNewsData(
   ) {
     return "economia";
   }
-
 
   if (
     categoriasNormalizadas.includes(
@@ -3110,7 +3019,6 @@ function mapearCategoriaNewsData(
     return "tecnologia";
   }
 
-
   if (
     categoriasNormalizadas.includes(
       "entertainment"
@@ -3119,7 +3027,6 @@ function mapearCategoriaNewsData(
     return "espectaculos";
   }
 
-
   if (
     categoriasNormalizadas.includes(
       "crime"
@@ -3127,7 +3034,6 @@ function mapearCategoriaNewsData(
   ) {
     return "policiales";
   }
-
 
   return clasificarPorPalabras(
     noticia
@@ -3166,7 +3072,7 @@ function obtenerClaveNoticia(
 
 
 /* ============================================================
-   CARGAR CACHE NOTICIAS
+   CACHE NOTICIAS
 ============================================================ */
 
 function cargarCacheNoticias() {
@@ -3214,10 +3120,6 @@ function cargarCacheNoticias() {
 }
 
 
-/* ============================================================
-   GUARDAR CACHE NOTICIAS
-============================================================ */
-
 function guardarCacheNoticias() {
 
   try {
@@ -3243,7 +3145,7 @@ function guardarCacheNoticias() {
 
 
 /* ============================================================
-   MERGE DE NOTICIAS
+   MERGE NOTICIAS
 ============================================================ */
 
 function fusionarNoticias(
@@ -3252,7 +3154,6 @@ function fusionarNoticias(
 
   const mapa =
     new Map();
-
 
   noticias.forEach(
     noticia => {
@@ -3267,7 +3168,6 @@ function fusionarNoticias(
     }
   );
 
-
   nuevasNoticias.forEach(
     noticia => {
 
@@ -3280,7 +3180,6 @@ function fusionarNoticias(
 
     }
   );
-
 
   noticias =
     Array.from(
@@ -3307,7 +3206,6 @@ function fusionarNoticias(
       0,
       NEWS_MAX_ITEMS
     );
-
 
   guardarCacheNoticias();
 
@@ -3376,10 +3274,6 @@ async function cargarNoticias() {
   const nuevasNoticias = [];
 
 
-  /* ==========================================================
-     NEWSDATA
-  ========================================================== */
-
   const newsDataResult =
     resultados[0];
 
@@ -3391,7 +3285,6 @@ async function cargarNoticias() {
 
     const data =
       newsDataResult.value;
-
 
     if (
       Array.isArray(
@@ -3443,7 +3336,6 @@ async function cargarNoticias() {
 
           };
 
-
           nuevasNoticias.push(
             noticia
           );
@@ -3463,10 +3355,6 @@ async function cargarNoticias() {
   }
 
 
-  /* ==========================================================
-     CLARÍN
-  ========================================================== */
-
   const clarinResult =
     resultados[1];
 
@@ -3478,7 +3366,6 @@ async function cargarNoticias() {
 
     const data =
       clarinResult.value;
-
 
     if (
       Array.isArray(
@@ -3522,15 +3409,10 @@ async function cargarNoticias() {
             source:
               "Clarín",
 
-            /* Clarín queda como actualidad.
-               Así evitamos que una clasificación
-               por palabras vuelva a provocar
-               movimientos impredecibles. */
             categoria:
               "actualidad"
 
           };
-
 
           nuevasNoticias.push(
             noticia
@@ -3551,10 +3433,6 @@ async function cargarNoticias() {
   }
 
 
-  /* ==========================================================
-     ACTUALIZAR SOLO SI LLEGÓ INFORMACIÓN
-  ========================================================== */
-
   if (
     nuevasNoticias.length > 0
   ) {
@@ -3569,9 +3447,6 @@ async function cargarNoticias() {
     mostrarNoticia();
 
   } else {
-
-    /* Si falla una consulta,
-       conservamos lo que ya teníamos. */
 
     if (
       noticias.length === 0
@@ -3620,7 +3495,6 @@ function mostrarNoticia() {
   const noticiasFiltradas =
     obtenerNoticiasFiltradas();
 
-
   if (
     noticiasFiltradas.length ===
     0
@@ -3637,7 +3511,6 @@ function mostrarNoticia() {
 
   }
 
-
   if (
     indiceNoticia >=
     noticiasFiltradas.length
@@ -3648,18 +3521,15 @@ function mostrarNoticia() {
 
   }
 
-
   const n =
     noticiasFiltradas[
       indiceNoticia
     ];
 
-
   const safeLink =
     getSafeLink(
       n.link
     );
-
 
   const nombresCategorias = {
 
@@ -3686,13 +3556,11 @@ function mostrarNoticia() {
 
   };
 
-
   const nombreCategoria =
     nombresCategorias[
       n.categoria
     ] ||
     "Actualidad";
-
 
   newsContainer.innerHTML = `
 
@@ -3747,7 +3615,6 @@ function mostrarNoticia() {
 
   `;
 
-
   indiceNoticia =
     (
       indiceNoticia + 1
@@ -3758,7 +3625,7 @@ function mostrarNoticia() {
 
 
 /* ============================================================
-   CAMBIO DE CATEGORÍA
+   CAMBIO CATEGORÍA
 ============================================================ */
 
 newsCategories.addEventListener(
@@ -3774,7 +3641,6 @@ newsCategories.addEventListener(
       return;
     }
 
-
     document
       .querySelectorAll(
         ".news-category"
@@ -3786,19 +3652,15 @@ newsCategories.addEventListener(
           )
       );
 
-
     button.classList.add(
       "active"
     );
 
-
     categoriaNoticias =
       button.dataset.category;
 
-
     indiceNoticia =
       0;
-
 
     mostrarNoticia();
 
@@ -3810,9 +3672,7 @@ newsCategories.addEventListener(
    LINKS SEGUROS
 ============================================================ */
 
-function getSafeLink(
-  url
-) {
+function getSafeLink(url) {
 
   try {
 
@@ -3835,7 +3695,6 @@ function getSafeLink(
 
   } catch {}
 
-
   return "#";
 
 }
@@ -3845,7 +3704,16 @@ function getSafeLink(
    FÚTBOL - CACHE
 ============================================================ */
 
-function leerCacheFutbol() {
+/*
+   IMPORTANTE:
+   Ahora permitimos leer la caché aunque esté vencida.
+   Así, si la API falla, seguimos mostrando los últimos
+   partidos conocidos.
+*/
+
+function leerCacheFutbol(
+  permitirVencida = false
+) {
 
   try {
 
@@ -3870,21 +3738,29 @@ function leerCacheFutbol() {
       return null;
     }
 
-    if (
+    const edad =
       Date.now() -
       Number(
         cache.timestamp || 0
-      ) >
-      FOOTBALL_CACHE_TIME
+      );
+
+    if (
+      permitirVencida ||
+      edad <= FOOTBALL_CACHE_TIME
     ) {
 
-      return null;
+      return cache.fixtures;
 
     }
 
-    return cache.fixtures;
+    return null;
 
-  } catch {
+  } catch (error) {
+
+    console.warn(
+      "No se pudo leer caché fútbol:",
+      error
+    );
 
     return null;
 
@@ -4075,8 +3951,9 @@ function renderFutbol(
 
     footballContainer.innerHTML = `
       <div class="news-empty">
-        No hay partidos disponibles
-        para esta competencia.
+        La API respondió correctamente,
+        pero no hay partidos disponibles
+        para esta competencia y temporada.
       </div>
     `;
 
@@ -4084,10 +3961,8 @@ function renderFutbol(
 
   }
 
-
   const ahora =
     Date.now();
-
 
   const ordenados =
     [...fixtures].sort(
@@ -4132,12 +4007,8 @@ function renderFutbol(
 
         return (
           fecha >= ahora &&
-          !esPartidoEnVivo(
-            status
-          ) &&
-          !esPartidoFinalizado(
-            status
-          )
+          !esPartidoEnVivo(status) &&
+          !esPartidoFinalizado(status)
         );
 
       }
@@ -4181,8 +4052,7 @@ function renderFutbol(
   ];
 
 
-  const unicos =
-    [];
+  const unicos = [];
 
   const ids =
     new Set();
@@ -4295,24 +4165,39 @@ function renderFutbol(
             "";
 
           if (live) {
+
             statusClass =
               "live";
+
           } else if (finished) {
+
             statusClass =
               "finished";
+
           } else if (
             status === "PST" ||
             status === "CANC" ||
             status === "ABD"
           ) {
+
             statusClass =
               "postponed";
+
           }
 
 
           return `
 
-            <article class="football-card">
+            <article
+              class="football-card ${live ? "live" : ""}"
+            >
+
+              <div class="football-league">
+                ${escapeHtml(
+                  partido?.league?.name ||
+                  "Fútbol"
+                )}
+              </div>
 
               <div class="football-date">
                 ${escapeHtml(
@@ -4387,7 +4272,9 @@ function renderFutbol(
 
               <div style="text-align:center;">
 
-                <span class="football-status ${statusClass}">
+                <span
+                  class="football-status ${statusClass}"
+                >
                   ${escapeHtml(
                     estado
                   )}
@@ -4420,6 +4307,92 @@ function renderFutbol(
 
 
 /* ============================================================
+   FÚTBOL - ERROR API
+============================================================ */
+
+function obtenerMensajeErrorFootball(
+  data,
+  response
+) {
+
+  if (
+    data &&
+    data.errors
+  ) {
+
+    if (
+      typeof data.errors ===
+      "string"
+    ) {
+
+      return data.errors;
+
+    }
+
+    if (
+      Array.isArray(
+        data.errors
+      )
+    ) {
+
+      return data.errors
+        .map(
+          error =>
+            typeof error === "string"
+              ? error
+              : JSON.stringify(error)
+        )
+        .join(" | ");
+
+    }
+
+    if (
+      typeof data.errors ===
+      "object"
+    ) {
+
+      return Object.entries(
+        data.errors
+      )
+      .map(
+        ([clave, valor]) =>
+          `${clave}: ${valor}`
+      )
+      .join(" | ");
+
+    }
+
+  }
+
+
+  if (
+    data &&
+    data.message
+  ) {
+
+    return String(
+      data.message
+    );
+
+  }
+
+
+  if (
+    response &&
+    response.status
+  ) {
+
+    return `HTTP ${response.status}`;
+
+  }
+
+
+  return "Error desconocido de API-Football.";
+
+}
+
+
+/* ============================================================
    FÚTBOL - CARGAR API
 ============================================================ */
 
@@ -4431,10 +4404,14 @@ async function cargarFutbol(
     "Cargando...";
 
 
+  /*
+     Primero usamos caché fresca.
+  */
+
   if (!forzar) {
 
     const cache =
-      leerCacheFutbol();
+      leerCacheFutbol(false);
 
     if (cache) {
 
@@ -4451,6 +4428,10 @@ async function cargarFutbol(
 
   }
 
+
+  /*
+     Comprobamos que exista la clave.
+  */
 
   if (
     !API_FOOTBALL_KEY ||
@@ -4473,8 +4454,22 @@ async function cargarFutbol(
 
   try {
 
+    /*
+       La zona horaria hace que las fechas devueltas
+       por la API sean más cómodas para Argentina.
+    */
+
     const url =
-      `${API_FOOTBALL_BASE}/fixtures?league=${API_FOOTBALL_LEAGUE}&season=${API_FOOTBALL_SEASON}`;
+      `${API_FOOTBALL_BASE}/fixtures` +
+      `?league=${API_FOOTBALL_LEAGUE}` +
+      `&season=${API_FOOTBALL_SEASON}` +
+      `&timezone=America/Argentina/Buenos_Aires`;
+
+
+    console.log(
+      "API-FOOTBALL:",
+      url
+    );
 
 
     const response =
@@ -4484,11 +4479,13 @@ async function cargarFutbol(
           method: "GET",
 
           headers: {
+
             "x-apisports-key":
               API_FOOTBALL_KEY,
 
             "Accept":
               "application/json"
+
           },
 
           cache:
@@ -4497,37 +4494,81 @@ async function cargarFutbol(
       );
 
 
-    if (!response.ok) {
+    let data = null;
+
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch {
 
       throw new Error(
-        `API-Football HTTP ${response.status}`
+        `API-Football HTTP ${response.status}: respuesta no válida.`
       );
 
     }
 
 
-    const data =
-      await response.json();
+    console.log(
+      "API-FOOTBALL RESPONSE:",
+      data
+    );
 
+
+    /*
+       API-Football puede devolver información de error
+       incluso cuando el HTTP es 200.
+    */
 
     if (
+      data &&
       data.errors &&
-      Object.keys(
-        data.errors
-      ).length > 0
+      (
+        Array.isArray(data.errors)
+          ? data.errors.length > 0
+          : Object.keys(data.errors).length > 0
+      )
     ) {
 
-      console.error(
-        "API-Football:",
-        data.errors
-      );
+      const mensaje =
+        obtenerMensajeErrorFootball(
+          data,
+          response
+        );
 
       throw new Error(
-        "API-Football devolvió un error."
+        mensaje
       );
 
     }
 
+
+    /*
+       Errores HTTP.
+    */
+
+    if (
+      !response.ok
+    ) {
+
+      const mensaje =
+        obtenerMensajeErrorFootball(
+          data,
+          response
+        );
+
+      throw new Error(
+        mensaje
+      );
+
+    }
+
+
+    /*
+       Respuesta correcta.
+    */
 
     const fixtures =
       Array.isArray(
@@ -4536,6 +4577,54 @@ async function cargarFutbol(
         ? data.response
         : [];
 
+
+    console.log(
+      "PARTIDOS RECIBIDOS:",
+      fixtures.length
+    );
+
+
+    /*
+       200 + response vacío.
+    */
+
+    if (
+      fixtures.length === 0
+    ) {
+
+      footballContainer.innerHTML = `
+        <div class="news-empty">
+
+          La API respondió correctamente,
+          pero no devolvió partidos para:
+
+          <br><br>
+
+          Liga: ${API_FOOTBALL_LEAGUE}<br>
+          Temporada: ${API_FOOTBALL_SEASON}
+
+          <br><br>
+
+          <span style="font-size:10px;color:#697384;">
+            Esto puede indicar que la competencia,
+            temporada o cobertura no está disponible
+            para esta cuenta.
+          </span>
+
+        </div>
+      `;
+
+      footballStatus.textContent =
+        "Sin partidos";
+
+      return;
+
+    }
+
+
+    /*
+       Guardamos los datos.
+    */
 
     guardarCacheFutbol(
       fixtures
@@ -4557,39 +4646,100 @@ async function cargarFutbol(
   } catch (error) {
 
     console.error(
-      "Error cargando fútbol:",
+      "ERROR COMPLETO API-FOOTBALL:",
       error
     );
 
 
-    const cache =
-      leerCacheFutbol();
+    /*
+       Intentamos utilizar incluso una caché vencida.
+    */
+
+    const cacheVencida =
+      leerCacheFutbol(true);
 
 
-    if (cache) {
+    if (
+      cacheVencida &&
+      cacheVencida.length > 0
+    ) {
 
       renderFutbol(
-        cache
+        cacheVencida
       );
 
       footballStatus.textContent =
         "Datos guardados";
 
-    } else {
 
-      footballContainer.innerHTML = `
-        <div class="news-empty">
-          No se pudieron cargar los partidos.
-          <br><br>
-          Revisá la API key o la disponibilidad
-          de la competencia.
-        </div>
-      `;
+      /*
+         Mostramos el error en consola pero no
+         molestamos al usuario si tenemos datos.
+      */
 
-      footballStatus.textContent =
-        "Sin conexión";
+      console.warn(
+        "Se utilizaron datos guardados porque la API falló:",
+        error.message
+      );
+
+      return;
 
     }
+
+
+    /*
+       Ahora sí mostramos el error REAL.
+    */
+
+    const mensaje =
+      error &&
+      error.message
+        ? error.message
+        : "Error desconocido";
+
+
+    footballContainer.innerHTML = `
+
+      <div class="news-empty">
+
+        <strong>
+          No se pudieron cargar los partidos.
+        </strong>
+
+        <br><br>
+
+        <span
+          style="
+            color:#ff8585;
+            font-size:11px;
+            line-height:1.5;
+          "
+        >
+          ${escapeHtml(
+            mensaje
+          )}
+        </span>
+
+        <br><br>
+
+        <span
+          style="
+            color:#687384;
+            font-size:10px;
+            line-height:1.5;
+          "
+        >
+          Liga: ${API_FOOTBALL_LEAGUE}<br>
+          Temporada: ${API_FOOTBALL_SEASON}
+        </span>
+
+      </div>
+
+    `;
+
+
+    footballStatus.textContent =
+      "Error API";
 
   }
 
