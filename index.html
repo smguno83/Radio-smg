@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Radio SMG</title>
+  <title>Radio SMG - Tu música, tus radios</title>
 
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,5070 +21,972 @@
   >
 
   <style>
+    :root {
+      --bg-dark: #030712;
+      --card-bg: rgba(13, 22, 41, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-blue: #0088ff;
+      --accent-cyan: #00d4ff;
+      --accent-red: #ff3b30;
+      --text-main: #ffffff;
+      --text-sub: #94a3b8;
+    }
 
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
 
-    html {
-      background: #08090c;
-    }
-
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
-      background:
-        radial-gradient(circle at top left, #172033 0%, transparent 35%),
-        radial-gradient(circle at top right, #111827 0%, transparent 30%),
-        linear-gradient(180deg, #08090c 0%, #0d1016 100%);
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      padding-bottom: 115px;
+      padding: 0;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 102, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(0, 212, 255, 0.08) 0%, transparent 40%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      padding-bottom: 40px;
     }
 
-    button,
-    input {
-      font-family: inherit;
-    }
-
+    /* TOPBAR */
     .topbar {
       width: 100%;
-      max-width: 700px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 18px 18px 10px;
+      padding: 20px 20px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 20px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #19c7a3, #1688ff);
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0088ff, #00d4ff);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 25px rgba(24, 190, 166, 0.20);
+      box-shadow: 0 0 20px rgba(0, 136, 255, 0.4);
     }
 
     .brand-icon i {
-      font-size: 20px;
+      font-size: 22px;
       color: white;
     }
 
     .brand-text h1 {
       margin: 0;
-      font-size: 21px;
+      font-size: 22px;
       font-weight: 800;
-      letter-spacing: -0.4px;
+      letter-spacing: -0.5px;
     }
 
-    .brand-text span {
+    .brand-text h1 span {
+      color: var(--accent-blue);
+    }
+
+    .brand-text span.tagline {
       display: block;
-      color: #8d96a6;
+      color: var(--text-sub);
       font-size: 11px;
-      margin-top: 1px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 2px;
     }
 
-    .settings-button {
-      width: 42px;
-      height: 42px;
-      border: 0;
-      border-radius: 14px;
-      background: rgba(255,255,255,0.07);
-      color: #cdd3dc;
+    .top-search-bar {
+      flex: 1;
+      max-width: 480px;
+      position: relative;
+    }
+
+    .top-search-bar i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 15px;
+    }
+
+    .top-search-bar input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 30px;
+      padding: 12px 20px 12px 45px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .top-search-bar input:focus {
+      border-color: var(--accent-blue);
+      background: rgba(255, 255, 255, 0.09);
+      box-shadow: 0 0 15px rgba(0, 136, 255, 0.2);
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-main);
+      font-size: 20px;
       cursor: pointer;
-      font-size: 17px;
+      padding: 8px;
     }
 
-    .settings-button:active {
-      transform: scale(0.94);
-    }
-
+    /* MAIN CONTAINER */
     .main {
       width: 100%;
-      max-width: 700px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 5px 16px 30px;
+      padding: 10px 20px;
     }
 
-    .section {
-      margin-top: 22px;
+    /* HERO / PLAYER CARD */
+    .player-hero-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 30px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
     }
 
-    .section-header {
+    .hero-left {
+      border-right: 1px solid var(--card-border);
+      padding-right: 25px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .live-badge {
+      position: absolute;
+      top: 0;
+      right: 10px;
+      background: var(--accent-red);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .live-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .hero-radio-logo-container {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      padding: 6px;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      box-shadow: 0 0 35px rgba(0, 136, 255, 0.3);
+      margin-top: 15px;
+      margin-bottom: 18px;
+    }
+
+    .hero-radio-logo {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .hero-radio-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 4px;
+      letter-spacing: -0.3px;
+    }
+
+    .hero-radio-location {
+      color: var(--text-sub);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .now-playing-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 11px;
+      align-items: flex-start;
     }
 
-    .section-title {
-      font-size: 17px;
-      font-weight: 750;
-      margin: 0;
-      letter-spacing: -0.2px;
-    }
-
-    .section-subtitle {
-      color: #747e8e;
-      font-size: 12px;
-    }
-
-    .current-card {
-      background:
-        linear-gradient(
-          145deg,
-          rgba(255,255,255,0.08),
-          rgba(255,255,255,0.025)
-        );
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 24px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 17px;
-      box-shadow: 0 15px 45px rgba(0,0,0,0.25);
-    }
-
-    .current-logo {
-      width: 78px;
-      height: 78px;
-      border-radius: 20px;
-      object-fit: contain;
-      background: #11151c;
-      padding: 8px;
-      flex-shrink: 0;
-      display: none;
-    }
-
-    .current-info {
-      min-width: 0;
+    .now-playing-info {
       flex: 1;
     }
 
-    .current-label {
-      color: #6fd8c5;
+    .now-playing-label {
+      color: var(--accent-cyan);
       font-size: 11px;
-      text-transform: uppercase;
+      font-weight: 700;
       letter-spacing: 1px;
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .current-name {
-      font-size: 19px;
-      font-weight: 750;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .current-province {
-      color: #8b94a3;
-      font-size: 12px;
-      margin-top: 3px;
-    }
-
-    .current-status {
-      color: #687384;
-      font-size: 11px;
-      margin-top: 8px;
-    }
-
-    .favorites-scroll {
-      display: flex;
-      gap: 11px;
-      overflow-x: auto;
-      padding: 2px 1px 8px;
-      scrollbar-width: none;
-    }
-
-    .favorites-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    .favorite-card {
-      min-width: 125px;
-      max-width: 125px;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.055);
-      border: 1px solid rgba(255,255,255,0.06);
-      cursor: pointer;
-      transition: 0.18s;
-    }
-
-    .favorite-card:active {
-      transform: scale(0.96);
-    }
-
-    .favorite-logo {
-      width: 62px;
-      height: 62px;
-      display: block;
-      margin: 0 auto 9px;
-      border-radius: 17px;
-      object-fit: contain;
-      background: #11151c;
-      padding: 6px;
-    }
-
-    .favorite-name {
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-    }
-
-    .favorite-province {
-      color: #737d8d;
-      font-size: 10px;
-      margin-top: 3px;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .empty-favorites {
-      width: 100%;
-      padding: 17px;
-      border-radius: 17px;
-      background: rgba(255,255,255,0.035);
-      border: 1px dashed rgba(255,255,255,0.09);
-      color: #7e8795;
-      font-size: 12px;
-      text-align: center;
-    }
-
-    .search-box {
-      position: relative;
-      margin-bottom: 12px;
-    }
-
-    .search-box i {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6e7888;
-      font-size: 14px;
-    }
-
-    #stationSearch {
-      width: 100%;
-      border: 1px solid rgba(255,255,255,0.07);
-      outline: none;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.055);
-      color: white;
-      padding: 13px 15px 13px 42px;
-      font-size: 14px;
-    }
-
-    #stationSearch::placeholder {
-      color: #687384;
-    }
-
-    #stationSearch:focus {
-      border-color: rgba(25,199,163,0.5);
-    }
-
-    .province-filters {
-      display: flex;
-      gap: 7px;
-      overflow-x: auto;
-      padding: 1px 1px 10px;
-      margin-bottom: 2px;
-      scrollbar-width: none;
-    }
-
-    .province-filters::-webkit-scrollbar {
-      display: none;
-    }
-
-    .province-filter {
-      flex: 0 0 auto;
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.045);
-      color: #8b95a5;
-      border-radius: 999px;
-      padding: 7px 11px;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: 0.18s;
-    }
-
-    .province-filter.active {
-      color: white;
-      border-color: rgba(25,199,163,0.45);
-      background: rgba(25,199,163,0.13);
-    }
-
-    .stations-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-    }
-
-    .station-item {
-      width: 100%;
-      min-width: 0;
-      min-height: 132px;
-      box-sizing: border-box;
-      border: 1px solid rgba(255,255,255,0.055);
-      background: rgba(255,255,255,0.045);
-      border-radius: 17px;
-      padding: 10px;
-      display: grid;
-      grid-template-columns: 48px minmax(0, 1fr);
-      grid-template-rows: 52px auto;
-      align-items: start;
-      column-gap: 9px;
-      row-gap: 8px;
-      position: relative;
-      cursor: pointer;
-      transition: 0.18s;
-    }
-
-    .station-item:active {
-      transform: scale(0.985);
-    }
-
-    .station-item.active {
-      border-color: rgba(25,199,163,0.45);
-      background:
-        linear-gradient(
-          90deg,
-          rgba(25,199,163,0.13),
-          rgba(255,255,255,0.045)
-        );
-    }
-
-    .station-logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      object-fit: contain;
-      background: #10141b;
-      padding: 5px;
-      box-sizing: border-box;
-      flex-shrink: 0;
-      grid-row: 1;
-    }
-
-    .station-info {
-      min-width: 0;
-      text-align: left;
-      padding-right: 0;
-      grid-column: 1 / -1;
-      grid-row: 2;
-    }
-
-    .station-name {
-      font-size: 12.5px;
-      font-weight: 800;
-      line-height: 1.2;
-      min-height: 30px;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-      overflow-wrap: anywhere;
-      padding-right: 1px;
-    }
-
-    .station-province {
-      color: #788292;
-      font-size: 10px;
-      line-height: 1.15;
-      margin-top: 4px;
-      white-space: normal;
-      overflow-wrap: anywhere;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
-      overflow: hidden;
-    }
-
-    .station-actions {
+      text-transform: uppercase;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      gap: 2px;
-      grid-column: 2;
-      grid-row: 1;
-      margin-top: 0;
+      gap: 6px;
+      margin-bottom: 6px;
     }
 
-    .favorite-button {
-      width: 32px;
-      height: 32px;
-      border: 0;
-      border-radius: 11px;
-      background: transparent;
-      color: #657080;
-      font-size: 16px;
-      cursor: pointer;
+    .song-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 4px;
     }
 
-    .favorite-button.active {
-      color: #ffd45c;
+    .artist-name {
+      color: var(--text-sub);
+      font-size: 14px;
+      margin: 0;
     }
 
-    .station-play {
-      width: 34px;
-      height: 34px;
-      border: 0;
+    .album-art {
+      width: 110px;
+      height: 110px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Waveform Visualizer simulation */
+    .waveform-visualizer {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 30px;
+      margin: 20px 0 10px;
+    }
+
+    .wave-bar {
+      flex: 1;
+      background: var(--accent-blue);
+      border-radius: 3px;
+      height: 20%;
+      animation: wave 1.2s infinite ease-in-out alternate;
+    }
+
+    @keyframes wave {
+      0% { height: 15%; }
+      100% { height: 90%; }
+    }
+
+    .waveform-visualizer .wave-bar:nth-child(2n) { animation-delay: 0.2s; }
+    .waveform-visualizer .wave-bar:nth-child(3n) { animation-delay: 0.4s; }
+    .waveform-visualizer .wave-bar:nth-child(4n) { animation-delay: 0.1s; }
+    .waveform-visualizer .wave-bar:nth-child(5n) { animation-delay: 0.3s; }
+
+    .progress-container {
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan));
+      border-radius: 2px;
+      position: relative;
+    }
+
+    .progress-bar-fill::after {
+      content: '';
+      position: absolute;
+      right: -5px;
+      top: -3px;
+      width: 10px;
+      height: 10px;
+      background: #fff;
       border-radius: 50%;
-      background: #19c7a3;
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .progress-time {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-sub);
+      font-size: 11px;
+      margin-top: 6px;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .control-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
       color: white;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      flex-shrink: 0;
+      font-size: 15px;
+      transition: all 0.2s;
     }
 
-    #loading {
-      text-align: center;
-      color: #8993a2;
-      font-size: 13px;
-      padding: 18px 0;
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
     }
 
-    #errorMessage {
-      display: none;
-      color: #ff7777;
-      text-align: center;
-      font-size: 13px;
-      padding: 12px;
+    .control-btn.play-main {
+      width: 58px;
+      height: 58px;
+      background: linear-gradient(135deg, var(--accent-blue), #0055ff);
+      border: none;
+      font-size: 20px;
+      box-shadow: 0 0 25px rgba(0, 136, 255, 0.5);
     }
 
-    @media (max-width: 380px) {
-      .stations-list {
-        grid-template-columns: 1fr;
-      }
-
-      .station-logo {
-        width: 50px;
-        height: 50px;
-      }
-
-      .station-name {
-        font-size: 13px;
-      }
+    .control-btn.play-main:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 35px rgba(0, 136, 255, 0.7);
     }
 
-    .news-categories {
+    /* SECTIONS COMMON */
+    .section-header-flex {
       display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 2px 1px 10px;
-      scrollbar-width: none;
+      align-items: center;
+      justify-content: space-between;
+      margin: 32px 0 16px;
     }
 
-    .news-categories::-webkit-scrollbar {
-      display: none;
-    }
-
-    .news-category {
-      border: 1px solid rgba(255,255,255,0.07);
-      background: rgba(255,255,255,0.045);
-      color: #8f99a8;
-      border-radius: 20px;
-      padding: 8px 13px;
-      font-size: 11px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-      transition: 0.18s;
-    }
-
-    .news-category.active {
-      background: #19c7a3;
-      border-color: #19c7a3;
-      color: white;
-    }
-
-    .news-category:active {
-      transform: scale(0.95);
-    }
-
-    .news-card {
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.22);
-    }
-
-    .news-img {
-      width: 100%;
-      height: 185px;
-      display: block;
-      object-fit: cover;
-      background: #12161d;
-    }
-
-    .news-content {
-      padding: 15px;
-    }
-
-    .news-category-label {
-      display: inline-block;
-      color: #6fd8c5;
-      font-size: 10px;
+    .section-title-icon {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
       font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 7px;
+      margin: 0;
     }
 
-    .news-title {
-      font-size: 16px;
-      line-height: 1.35;
-      margin: 0 0 8px;
+    .section-title-icon i {
+      color: var(--accent-blue);
     }
 
-    .news-desc {
-      font-size: 12px;
-      line-height: 1.5;
-      color: #9ba4b2;
-      margin: 0 0 12px;
-    }
-
-    .news-link {
-      color: #55b9ff;
-      font-size: 12px;
-      font-weight: 700;
+    .see-all-link {
+      color: var(--accent-blue);
       text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .news-empty {
-      padding: 20px;
-      text-align: center;
-      color: #7e8795;
-      font-size: 12px;
-      background: rgba(255,255,255,0.035);
-      border-radius: 17px;
+    /* FAVORITES GRID */
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
     }
 
-    /* =========================================================
-       FOOTBALL
-    ========================================================= */
-
-    .football-list {
+    .favorite-card-modern {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px;
+      position: relative;
       display: flex;
       flex-direction: column;
-      gap: 9px;
-    }
-
-    .football-card {
-      background: rgba(255,255,255,0.045);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 18px;
-      padding: 12px;
-    }
-
-    .football-card.live {
-      border-color: rgba(255,80,80,0.35);
-    }
-
-    .football-date {
-      color: #737e8e;
-      font-size: 10px;
+      align-items: center;
       text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .favorite-card-modern:hover {
+      transform: translateY(-5px);
+      border-color: rgba(0, 136, 255, 0.4);
+      background: rgba(18, 30, 56, 0.85);
+    }
+
+    .fav-heart-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      color: var(--accent-red);
+      font-size: 14px;
+    }
+
+    .fav-logo-wrapper {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      padding: 4px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+      border: 1px solid var(--card-border);
+      margin-bottom: 12px;
+    }
+
+    .fav-logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .fav-title {
+      font-weight: 800;
+      font-size: 14px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .fav-sub {
+      color: var(--text-sub);
+      font-size: 11px;
       margin-bottom: 10px;
     }
 
-    .football-league {
-      color: #6fd8c5;
-      font-size: 9px;
-      font-weight: 800;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      margin-bottom: 5px;
-    }
-
-    .football-teams {
-      display: grid;
-      grid-template-columns: 1fr 72px 1fr;
+    .fav-play-btn {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      color: white;
+      border: none;
+      display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      font-size: 12px;
+      box-shadow: 0 4px 12px rgba(0, 136, 255, 0.4);
+      cursor: pointer;
     }
 
-    .football-team {
+    /* NEWS SECTION */
+    .news-pills {
+      display: flex;
+      gap: 10px;
+    }
+
+    .news-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-sub);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .news-pill.active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: white;
+    }
+
+    .news-main-featured {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 16px;
+    }
+
+    .news-featured-img {
+      width: 100%;
+      height: 100%;
+      min-height: 250px;
+      object-fit: cover;
+    }
+
+    .news-featured-body {
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      min-width: 0;
+      justify-content: center;
     }
 
-    .football-team-logo {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      margin-bottom: 6px;
-    }
-
-    .football-team-name {
+    .news-cat-tag {
+      color: var(--accent-cyan);
       font-size: 11px;
-      font-weight: 700;
-      line-height: 1.25;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
-    .football-score {
-      text-align: center;
+    .news-featured-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 0 0 12px;
+      line-height: 1.3;
+    }
+
+    .news-featured-desc {
+      color: var(--text-sub);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .news-meta-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-sub);
+      font-size: 12px;
+    }
+
+    .news-grid-secondary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .news-card-sub {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .news-card-sub img {
+      width: 70px;
+      height: 70px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .news-sub-content {
+      flex: 1;
+    }
+
+    .news-sub-title {
+      font-size: 12px;
+      font-weight: 700;
+      margin: 4px 0 6px;
+      line-height: 1.3;
+    }
+
+    /* SMART AI BANNER */
+    .ai-assistant-banner {
+      margin-top: 35px;
+      background: linear-gradient(135deg, #0d3b8e 0%, #1a1053 50%, #310d7a 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      padding: 20px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    .ai-brand-info {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .ai-bot-avatar {
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, var(--accent-cyan), var(--accent-blue));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 0 20px var(--accent-cyan);
+    }
+
+    .ai-text h3 {
+      margin: 0 0 4px;
       font-size: 18px;
       font-weight: 800;
     }
 
-    .football-score small {
-      display: block;
-      font-size: 9px;
-      font-weight: 600;
-      color: #7d8796;
-      margin-top: 3px;
-    }
-
-    .football-status {
-      display: inline-block;
-      margin-top: 9px;
-      padding: 4px 9px;
-      border-radius: 20px;
-      background: rgba(25,199,163,0.12);
-      color: #6fd8c5;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .football-status.live {
-      background: rgba(255,80,80,0.14);
-      color: #ff7d7d;
-    }
-
-    .football-status.finished {
-      background: rgba(255,255,255,0.07);
-      color: #929baa;
-    }
-
-    .football-status.postponed {
-      background: rgba(255,190,70,0.13);
-      color: #ffc85c;
-    }
-
-    .football-more {
-      margin-top: 10px;
-      color: #657080;
-      text-align: center;
-      font-size: 10px;
-    }
-
-    #player {
-      display: none;
-    }
-
-    #stationList {
-      display: none;
-    }
-
-    .bottom-player {
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding:
-        10px
-        14px
-        calc(10px + env(safe-area-inset-bottom));
-      background: rgba(10,12,17,0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .bottom-player-inner {
-      width: 100%;
-      max-width: 700px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .mini-logo {
-      width: 46px;
-      height: 46px;
-      border-radius: 13px;
-      object-fit: contain;
-      background: #151922;
-      padding: 5px;
-      flex-shrink: 0;
-    }
-
-    .mini-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .mini-name {
+    .ai-text p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.7);
       font-size: 13px;
-      font-weight: 750;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
-    .mini-status {
-      color: #737e8e;
-      font-size: 10px;
-      margin-top: 3px;
+    .ai-input-wrapper {
+      position: relative;
+      width: 380px;
     }
 
-    .player-button {
-      width: 43px;
-      height: 43px;
-      border: 0;
+    .ai-input-wrapper input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 30px;
+      padding: 12px 50px 12px 45px;
+      color: white;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .ai-input-wrapper i.chat-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ai-send-btn {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
+      background: var(--accent-blue);
+      border: none;
+      color: white;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
     }
 
-    #prevButton,
-    #nextButton {
-      background: rgba(255,255,255,0.08);
-      color: #d7dce4;
-      font-size: 13px;
+    /* FOOTER */
+    .app-footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-sub);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
-    #playButton {
-      background: #19c7a3;
-      color: white;
-      font-size: 16px;
-      box-shadow: 0 5px 18px rgba(25,199,163,0.25);
-    }
-
-    @media (max-width: 430px) {
-
-      .football-teams {
-        grid-template-columns: 1fr 60px 1fr;
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 900px) {
+      .player-hero-card {
+        grid-template-columns: 1fr;
       }
-
-      .football-team-name {
-        font-size: 10px;
+      .hero-left {
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+        padding-right: 0;
+        padding-bottom: 20px;
       }
-
-      .football-score {
-        font-size: 16px;
+      .news-main-featured {
+        grid-template-columns: 1fr;
       }
-
+      .news-grid-secondary {
+        grid-template-columns: 1fr;
+      }
+      .ai-assistant-banner {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+      }
+      .ai-input-wrapper {
+        width: 100%;
+      }
     }
-
   </style>
 </head>
 
 <body>
 
-<header class="topbar">
-
-  <div class="brand">
-
-    <div class="brand-icon">
-      <i class="fa-solid fa-radio"></i>
-    </div>
-
-    <div class="brand-text">
-      <h1>Radio SMG</h1>
-      <span>Tu radio, estés donde estés</span>
-    </div>
-
-  </div>
-
-  <button
-    class="settings-button"
-    id="settingsButton"
-    aria-label="Configuración"
-  >
-    <i class="fa-solid fa-gear"></i>
-  </button>
-
-</header>
-
-
-<main class="main">
-
-  <section class="section">
-
-    <div class="current-card">
-
-      <img
-        id="stationLogo"
-        class="current-logo"
-        src=""
-        alt="Logo emisora"
-      >
-
-      <div class="current-info">
-
-        <div class="current-label">
-          <i class="fa-solid fa-circle"></i>
-          Radio seleccionada
-        </div>
-
-        <div
-          id="currentName"
-          class="current-name"
-        >
-          Seleccioná una emisora
-        </div>
-
-        <div
-          id="currentProvince"
-          class="current-province"
-        >
-          -
-        </div>
-
-        <div
-          id="nowPlaying"
-          class="current-status"
-        >
-          Lista para reproducir
-        </div>
-
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="fa-solid fa-radio"></i>
       </div>
-
+      <div class="brand-text">
+        <h1>Radio <span>SMG</span></h1>
+        <span class="tagline">Tu música, tus radios</span>
+      </div>
     </div>
 
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-header">
-
-      <h2 class="section-title">
-        ⭐ Tus radios favoritas
-      </h2>
-
-    </div>
-
-    <div
-      id="favoritesContainer"
-      class="favorites-scroll"
-    ></div>
-
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-header">
-
-      <h2 class="section-title">
-        📻 Todas las radios
-      </h2>
-
-      <span
-        id="radioCount"
-        class="section-subtitle"
-      ></span>
-
-    </div>
-
-    <div class="search-box">
-
+    <div class="top-search-bar">
       <i class="fa-solid fa-magnifying-glass"></i>
-
-      <input
-        type="search"
-        id="stationSearch"
-        placeholder="Buscar emisora..."
-        autocomplete="off"
-      >
-
+      <input type="search" id="stationSearch" placeholder="Buscar radio, ciudad o género..." autocomplete="off">
     </div>
 
-    <div
-      id="provinceFilters"
-      class="province-filters"
-    ></div>
-
-    <div id="loading">
-      Cargando emisoras...
-    </div>
-
-    <div id="errorMessage"></div>
-
-    <div
-      id="stationsContainer"
-      class="stations-list"
-    ></div>
-
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-header">
-
-      <h2 class="section-title">
-        ⚽ Fútbol
-      </h2>
-
-      <span
-        id="footballStatus"
-        class="section-subtitle"
-      >
-        2026
-      </span>
-
-    </div>
-
-    <div id="footballContainer">
-
-      <div class="news-empty">
-        Cargando partidos...
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <section class="section">
-
-    <div class="section-header">
-
-      <h2 class="section-title">
-        📰 Noticias
-      </h2>
-
-    </div>
-
-    <div
-      id="newsCategories"
-      class="news-categories"
-    >
-
-      <button
-        class="news-category active"
-        data-category="todas"
-      >
-        Todas
-      </button>
-
-      <button
-        class="news-category"
-        data-category="actualidad"
-      >
-        Actualidad
-      </button>
-
-      <button
-        class="news-category"
-        data-category="politica"
-      >
-        Política
-      </button>
-
-      <button
-        class="news-category"
-        data-category="economia"
-      >
-        Economía
-      </button>
-
-      <button
-        class="news-category"
-        data-category="deportes"
-      >
-        Deportes
-      </button>
-
-      <button
-        class="news-category"
-        data-category="tecnologia"
-      >
-        Tecnología
-      </button>
-
-      <button
-        class="news-category"
-        data-category="espectaculos"
-      >
-        Espectáculos
-      </button>
-
-      <button
-        class="news-category"
-        data-category="policiales"
-      >
-        Policiales
-      </button>
-
-    </div>
-
-    <div id="news-container"></div>
-
-  </section>
-
-</main>
-
-
-<select id="stationList">
-  <option value="">Seleccioná una emisora</option>
-</select>
-
-
-<audio
-  id="player"
-  preload="none"
-  playsinline
-></audio>
-
-
-<div class="bottom-player">
-
-  <div class="bottom-player-inner">
-
-    <img
-      id="miniLogo"
-      class="mini-logo"
-      src="icon.png"
-      alt="Radio"
-    >
-
-    <div class="mini-info">
-
-      <div
-        id="miniName"
-        class="mini-name"
-      >
-        Radio SMG
-      </div>
-
-      <div
-        id="miniStatus"
-        class="mini-status"
-      >
-        Seleccioná una emisora
-      </div>
-
-    </div>
-
-    <button
-      id="prevButton"
-      class="player-button"
-      aria-label="Radio anterior"
-    >
-      <i class="fa-solid fa-backward-step"></i>
+    <button class="theme-toggle" aria-label="Modo Oscuro">
+      <i class="fa-regular fa-moon"></i>
     </button>
-
-    <button
-      id="playButton"
-      class="player-button"
-      aria-label="Reproducir"
-    >
-      <i class="fa-solid fa-play"></i>
-    </button>
-
-    <button
-      id="nextButton"
-      class="player-button"
-      aria-label="Radio siguiente"
-    >
-      <i class="fa-solid fa-forward-step"></i>
-    </button>
-
-  </div>
-
-</div>
-
-
-<script>
-
-/* ============================================================
-   CONFIGURACIÓN
-============================================================ */
-
-const SUPABASE_URL =
-  "https://kzcnkktttazibhnqfxvq.supabase.co";
-
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_stHEaVggW8TWfKMrTOW0OQ_QoOB4y8f";
-
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
-
-const WORKER_URL =
-  "https://cool-fire-ed4b.matiasgutierrez402.workers.dev/?url=";
-
-const LOGOS_BUCKET =
-  "logos";
-
-
-/* ============================================================
-   THE SPORTS DB - FÚTBOL
-============================================================ */
-
-const THESPORTSDB_BASE =
-  "https://www.thesportsdb.com/api/v1/json/123";
-
-const THESPORTSDB_LEAGUE =
-  4406;
-
-const THESPORTSDB_SEASON =
-  "2026";
-
-const FOOTBALL_CACHE_KEY =
-  "radioSMGFootballFixturesTSDB";
-
-const FOOTBALL_CACHE_TIME =
-  30 * 60 * 1000;
-
-
-/* ============================================================
-   METADATA
-============================================================ */
-
-const TRITON_NOW_PLAYING_URL =
-  "https://np.tritondigital.com/public/nowplaying";
-
-const METADATA_LA100 =
-  "FM999_56AAC";
-
-const METADATA_INTERVAL =
-  30000;
-
-
-/* ============================================================
-   ELEMENTOS
-============================================================ */
-
-const player =
-  document.getElementById("player");
-
-const list =
-  document.getElementById("stationList");
-
-const playButton =
-  document.getElementById("playButton");
-
-const prevButton =
-  document.getElementById("prevButton");
-
-const nextButton =
-  document.getElementById("nextButton");
-
-const logoImg =
-  document.getElementById("stationLogo");
-
-const miniLogo =
-  document.getElementById("miniLogo");
-
-const miniName =
-  document.getElementById("miniName");
-
-const miniStatus =
-  document.getElementById("miniStatus");
-
-const currentName =
-  document.getElementById("currentName");
-
-const currentProvince =
-  document.getElementById("currentProvince");
-
-const nowPlaying =
-  document.getElementById("nowPlaying");
-
-const loading =
-  document.getElementById("loading");
-
-const errorMessage =
-  document.getElementById("errorMessage");
-
-const stationsContainer =
-  document.getElementById("stationsContainer");
-
-const favoritesContainer =
-  document.getElementById("favoritesContainer");
-
-const stationSearch =
-  document.getElementById("stationSearch");
-
-const provinceFilters =
-  document.getElementById("provinceFilters");
-
-const radioCount =
-  document.getElementById("radioCount");
-
-const settingsButton =
-  document.getElementById("settingsButton");
-
-const newsContainer =
-  document.getElementById("news-container");
-
-const newsCategories =
-  document.getElementById("newsCategories");
-
-const footballContainer =
-  document.getElementById("footballContainer");
-
-const footballStatus =
-  document.getElementById("footballStatus");
-
-
-/* ============================================================
-   VARIABLES
-============================================================ */
-
-let radios = [];
-
-let noticias = [];
-
-let indiceNoticia = 0;
-
-let metadataTimer = null;
-
-let categoriaNoticias =
-  "todas";
-
-let provinciaRadios =
-  "todas";
-
-const FAVORITES_KEY =
-  "radioSMGFavorites";
-
-const NEWS_CACHE_KEY =
-  "radioSMGNewsCache";
-
-const NEWS_CACHE_TIME =
-  10 * 60 * 1000;
-
-
-/* ============================================================
-   LOGOS
-============================================================ */
-
-function getLogoUrl(nombreLogo) {
-
-  if (!nombreLogo) {
-    return null;
-  }
-
-  if (
-    nombreLogo.startsWith("http://") ||
-    nombreLogo.startsWith("https://")
-  ) {
-    return nombreLogo;
-  }
-
-  return `${SUPABASE_URL}/storage/v1/object/public/${LOGOS_BUCKET}/${encodeURIComponent(nombreLogo)}`;
-
-}
-
-
-/* ============================================================
-   FAVORITOS
-============================================================ */
-
-function getFavorites() {
-
-  try {
-
-    const data =
-      localStorage.getItem(
-        FAVORITES_KEY
-      );
-
-    if (!data) {
-      return [];
-    }
-
-    const result =
-      JSON.parse(data);
-
-    return Array.isArray(result)
-      ? result
-      : [];
-
-  } catch {
-
-    return [];
-
-  }
-
-}
-
-
-function saveFavorites(favorites) {
-
-  localStorage.setItem(
-    FAVORITES_KEY,
-    JSON.stringify(favorites)
-  );
-
-}
-
-
-function isFavorite(radioId) {
-
-  return getFavorites()
-    .includes(
-      String(radioId)
-    );
-
-}
-
-
-function toggleFavorite(radioId) {
-
-  const id =
-    String(radioId);
-
-  let favorites =
-    getFavorites();
-
-  if (
-    favorites.includes(id)
-  ) {
-
-    favorites =
-      favorites.filter(
-        x => x !== id
-      );
-
-  } else {
-
-    favorites.push(id);
-
-  }
-
-  saveFavorites(favorites);
-
-  renderFavorites();
-
-  renderStations(
-    stationSearch.value
-  );
-
-}
-
-
-/* ============================================================
-   CARGAR RADIOS
-============================================================ */
-
-async function cargarRadios() {
-
-  loading.style.display =
-    "block";
-
-  errorMessage.style.display =
-    "none";
-
-  try {
-
-    const { data, error } =
-      await supabaseClient
-        .from("radios")
-        .select(
-          "id, descripcion, provincia, enlace, logo, codigo"
-        )
-        .order(
-          "codigo",
-          {
-            ascending: true
-          }
-        );
-
-    if (error) {
-      throw error;
-    }
-
-    if (
-      !data ||
-      data.length === 0
-    ) {
-
-      throw new Error(
-        "No se encontraron emisoras."
-      );
-
-    }
-
-    radios =
-      data;
-
-    list.innerHTML =
-      "";
-
-    radios.forEach(
-      radio => {
-
-        const option =
-          document.createElement(
-            "option"
-          );
-
-        option.value =
-          radio.enlace || "";
-
-        option.textContent =
-          `${radio.descripcion} - ${radio.provincia}`;
-
-        option.dataset.logo =
-          getLogoUrl(
-            radio.logo
-          );
-
-        option.dataset.id =
-          radio.id;
-
-        option.dataset.codigo =
-          radio.codigo;
-
-        option.dataset.descripcion =
-          radio.descripcion;
-
-        option.dataset.provincia =
-          radio.provincia;
-
-        list.appendChild(
-          option
-        );
-
-      }
-    );
-
-    loading.style.display =
-      "none";
-
-    radioCount.textContent =
-      `${radios.length} emisoras`;
-
-    const lastStation =
-      localStorage.getItem(
-        "lastStation"
-      );
-
-    if (lastStation) {
-
-      const index =
-        radios.findIndex(
-          radio =>
-            radio.enlace ===
-            lastStation
-        );
-
-      if (index >= 0) {
-
-        list.selectedIndex =
-          index;
-
-      }
-
-    }
-
-    if (
-      list.selectedIndex < 0 &&
-      radios.length > 0
-    ) {
-
-      list.selectedIndex =
-        0;
-
-    }
-
-    actualizarInterfazRadio();
-
-    renderProvinceFilters();
-
-    renderFavorites();
-
-    renderStations();
-
-  } catch (error) {
-
-    console.error(
-      "Error cargando radios:",
-      error
-    );
-
-    loading.style.display =
-      "none";
-
-    errorMessage.textContent =
-      "No se pudieron cargar las emisoras.";
-
-    errorMessage.style.display =
-      "block";
-
-  }
-
-}
-
-
-/* ============================================================
-   LOGO
-============================================================ */
-
-function mostrarLogo(nombreLogo) {
-
-  const logo =
-    getLogoUrl(
-      nombreLogo
-    );
-
-  if (!logo) {
-
-    logoImg.style.display =
-      "none";
-
-    miniLogo.src =
-      "icon.png";
-
-    return;
-
-  }
-
-  logoImg.onload =
-    function() {
-
-      logoImg.style.display =
-        "block";
-
-    };
-
-  logoImg.onerror =
-    function() {
-
-      logoImg.style.display =
-        "none";
-
-      miniLogo.src =
-        "icon.png";
-
-    };
-
-  logoImg.src =
-    logo;
-
-  miniLogo.src =
-    logo;
-
-}
-
-
-/* ============================================================
-   RADIO ACTUAL
-============================================================ */
-
-function getCurrentRadio() {
-
-  const index =
-    list.selectedIndex;
-
-  if (
-    index < 0 ||
-    index >= radios.length
-  ) {
-
-    return null;
-
-  }
-
-  return radios[index];
-
-}
-
-
-function actualizarInterfazRadio() {
-
-  const radio =
-    getCurrentRadio();
-
-  if (!radio) {
-
-    currentName.textContent =
-      "Seleccioná una emisora";
-
-    currentProvince.textContent =
-      "-";
-
-    miniName.textContent =
-      "Radio SMG";
-
-    miniStatus.textContent =
-      "Seleccioná una emisora";
-
-    return;
-
-  }
-
-  currentName.textContent =
-    radio.descripcion ||
-    "Radio";
-
-  currentProvince.textContent =
-    radio.provincia ||
-    "";
-
-  miniName.textContent =
-    radio.descripcion ||
-    "Radio";
-
-  miniStatus.textContent =
-    player.paused
-      ? "Lista para reproducir"
-      : "Reproduciendo";
-
-  mostrarLogo(
-    radio.logo
-  );
-
-  renderStations(
-    stationSearch.value
-  );
-
-}
-
-
-/* ============================================================
-   FAVORITOS
-============================================================ */
-
-function renderFavorites() {
-
-  const favorites =
-    getFavorites();
-
-  const favoriteRadios =
-    radios.filter(
-      radio =>
-        favorites.includes(
-          String(radio.id)
-        )
-    );
-
-  if (
-    favoriteRadios.length === 0
-  ) {
-
-    favoritesContainer.innerHTML = `
-      <div class="empty-favorites">
-        ⭐ Todavía no tenés radios favoritas.
-        Tocá la estrella de una emisora para agregarla.
-      </div>
-    `;
-
-    return;
-
-  }
-
-  favoritesContainer.innerHTML =
-    favoriteRadios
-      .map(
-        radio => {
-
-          const logo =
-            getLogoUrl(
-              radio.logo
-            ) ||
-            "icon.png";
-
-          return `
-            <div
-              class="favorite-card"
-              data-radio-id="${radio.id}"
-            >
-
-              <img
-                class="favorite-logo"
-                src="${escapeAttribute(logo)}"
-                alt=""
-                onerror="this.src='icon.png'"
-              >
-
-              <div class="favorite-name">
-                ${escapeHtml(
-                  radio.descripcion ||
-                  "Radio"
-                )}
-              </div>
-
-              <div class="favorite-province">
-                ${escapeHtml(
-                  radio.provincia ||
-                  ""
-                )}
-              </div>
-
-            </div>
-          `;
-
-        }
-      )
-      .join("");
-
-}
-
-
-favoritesContainer.addEventListener(
-  "click",
-  event => {
-
-    const card =
-      event.target.closest(
-        ".favorite-card"
-      );
-
-    if (!card) {
-      return;
-    }
-
-    const id =
-      String(
-        card.dataset.radioId
-      );
-
-    const index =
-      radios.findIndex(
-        radio =>
-          String(radio.id) === id
-      );
-
-    if (index < 0) {
-      return;
-    }
-
-    list.selectedIndex =
-      index;
-
-    playStation(
-      radios[index]
-    );
-
-  }
-);
-
-
-/* ============================================================
-   LISTA DE RADIOS
-============================================================ */
-
-function renderProvinceFilters() {
-
-  const provincias =
-    [...new Set(
-      radios
-        .map(radio =>
-          (radio.provincia || "").trim()
-        )
-        .filter(Boolean)
-    )]
-    .sort((a, b) =>
-      a.localeCompare(b, "es")
-    );
-
-  const botones = [
-    `
-      <button
-        class="province-filter ${
-          provinciaRadios === "todas"
-            ? "active"
-            : ""
-        }"
-        data-province="todas"
-      >
-        Todas (${radios.length})
-      </button>
-    `,
-    ...provincias.map(provincia => {
-
-      const cantidad =
-        radios.filter(
-          radio =>
-            (radio.provincia || "").trim() ===
-            provincia
-        ).length;
-
-      return `
-        <button
-          class="province-filter ${
-            provinciaRadios === provincia
-              ? "active"
-              : ""
-          }"
-          data-province="${escapeAttribute(provincia)}"
-        >
-          ${escapeHtml(provincia)} (${cantidad})
-        </button>
-      `;
-
-    })
-  ];
-
-  provinceFilters.innerHTML =
-    botones.join("");
-
-}
-
-
-function renderStations(searchText = "") {
-
-  const text =
-    searchText
-      .trim()
-      .toLowerCase();
-
-  const filtered =
-    radios.filter(
-      radio => {
-
-        const provincia =
-          (
-            radio.provincia ||
-            ""
-          ).trim();
-
-        if (
-          provinciaRadios !== "todas" &&
-          provincia !== provinciaRadios
-        ) {
-          return false;
-        }
-
-        if (!text) {
-          return true;
-        }
-
-        const nombre =
-          (
-            radio.descripcion ||
-            ""
-          ).toLowerCase();
-
-        const provinciaTexto =
-          provincia.toLowerCase();
-
-        return (
-          nombre.includes(text) ||
-          provinciaTexto.includes(text)
-        );
-
-      }
-    );
-
-  if (
-    filtered.length === 0
-  ) {
-
-    stationsContainer.innerHTML = `
-      <div
-        class="empty-favorites"
-        style="grid-column:1/-1;"
-      >
-        No encontramos radios con esos filtros.
-      </div>
-    `;
-
-    return;
-
-  }
-
-  stationsContainer.innerHTML =
-    filtered
-      .map(
-        radio => {
-
-          const current =
-            getCurrentRadio();
-
-          const active =
-            current &&
-            String(current.id) ===
-            String(radio.id);
-
-          const favorite =
-            isFavorite(
-              radio.id
-            );
-
-          const logo =
-            getLogoUrl(
-              radio.logo
-            ) ||
-            "icon.png";
-
-          return `
-
-            <div
-              class="station-item ${active ? "active" : ""}"
-              data-radio-id="${radio.id}"
-            >
-
-              <img
-                class="station-logo"
-                src="${escapeAttribute(logo)}"
-                alt=""
-                onerror="this.src='icon.png'"
-              >
-
-              <div class="station-info">
-
-                <div class="station-name">
-                  ${escapeHtml(
-                    radio.descripcion ||
-                    "Radio"
-                  )}
-                </div>
-
-                <div class="station-province">
-                  ${escapeHtml(
-                    radio.provincia ||
-                    ""
-                  )}
-                </div>
-
-              </div>
-
-              <div class="station-actions">
-
-                <button
-                  class="station-play"
-                  data-play-id="${radio.id}"
-                  aria-label="Reproducir"
-                >
-                  <i class="fa-solid fa-play"></i>
-                </button>
-
-                <button
-                  class="favorite-button ${favorite ? "active" : ""}"
-                  data-favorite-id="${radio.id}"
-                  aria-label="Favorito"
-                >
-                  <i class="${
-                    favorite
-                      ? "fa-solid"
-                      : "fa-regular"
-                  } fa-star"></i>
-                </button>
-
-              </div>
-
-            </div>
-
-          `;
-
-        }
-      )
-      .join("");
-
-}
-
-
-stationsContainer.addEventListener(
-  "click",
-  event => {
-
-    const favoriteButton =
-      event.target.closest(
-        ".favorite-button"
-      );
-
-    if (favoriteButton) {
-
-      event.stopPropagation();
-
-      toggleFavorite(
-        favoriteButton.dataset.favoriteId
-      );
-
-      return;
-
-    }
-
-    const playButtonElement =
-      event.target.closest(
-        ".station-play"
-      );
-
-    if (playButtonElement) {
-
-      event.stopPropagation();
-
-      const id =
-        String(
-          playButtonElement.dataset.playId
-        );
-
-      const index =
-        radios.findIndex(
-          radio =>
-            String(radio.id) === id
-        );
-
-      if (index >= 0) {
-
-        list.selectedIndex =
-          index;
-
-        playStation(
-          radios[index]
-        );
-
-      }
-
-      return;
-
-    }
-
-    const station =
-      event.target.closest(
-        ".station-item"
-      );
-
-    if (!station) {
-      return;
-    }
-
-    const id =
-      String(
-        station.dataset.radioId
-      );
-
-    const index =
-      radios.findIndex(
-        radio =>
-          String(radio.id) === id
-      );
-
-    if (index >= 0) {
-
-      list.selectedIndex =
-        index;
-
-      playStation(
-        radios[index]
-      );
-
-    }
-
-  }
-);
-
-
-provinceFilters.addEventListener(
-  "click",
-  event => {
-
-    const button =
-      event.target.closest(
-        ".province-filter"
-      );
-
-    if (!button) {
-      return;
-    }
-
-    provinciaRadios =
-      button.dataset.province ||
-      "todas";
-
-    renderProvinceFilters();
-
-    renderStations(
-      stationSearch.value
-    );
-
-  }
-);
-
-
-/* ============================================================
-   BUSCADOR
-============================================================ */
-
-stationSearch.addEventListener(
-  "input",
-  () => {
-
-    renderStations(
-      stationSearch.value
-    );
-
-  }
-);
-
-
-/* ============================================================
-   METADATA LA 100
-============================================================ */
-
-async function actualizarMetadata(radio) {
-
-  if (!radio) {
-    return;
-  }
-
-  if (
-    (
-      radio.descripcion ||
-      ""
-    ).toUpperCase() !==
-    "LA 100"
-  ) {
-
-    return;
-
-  }
-
-  try {
-
-    const url =
-      `${TRITON_NOW_PLAYING_URL}?mountName=${METADATA_LA100}&numberToFetch=5&eventType=track`;
-
-    const response =
-      await fetch(
-        url,
-        {
-          cache: "no-store"
-        }
-      );
-
-    if (!response.ok) {
-      return;
-    }
-
-    const xmlText =
-      await response.text();
-
-    const parser =
-      new DOMParser();
-
-    const xml =
-      parser.parseFromString(
-        xmlText,
-        "application/xml"
-      );
-
-    const registros =
-      Array.from(
-        xml.querySelectorAll(
-          "nowplaying-info"
-        )
-      );
-
-    if (
-      registros.length === 0
-    ) {
-      return;
-    }
-
-    const current =
-      getCurrentRadio();
-
-    if (
-      !current ||
-      current.id !== radio.id
-    ) {
-      return;
-    }
-
-    const primero =
-      registros[0];
-
-    const propiedad =
-      primero.querySelector(
-        'property[name="cue_title"]'
-      );
-
-    if (!propiedad) {
-      return;
-    }
-
-    const titulo =
-      propiedad.textContent.trim();
-
-    if (!titulo) {
-      return;
-    }
-
-    const programaMatch =
-      titulo.match(
-        /^\d{2}-\d{2}\s+\d{1,2}HS\s+AIRE\s+(.+?)\s+\d{3}$/i
-      );
-
-    if (programaMatch) {
-
-      const programa =
-        programaMatch[1].trim();
-
-      if (
-        programa.toUpperCase() ===
-        "LOOP 30 SEGUNDOS"
-      ) {
-        return;
-      }
-
-      nowPlaying.innerHTML =
-        `<span>📻 ${escapeHtml(programa)}</span>`;
-
-      miniStatus.textContent =
-        `📻 ${programa}`;
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "Metadata no disponible:",
-      error
-    );
-
-  }
-
-}
-
-
-function iniciarMetadata(radio) {
-
-  detenerMetadata();
-
-  if (!radio) {
-    return;
-  }
-
-  actualizarMetadata(
-    radio
-  );
-
-  metadataTimer =
-    setInterval(
-      () => {
-
-        if (!player.paused) {
-
-          const current =
-            getCurrentRadio();
-
-          if (current) {
-
-            actualizarMetadata(
-              current
-            );
-
-          }
-
-        }
-
-      },
-      METADATA_INTERVAL
-    );
-
-}
-
-
-function detenerMetadata() {
-
-  if (metadataTimer) {
-
-    clearInterval(
-      metadataTimer
-    );
-
-    metadataTimer =
-      null;
-
-  }
-
-}
-
-
-/* ============================================================
-   REPRODUCIR
-============================================================ */
-
-function playStation(radio) {
-
-  if (
-    !radio ||
-    !radio.enlace
-  ) {
-    return;
-  }
-
-  nowPlaying.innerHTML =
-    "";
-
-  // Indicamos inmediatamente que estamos conectando.
-  miniStatus.textContent = "Conectando...";
-
-  const originalUrl =
-    radio.enlace;
-
-  const streamUrl =
-    WORKER_URL +
-    encodeURIComponent(
-      originalUrl
-    );
-
-  player.pause();
-
-  player.src =
-    streamUrl;
-
-  player.load();
-
-  player.play()
-    .then(
-      () => {
-
-        localStorage.setItem(
-          "lastStation",
-          radio.enlace
-        );
-
-        localStorage.setItem(
-          "lastName",
-          radio.descripcion || ""
-        );
-
-        localStorage.setItem(
-          "lastLogo",
-          radio.logo || ""
-        );
-
-        mostrarLogo(
-          radio.logo
-        );
-
-        actualizarInterfazRadio();
-
-        miniStatus.textContent =
-          "Reproduciendo";
-
-        playButton.innerHTML =
-          `<i class="fa-solid fa-pause"></i>`;
-
-        playButton.setAttribute(
-          "aria-label",
-          "Pausar"
-        );
-
-        updateMediaSession(
-          radio.descripcion,
-          getLogoUrl(
-            radio.logo
-          )
-        );
-
-        iniciarMetadata(
-          radio
-        );
-
-        renderStations(
-          stationSearch.value
-        );
-
-      }
-    )
-    .catch(
-      error => {
-
-        console.error(
-          "Error al reproducir:",
-          error
-        );
-
-        miniStatus.textContent =
-          "No se pudo reproducir";
-
-        playButton.innerHTML =
-          `<i class="fa-solid fa-play"></i>`;
-
-      }
-    );
-
-}
-
-
-/* ============================================================
-   PAUSAR
-============================================================ */
-
-function pauseStation() {
-
-  player.pause();
-
-  detenerMetadata();
-
-  nowPlaying.innerHTML =
-    "";
-
-  playButton.innerHTML =
-    `<i class="fa-solid fa-play"></i>`;
-
-  playButton.setAttribute(
-    "aria-label",
-    "Reproducir"
-  );
-
-  miniStatus.textContent =
-    "Pausada";
-
-  if (
-    "mediaSession" in navigator
-  ) {
-
-    navigator.mediaSession.playbackState =
-      "paused";
-
-  }
-
-}
-
-
-/* ============================================================
-   PLAY / PAUSE
-============================================================ */
-
-playButton.addEventListener(
-  "click",
-  () => {
-
-    const radio =
-      getCurrentRadio();
-
-    if (!radio) {
-
-      alert(
-        "Seleccioná una emisora."
-      );
-
-      return;
-
-    }
-
-    if (player.paused) {
-
-      if (!player.src) {
-
-        playStation(
-          radio
-        );
-
-        return;
-
-      }
-
-      player.play()
-        .then(
-          () => {
-
-            playButton.innerHTML =
-              `<i class="fa-solid fa-pause"></i>`;
-
-            playButton.setAttribute(
-              "aria-label",
-              "Pausar"
-            );
-
-            miniStatus.textContent =
-              "Reproduciendo";
-
-            updateMediaSession(
-              radio.descripcion,
-              getLogoUrl(
-                radio.logo
-              )
-            );
-
-            iniciarMetadata(
-              radio
-            );
-
-          }
-        );
-
-    } else {
-
-      pauseStation();
-
-    }
-
-  }
-);
-
-
-/* ============================================================
-   CAMBIO DE RADIO
-============================================================ */
-
-list.addEventListener(
-  "change",
-  () => {
-
-    const radio =
-      getCurrentRadio();
-
-    if (!radio) {
-      return;
-    }
-
-    actualizarInterfazRadio();
-
-    playStation(
-      radio
-    );
-
-  }
-);
-
-
-/* ============================================================
-   ANTERIOR / SIGUIENTE
-============================================================ */
-
-function playByIndex(index) {
-
-  if (
-    radios.length === 0
-  ) {
-    return;
-  }
-
-  if (index < 0) {
-    index =
-      radios.length - 1;
-  }
-
-  if (
-    index >= radios.length
-  ) {
-    index = 0;
-  }
-
-  list.selectedIndex =
-    index;
-
-  playStation(
-    radios[index]
-  );
-
-}
-
-
-nextButton.addEventListener(
-  "click",
-  () => {
-
-    let nextIndex =
-      list.selectedIndex + 1;
-
-    if (
-      nextIndex >= radios.length
-    ) {
-      nextIndex = 0;
-    }
-
-    playByIndex(
-      nextIndex
-    );
-
-  }
-);
-
-
-prevButton.addEventListener(
-  "click",
-  () => {
-
-    let prevIndex =
-      list.selectedIndex - 1;
-
-    if (prevIndex < 0) {
-      prevIndex =
-        radios.length - 1;
-    }
-
-    playByIndex(
-      prevIndex
-    );
-
-  }
-);
-
-
-/* ============================================================
-   AUDIO
-============================================================ */
-
-player.addEventListener(
-  "error",
-  () => {
-
-    console.error(
-      "Error cargando el stream."
-    );
-
-    detenerMetadata();
-
-    nowPlaying.innerHTML =
-      "";
-
-    miniStatus.textContent =
-      "Error en la señal";
-
-    playButton.innerHTML =
-      `<i class="fa-solid fa-play"></i>`;
-
-  }
-);
-
-
-player.addEventListener(
-  "play",
-  () => {
-
-    playButton.innerHTML =
-      `<i class="fa-solid fa-pause"></i>`;
-
-    miniStatus.textContent =
-      "Reproduciendo";
-
-  }
-);
-
-
-player.addEventListener(
-  "pause",
-  () => {
-
-    playButton.innerHTML =
-      `<i class="fa-solid fa-play"></i>`;
-
-  }
-);
-
-
-/* ============================================================
-   MEDIA SESSION
-============================================================ */
-
-function updateMediaSession(
-  title,
-  artwork
-) {
-
-  if (
-    !("mediaSession" in navigator)
-  ) {
-    return;
-  }
-
-  try {
-
-    navigator.mediaSession.metadata =
-      new MediaMetadata({
-
-        title:
-          title ||
-          "Radio SMG",
-
-        artist:
-          "Radio SMG",
-
-        album:
-          "Radio Online",
-
-        artwork: [
-          {
-            src:
-              getSafeLogo(
-                artwork ||
-                "icon.png"
-              ),
-            sizes:
-              "512x512",
-            type:
-              "image/png"
-          }
-        ]
-
-      });
-
-    navigator.mediaSession.playbackState =
-      player.paused
-        ? "paused"
-        : "playing";
-
-
-    try {
-
-      navigator.mediaSession.setActionHandler(
-        "play",
-        () => {
-
-          const radio =
-            getCurrentRadio();
-
-          if (!radio) {
-            return;
-          }
-
-          player.play()
-            .then(
-              () => {
-
-                miniStatus.textContent =
-                  "Reproduciendo";
-
-                playButton.innerHTML =
-                  `<i class="fa-solid fa-pause"></i>`;
-
-                iniciarMetadata(
-                  radio
-                );
-
-              }
-            );
-
-        }
-      );
-
-    } catch {}
-
-
-    try {
-
-      navigator.mediaSession.setActionHandler(
-        "pause",
-        () => {
-
-          pauseStation();
-
-        }
-      );
-
-    } catch {}
-
-
-    try {
-
-      navigator.mediaSession.setActionHandler(
-        "nexttrack",
-        () => {
-
-          let nextIndex =
-            list.selectedIndex + 1;
-
-          if (
-            nextIndex >= radios.length
-          ) {
-            nextIndex = 0;
-          }
-
-          playByIndex(
-            nextIndex
-          );
-
-        }
-      );
-
-    } catch {}
-
-
-    try {
-
-      navigator.mediaSession.setActionHandler(
-        "previoustrack",
-        () => {
-
-          let prevIndex =
-            list.selectedIndex - 1;
-
-          if (
-            prevIndex < 0
-          ) {
-            prevIndex =
-              radios.length - 1;
-          }
-
-          playByIndex(
-            prevIndex
-          );
-
-        }
-      );
-
-    } catch {}
-
-  } catch (error) {
-
-    console.warn(
-      "MediaSession no disponible:",
-      error
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   LOGO SEGURO
-============================================================ */
-
-function getSafeLogo(url) {
-
-  try {
-
-    return new URL(
-      url,
-      location.href
-    ).href;
-
-  } catch {
-
-    return "icon.png";
-
-  }
-
-}
-
-
-/* ============================================================
-   ESCAPE
-============================================================ */
-
-function escapeHtml(text) {
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-  div.textContent =
-    text == null
-      ? ""
-      : String(text);
-
-  return div.innerHTML;
-
-}
-
-
-function escapeAttribute(text) {
-
-  return escapeHtml(
-    text
-  ).replace(
-    /"/g,
-    "&quot;"
-  );
-
-}
-
-
-/* ============================================================
-   CONFIGURACIÓN
-============================================================ */
-
-settingsButton.addEventListener(
-  "click",
-  () => {
-
-    alert(
-      "Configuración de Radio SMG\n\nEsta sección la vamos a desarrollar próximamente."
-    );
-
-  }
-);
-
-
-/* ============================================================
-   NOTICIAS
-============================================================ */
-
-const apiKey =
-  "pub_ebffaca675dd4f2a91c4e96e7656ef14";
-
-const NEWS_MAX_ITEMS =
-  60;
-
-const NEWS_REFRESH_TIME =
-  10 * 60 * 1000;
-
-
-/* ============================================================
-   NORMALIZAR TEXTO
-============================================================ */
-
-function limpiarTexto(texto) {
-
-  return String(
-    texto || ""
-  )
-    .replace(
-      /<[^>]*>/g,
-      ""
-    )
-    .replace(
-      /&nbsp;/gi,
-      " "
-    )
-    .replace(
-      /&amp;/gi,
-      "&"
-    )
-    .replace(
-      /\s+/g,
-      " "
-    )
-    .trim();
-
-}
-
-
-function normalizarTexto(texto) {
-
-  return limpiarTexto(
-    texto
-  )
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    );
-
-}
-
-
-/* ============================================================
-   CLASIFICACIÓN FALLBACK
-============================================================ */
-
-function clasificarPorPalabras(noticia) {
-
-  const texto =
-    normalizarTexto(
-      `${noticia.title || ""} ${noticia.description || ""}`
-    );
-
-  const deportes = [
-    "futbol",
-    "river",
-    "boca",
-    "racing",
-    "independiente",
-    "san lorenzo",
-    "seleccion",
-    "messi",
-    "deporte",
-    "tenis",
-    "basquet",
-    "nba",
-    "formula 1",
-    "mundial",
-    "champions",
-    "liga"
-  ];
-
-  const tecnologia = [
-    "tecnologia",
-    "tecnologico",
-    "inteligencia artificial",
-    "iphone",
-    "android",
-    "apple",
-    "google",
-    "microsoft",
-    "software",
-    "internet",
-    "aplicacion",
-    "celular",
-    "computadora"
-  ];
-
-  const espectaculos = [
-    "cine",
-    "pelicula",
-    "musica",
-    "actor",
-    "actriz",
-    "famoso",
-    "famosa",
-    "cantante",
-    "television",
-    "serie",
-    "streaming",
-    "show",
-    "espectaculo",
-    "celebridad"
-  ];
-
-  const economia = [
-    "economia",
-    "dolar",
-    "inflacion",
-    "mercado",
-    "banco",
-    "empleo",
-    "salario",
-    "precios",
-    "pymes",
-    "impuestos",
-    "finanzas",
-    "peso",
-    "reservas"
-  ];
-
-  const politica = [
-    "politica",
-    "presidente",
-    "gobierno",
-    "congreso",
-    "diputado",
-    "senado",
-    "senador",
-    "gobernador",
-    "elecciones",
-    "eleccion",
-    "milei",
-    "peron",
-    "kirchner",
-    "partido"
-  ];
-
-  const policiales = [
-    "policia",
-    "policial",
-    "asesinato",
-    "asesinado",
-    "asesinada",
-    "crimen",
-    "delito",
-    "robo",
-    "ladron",
-    "detenido",
-    "detenida",
-    "accidente",
-    "fiscal",
-    "juez",
-    "violencia"
-  ];
-
-  if (
-    deportes.some(
-      p => texto.includes(p)
-    )
-  ) {
-    return "deportes";
-  }
-
-  if (
-    tecnologia.some(
-      p => texto.includes(p)
-    )
-  ) {
-    return "tecnologia";
-  }
-
-  if (
-    espectaculos.some(
-      p => texto.includes(p)
-    )
-  ) {
-    return "espectaculos";
-  }
-
-  if (
-    economia.some(
-      p => texto.includes(p)
-    )
-  ) {
-    return "economia";
-  }
-
-  if (
-    politica.some(
-      p => texto.includes(p)
-    )
-  ) {
-    return "politica";
-  }
-
-  if (
-    policiales.some(
-      p => texto.includes(p)
-    )
-  ) {
-    return "policiales";
-  }
-
-  return "actualidad";
-
-}
-
-
-/* ============================================================
-   MAPEAR CATEGORÍAS NEWS DATA
-============================================================ */
-
-function mapearCategoriaNewsData(
-  categorias,
-  noticia
-) {
-
-  const categoriasNormalizadas =
-    Array.isArray(categorias)
-      ? categorias.map(
-          x =>
-            String(x)
-              .toLowerCase()
-              .trim()
-        )
-      : [];
-
-  if (
-    categoriasNormalizadas.includes(
-      "sports"
-    )
-  ) {
-    return "deportes";
-  }
-
-  if (
-    categoriasNormalizadas.includes(
-      "politics"
-    )
-  ) {
-    return "politica";
-  }
-
-  if (
-    categoriasNormalizadas.includes(
-      "business"
-    )
-  ) {
-    return "economia";
-  }
-
-  if (
-    categoriasNormalizadas.includes(
-      "technology"
-    )
-  ) {
-    return "tecnologia";
-  }
-
-  if (
-    categoriasNormalizadas.includes(
-      "entertainment"
-    )
-  ) {
-    return "espectaculos";
-  }
-
-  if (
-    categoriasNormalizadas.includes(
-      "crime"
-    )
-  ) {
-    return "policiales";
-  }
-
-  return clasificarPorPalabras(
-    noticia
-  );
-
-}
-
-
-/* ============================================================
-   CLAVE ÚNICA DE NOTICIA
-============================================================ */
-
-function obtenerClaveNoticia(
-  noticia
-) {
-
-  const link =
-    String(
-      noticia.link || ""
-    ).trim();
-
-  if (
-    link &&
-    link !== "#"
-  ) {
-
-    return `link:${link}`;
-
-  }
-
-  return `title:${normalizarTexto(
-    noticia.title || ""
-  )}`;
-
-}
-
-
-/* ============================================================
-   CACHE NOTICIAS
-============================================================ */
-
-function cargarCacheNoticias() {
-
-  try {
-
-    const raw =
-      localStorage.getItem(
-        NEWS_CACHE_KEY
-      );
-
-    if (!raw) {
-      return;
-    }
-
-    const cache =
-      JSON.parse(raw);
-
-    if (
-      !cache ||
-      !Array.isArray(
-        cache.noticias
-      )
-    ) {
-      return;
-    }
-
-    noticias =
-      cache.noticias;
-
-    indiceNoticia =
-      0;
-
-    mostrarNoticia();
-
-  } catch (error) {
-
-    console.warn(
-      "No se pudo leer caché de noticias:",
-      error
-    );
-
-  }
-
-}
-
-
-function guardarCacheNoticias() {
-
-  try {
-
-    localStorage.setItem(
-      NEWS_CACHE_KEY,
-      JSON.stringify({
-        timestamp: Date.now(),
-        noticias: noticias
-      })
-    );
-
-  } catch (error) {
-
-    console.warn(
-      "No se pudo guardar caché de noticias:",
-      error
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   MERGE NOTICIAS
-============================================================ */
-
-function fusionarNoticias(
-  nuevasNoticias
-) {
-
-  const mapa =
-    new Map();
-
-  noticias.forEach(
-    noticia => {
-
-      mapa.set(
-        obtenerClaveNoticia(
-          noticia
-        ),
-        noticia
-      );
-
-    }
-  );
-
-  nuevasNoticias.forEach(
-    noticia => {
-
-      mapa.set(
-        obtenerClaveNoticia(
-          noticia
-        ),
-        noticia
-      );
-
-    }
-  );
-
-  noticias =
-    Array.from(
-      mapa.values()
-    )
-    .sort(
-      (a, b) => {
-
-        const fechaA =
-          Date.parse(
-            a.pubDate || ""
-          ) || 0;
-
-        const fechaB =
-          Date.parse(
-            b.pubDate || ""
-          ) || 0;
-
-        return fechaB - fechaA;
-
-      }
-    )
-    .slice(
-      0,
-      NEWS_MAX_ITEMS
-    );
-
-  guardarCacheNoticias();
-
-}
-
-
-/* ============================================================
-   CARGAR NOTICIAS
-============================================================ */
-
-async function cargarNoticias() {
-
-  const newsDataUrl =
-    `https://newsdata.io/api/1/latest?apikey=${apiKey}&country=ar&language=es`;
-
-  const clarinUrl =
-    "https://api.rss2json.com/v1/api.json?rss_url=https://www.clarin.com/rss/lo-ultimo/";
-
-
-  const resultados =
-    await Promise.allSettled([
-
-      fetch(
-        newsDataUrl,
-        {
-          cache: "no-store"
-        }
-      )
-      .then(
-        response => {
-
-          if (!response.ok) {
-            throw new Error(
-              `NewsData HTTP ${response.status}`
-            );
-          }
-
-          return response.json();
-
-        }
-      ),
-
-      fetch(
-        clarinUrl,
-        {
-          cache: "no-store"
-        }
-      )
-      .then(
-        response => {
-
-          if (!response.ok) {
-            throw new Error(
-              `Clarín HTTP ${response.status}`
-            );
-          }
-
-          return response.json();
-
-        }
-      )
-
-    ]);
-
-
-  const nuevasNoticias = [];
-
-
-  const newsDataResult =
-    resultados[0];
-
-
-  if (
-    newsDataResult.status ===
-    "fulfilled"
-  ) {
-
-    const data =
-      newsDataResult.value;
-
-    if (
-      Array.isArray(
-        data.results
-      )
-    ) {
-
-      data.results.forEach(
-        n => {
-
-          const noticia = {
-
-            title:
-              limpiarTexto(
-                n.title ||
-                "Sin título"
-              ),
-
-            description:
-              limpiarTexto(
-                n.description ||
-                ""
-              ).slice(
-                0,
-                160
-              ),
-
-            image_url:
-              n.image_url ||
-              "icon.png",
-
-            link:
-              n.link ||
-              "#",
-
-            pubDate:
-              n.pubDate ||
-              "",
-
-            source:
-              n.source_name ||
-              "NewsData",
-
-            categoria:
-              mapearCategoriaNewsData(
-                n.category,
-                n
-              )
-
-          };
-
-          nuevasNoticias.push(
-            noticia
-          );
-
-        }
-      );
-
-    }
-
-  } else {
-
-    console.warn(
-      "NewsData no disponible:",
-      newsDataResult.reason
-    );
-
-  }
-
-
-  const clarinResult =
-    resultados[1];
-
-
-  if (
-    clarinResult.status ===
-    "fulfilled"
-  ) {
-
-    const data =
-      clarinResult.value;
-
-    if (
-      Array.isArray(
-        data.items
-      )
-    ) {
-
-      data.items.forEach(
-        n => {
-
-          const noticia = {
-
-            title:
-              limpiarTexto(
-                n.title ||
-                "Sin título"
-              ),
-
-            description:
-              limpiarTexto(
-                n.description ||
-                ""
-              ).slice(
-                0,
-                160
-              ),
-
-            image_url:
-              n.thumbnail ||
-              n.enclosure?.link ||
-              "icon.png",
-
-            link:
-              n.link ||
-              "#",
-
-            pubDate:
-              n.pubDate ||
-              "",
-
-            source:
-              "Clarín",
-
-            categoria:
-              "actualidad"
-
-          };
-
-          nuevasNoticias.push(
-            noticia
-          );
-
-        }
-      );
-
-    }
-
-  } else {
-
-    console.warn(
-      "Clarín no disponible:",
-      clarinResult.reason
-    );
-
-  }
-
-
-  if (
-    nuevasNoticias.length > 0
-  ) {
-
-    fusionarNoticias(
-      nuevasNoticias
-    );
-
-    indiceNoticia =
-      0;
-
-    mostrarNoticia();
-
-  } else {
-
-    if (
-      noticias.length === 0
-    ) {
-
-      newsContainer.innerHTML = `
-        <div class="news-empty">
-          No se pudieron cargar las noticias
-          en este momento.
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- HERO PLAYER CARD -->
+    <section class="player-hero-card">
+      <div class="hero-left">
+        <div class="live-badge">EN VIVO</div>
+        <div class="hero-radio-logo-container">
+          <img id="stationLogo" class="hero-radio-logo" src="https://via.placeholder.com/160" alt="Logo Radio">
         </div>
-      `;
-
-    }
-
-  }
-
-}
-
-
-/* ============================================================
-   MOSTRAR NOTICIA
-============================================================ */
-
-function obtenerNoticiasFiltradas() {
-
-  if (
-    categoriaNoticias ===
-    "todas"
-  ) {
-
-    return noticias;
-
-  }
-
-  return noticias.filter(
-    noticia =>
-      noticia.categoria ===
-      categoriaNoticias
-  );
-
-}
-
-
-function mostrarNoticia() {
-
-  const noticiasFiltradas =
-    obtenerNoticiasFiltradas();
-
-  if (
-    noticiasFiltradas.length ===
-    0
-  ) {
-
-    newsContainer.innerHTML = `
-      <div class="news-empty">
-        No hay noticias disponibles
-        en esta categoría en este momento.
-      </div>
-    `;
-
-    return;
-
-  }
-
-  if (
-    indiceNoticia >=
-    noticiasFiltradas.length
-  ) {
-
-    indiceNoticia =
-      0;
-
-  }
-
-  const n =
-    noticiasFiltradas[
-      indiceNoticia
-    ];
-
-  const safeLink =
-    getSafeLink(
-      n.link
-    );
-
-  const nombresCategorias = {
-
-    actualidad:
-      "Actualidad",
-
-    politica:
-      "Política",
-
-    economia:
-      "Economía",
-
-    deportes:
-      "Deportes",
-
-    tecnologia:
-      "Tecnología",
-
-    espectaculos:
-      "Espectáculos",
-
-    policiales:
-      "Policiales"
-
-  };
-
-  const nombreCategoria =
-    nombresCategorias[
-      n.categoria
-    ] ||
-    "Actualidad";
-
-  newsContainer.innerHTML = `
-
-    <article class="news-card">
-
-      <img
-        class="news-img"
-        src="${escapeAttribute(
-          n.image_url ||
-          "icon.png"
-        )}"
-        alt=""
-        onerror="this.src='icon.png'"
-      >
-
-      <div class="news-content">
-
-        <div class="news-category-label">
-          ${escapeHtml(
-            nombreCategoria
-          )}
+        <h2 id="currentName" class="hero-radio-title">LA 100 - BUENOS AIRES</h2>
+        <div id="currentProvince" class="hero-radio-location">
+          <i class="fa-solid fa-location-dot"></i> Buenos Aires
         </div>
-
-        <h2 class="news-title">
-          ${escapeHtml(
-            n.title
-          )}
-        </h2>
-
-        <p class="news-desc">
-          ${escapeHtml(
-            n.description ||
-            ""
-          )}
-        </p>
-
-        <a
-          class="news-link"
-          href="${escapeAttribute(
-            safeLink
-          )}"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Ver más
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
-
       </div>
 
-    </article>
-
-  `;
-
-  indiceNoticia =
-    (
-      indiceNoticia + 1
-    ) %
-    noticiasFiltradas.length;
-
-}
-
-
-/* ============================================================
-   CAMBIO CATEGORÍA
-============================================================ */
-
-newsCategories.addEventListener(
-  "click",
-  event => {
-
-    const button =
-      event.target.closest(
-        ".news-category"
-      );
-
-    if (!button) {
-      return;
-    }
-
-    document
-      .querySelectorAll(
-        ".news-category"
-      )
-      .forEach(
-        item =>
-          item.classList.remove(
-            "active"
-          )
-      );
-
-    button.classList.add(
-      "active"
-    );
-
-    categoriaNoticias =
-      button.dataset.category;
-
-    indiceNoticia =
-      0;
-
-    mostrarNoticia();
-
-  }
-);
-
-
-/* ============================================================
-   LINKS SEGUROS
-============================================================ */
-
-function getSafeLink(url) {
-
-  try {
-
-    const parsed =
-      new URL(
-        url,
-        location.href
-      );
-
-    if (
-      parsed.protocol ===
-        "http:" ||
-      parsed.protocol ===
-        "https:"
-    ) {
-
-      return parsed.href;
-
-    }
-
-  } catch {}
-
-  return "#";
-
-}
-
-
-/* ============================================================
-   FÚTBOL - CACHE
-============================================================ */
-
-/*
-   IMPORTANTE:
-   Ahora permitimos leer la caché aunque esté vencida.
-   Así, si la API falla, seguimos mostrando los últimos
-   partidos conocidos.
-*/
-
-function leerCacheFutbol(
-  permitirVencida = false
-) {
-
-  try {
-
-    const raw =
-      localStorage.getItem(
-        FOOTBALL_CACHE_KEY
-      );
-
-    if (!raw) {
-      return null;
-    }
-
-    const cache =
-      JSON.parse(raw);
-
-    if (
-      !cache ||
-      !Array.isArray(
-        cache.fixtures
-      )
-    ) {
-      return null;
-    }
-
-    const edad =
-      Date.now() -
-      Number(
-        cache.timestamp || 0
-      );
-
-    if (
-      permitirVencida ||
-      edad <= FOOTBALL_CACHE_TIME
-    ) {
-
-      return cache.fixtures;
-
-    }
-
-    return null;
-
-  } catch (error) {
-
-    console.warn(
-      "No se pudo leer caché fútbol:",
-      error
-    );
-
-    return null;
-
-  }
-
-}
-
-
-function guardarCacheFutbol(
-  fixtures
-) {
-
-  try {
-
-    localStorage.setItem(
-      FOOTBALL_CACHE_KEY,
-      JSON.stringify({
-
-        timestamp:
-          Date.now(),
-
-        fixtures:
-          fixtures
-
-      })
-    );
-
-  } catch (error) {
-
-    console.warn(
-      "No se pudo guardar caché fútbol:",
-      error
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   FÚTBOL - ESTADO
-============================================================ */
-
-function textoEstadoFutbol(
-  status
-) {
-
-  const estados = {
-
-    NS:
-      "Próximo",
-
-    TBD:
-      "Horario a confirmar",
-
-    "1H":
-      "En vivo",
-
-    HT:
-      "Entretiempo",
-
-    "2H":
-      "En vivo",
-
-    ET:
-      "Tiempo extra",
-
-    BT:
-      "Entretiempo",
-
-    P:
-      "Penales",
-
-    FT:
-      "Finalizado",
-
-    AET:
-      "Finalizado",
-
-    PEN:
-      "Finalizado",
-
-    PST:
-      "Postergado",
-
-    CANC:
-      "Cancelado",
-
-    ABD:
-      "Suspendido",
-
-    AWD:
-      "Finalizado",
-
-    WO:
-      "Finalizado"
-
-  };
-
-  return estados[status] ||
-    status ||
-    "Estado desconocido";
-
-}
-
-
-function esPartidoEnVivo(
-  status
-) {
-
-  return [
-    "1H",
-    "HT",
-    "2H",
-    "ET",
-    "BT",
-    "P"
-  ].includes(
-    status
-  );
-
-}
-
-
-function esPartidoFinalizado(
-  status
-) {
-
-  return [
-    "FT",
-    "AET",
-    "PEN",
-    "AWD",
-    "WO"
-  ].includes(
-    status
-  );
-
-}
-
-
-/* ============================================================
-   FÚTBOL - FECHA
-============================================================ */
-
-function formatearFechaFutbol(
-  fecha
-) {
-
-  try {
-
-    return new Intl.DateTimeFormat(
-      "es-AR",
-      {
-        weekday: "short",
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    ).format(
-      new Date(fecha)
-    );
-
-  } catch {
-
-    return "";
-
-  }
-
-}
-
-
-/* ============================================================
-   FÚTBOL - RENDER
-============================================================ */
-
-function renderFutbol(
-  fixtures
-) {
-
-  if (
-    !Array.isArray(
-      fixtures
-    ) ||
-    fixtures.length === 0
-  ) {
-
-    footballContainer.innerHTML = `
-      <div class="news-empty">
-        La API respondió correctamente,
-        pero no hay partidos disponibles
-        para esta competencia y temporada.
-      </div>
-    `;
-
-    return;
-
-  }
-
-  const ahora =
-    Date.now();
-
-  const ordenados =
-    [...fixtures].sort(
-      (a, b) => {
-
-        const fechaA =
-          new Date(
-            a?.fixture?.date || 0
-          ).getTime();
-
-        const fechaB =
-          new Date(
-            b?.fixture?.date || 0
-          ).getTime();
-
-        return fechaA - fechaB;
-
-      }
-    );
-
-
-  const enVivo =
-    ordenados.filter(
-      partido =>
-        esPartidoEnVivo(
-          partido?.fixture?.status?.short
-        )
-    );
-
-
-  const proximos =
-    ordenados.filter(
-      partido => {
-
-        const fecha =
-          new Date(
-            partido?.fixture?.date || 0
-          ).getTime();
-
-        const status =
-          partido?.fixture?.status?.short;
-
-        return (
-          fecha >= ahora &&
-          !esPartidoEnVivo(status) &&
-          !esPartidoFinalizado(status)
-        );
-
-      }
-    );
-
-
-  const finalizados =
-    ordenados
-      .filter(
-        partido => {
-
-          const fecha =
-            new Date(
-              partido?.fixture?.date || 0
-            ).getTime();
-
-          return (
-            fecha < ahora &&
-            esPartidoFinalizado(
-              partido?.fixture?.status?.short
-            )
-          );
-
-        }
-      )
-      .sort(
-        (a, b) =>
-          new Date(
-            b.fixture.date
-          ) -
-          new Date(
-            a.fixture.date
-          )
-      );
-
-
-  const seleccionados = [
-    ...enVivo,
-    ...proximos.slice(0, 5),
-    ...finalizados.slice(0, 3)
-  ];
-
-
-  const unicos = [];
-
-  const ids =
-    new Set();
-
-
-  seleccionados.forEach(
-    partido => {
-
-      const id =
-        partido?.fixture?.id;
-
-      if (
-        id &&
-        !ids.has(id)
-      ) {
-
-        ids.add(id);
-
-        unicos.push(
-          partido
-        );
-
-      }
-
-    }
-  );
-
-
-  if (
-    unicos.length === 0
-  ) {
-
-    footballContainer.innerHTML = `
-      <div class="news-empty">
-        No hay partidos próximos o recientes
-        para mostrar.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  const nombreLiga =
-    unicos[0]?.league?.name ||
-    "Fútbol";
-
-
-  footballStatus.textContent =
-    `${nombreLiga} · 2026`;
-
-
-  footballContainer.innerHTML = `
-
-    <div class="football-list">
-
-      ${unicos.map(
-        partido => {
-
-          const fixture =
-            partido.fixture || {};
-
-          const home =
-            partido.teams?.home || {};
-
-          const away =
-            partido.teams?.away || {};
-
-          const golesHome =
-            partido.goals?.home;
-
-          const golesAway =
-            partido.goals?.away;
-
-          const status =
-            fixture.status?.short ||
-            "NS";
-
-          const estado =
-            textoEstadoFutbol(
-              status
-            );
-
-          const live =
-            esPartidoEnVivo(
-              status
-            );
-
-          const finished =
-            esPartidoFinalizado(
-              status
-            );
-
-          let score =
-            "vs";
-
-          if (
-            finished ||
-            live
-          ) {
-
-            score =
-              `${golesHome ?? 0} - ${golesAway ?? 0}`;
-
-          }
-
-
-          let statusClass =
-            "";
-
-          if (live) {
-
-            statusClass =
-              "live";
-
-          } else if (finished) {
-
-            statusClass =
-              "finished";
-
-          } else if (
-            status === "PST" ||
-            status === "CANC" ||
-            status === "ABD"
-          ) {
-
-            statusClass =
-              "postponed";
-
-          }
-
-
-          return `
-
-            <article
-              class="football-card ${live ? "live" : ""}"
-            >
-
-              <div class="football-league">
-                ${escapeHtml(
-                  partido?.league?.name ||
-                  "Fútbol"
-                )}
-              </div>
-
-              <div class="football-date">
-                ${escapeHtml(
-                  formatearFechaFutbol(
-                    fixture.date
-                  )
-                )}
-              </div>
-
-              <div class="football-teams">
-
-                <div class="football-team">
-
-                  <img
-                    class="football-team-logo"
-                    src="${escapeAttribute(
-                      home.logo ||
-                      "icon.png"
-                    )}"
-                    alt=""
-                    onerror="this.src='icon.png'"
-                  >
-
-                  <div class="football-team-name">
-                    ${escapeHtml(
-                      home.name ||
-                      "Local"
-                    )}
-                  </div>
-
-                </div>
-
-
-                <div class="football-score">
-
-                  ${escapeHtml(
-                    score
-                  )}
-
-                  <small>
-                    ${escapeHtml(
-                      estado
-                    )}
-                  </small>
-
-                </div>
-
-
-                <div class="football-team">
-
-                  <img
-                    class="football-team-logo"
-                    src="${escapeAttribute(
-                      away.logo ||
-                      "icon.png"
-                    )}"
-                    alt=""
-                    onerror="this.src='icon.png'"
-                  >
-
-                  <div class="football-team-name">
-                    ${escapeHtml(
-                      away.name ||
-                      "Visitante"
-                    )}
-                  </div>
-
-                </div>
-
-              </div>
-
-
-              <div style="text-align:center;">
-
-                <span
-                  class="football-status ${statusClass}"
-                >
-                  ${escapeHtml(
-                    estado
-                  )}
-                </span>
-
-              </div>
-
-            </article>
-
-          `;
-
-        }
-      ).join("")}
-
-    </div>
-
-    ${
-      fixtures.length > 8
-        ? `
-          <div class="football-more">
-            Mostrando próximos y últimos partidos.
+      <div class="hero-right">
+        <div class="now-playing-header">
+          <div class="now-playing-info">
+            <div class="now-playing-label">
+              <i class="fa-solid fa-music"></i> AHORA SUENA
+            </div>
+            <h3 id="songTitle" class="song-title">Persiana Americana</h3>
+            <p id="artistName" class="artist-name">Soda Stereo</p>
           </div>
-        `
-        : ""
-    }
-
-  `;
-
-}
-
-
-/* ============================================================
-   FÚTBOL - ERROR THE SPORTS DB
-============================================================ */
-
-function obtenerMensajeErrorFootball(
-  data,
-  response
-) {
-
-  if (
-    data &&
-    data.message
-  ) {
-
-    return String(
-      data.message
-    );
-
-  }
-
-  if (
-    response &&
-    response.status
-  ) {
-
-    return `HTTP ${response.status}`;
-
-  }
-
-  return "Error desconocido de TheSportsDB.";
-
-}
-
-
-/* ============================================================
-   FÚTBOL - CONVERTIR DATOS THE SPORTS DB
-============================================================ */
-
-function convertirEventoFootball(
-  evento
-) {
-
-  if (!evento) {
-    return null;
-  }
-
-  const fecha =
-    evento.strTimestamp ||
-    (
-      evento.dateEventLocal &&
-      evento.strTimeLocal
-        ? `${evento.dateEventLocal}T${evento.strTimeLocal}`
-        : evento.dateEvent
-    );
-
-  let status =
-    "NS";
-
-  const estado =
-    String(
-      evento.strStatus ||
-      ""
-    ).toUpperCase();
-
-  if (
-    estado === "FT" ||
-    estado === "AET" ||
-    estado === "PEN" ||
-    estado === "AWD" ||
-    estado === "WO"
-  ) {
-
-    status = estado;
-
-  } else if (
-    estado === "1H" ||
-    estado === "HT" ||
-    estado === "2H" ||
-    estado === "ET" ||
-    estado === "BT" ||
-    estado === "P"
-  ) {
-
-    status = estado;
-
-  } else if (
-    estado === "PST" ||
-    estado === "CANC" ||
-    estado === "ABD"
-  ) {
-
-    status = estado;
-
-  } else if (
-    String(
-      evento.strPostponed ||
-      ""
-    ).toLowerCase() === "yes"
-  ) {
-
-    status = "PST";
-
-  } else {
-
-    status = "NS";
-
-  }
-
-  const golesHome =
-    evento.intHomeScore !== null &&
-    evento.intHomeScore !== undefined &&
-    evento.intHomeScore !== ""
-      ? Number(evento.intHomeScore)
-      : null;
-
-  const golesAway =
-    evento.intAwayScore !== null &&
-    evento.intAwayScore !== undefined &&
-    evento.intAwayScore !== ""
-      ? Number(evento.intAwayScore)
-      : null;
-
-  return {
-
-    fixture: {
-
-      id:
-        evento.idEvent,
-
-      date:
-        fecha,
-
-      status: {
-
-        short:
-          status,
-
-        long:
-          evento.strStatus ||
-          status
-
-      }
-
-    },
-
-    league: {
-
-      id:
-        evento.idLeague,
-
-      name:
-        evento.strLeague ||
-        "Argentinian Primera Division",
-
-      season:
-        evento.strSeason ||
-        THESPORTSDB_SEASON
-
-    },
-
-    teams: {
-
-      home: {
-
-        id:
-          evento.idHomeTeam,
-
-        name:
-          evento.strHomeTeam ||
-          "Local",
-
-        logo:
-          evento.strHomeTeamBadge ||
-          "icon.png"
-
-      },
-
-      away: {
-
-        id:
-          evento.idAwayTeam,
-
-        name:
-          evento.strAwayTeam ||
-          "Visitante",
-
-        logo:
-          evento.strAwayTeamBadge ||
-          "icon.png"
-
-      }
-
-    },
-
-    goals: {
-
-      home:
-        golesHome,
-
-      away:
-        golesAway
-
-    }
-
-  };
-
-}
-
-
-/* ============================================================
-   FÚTBOL - CARGAR THE SPORTS DB
-============================================================ */
-
-async function cargarFutbol(
-  forzar = false
-) {
-
-  footballStatus.textContent =
-    "Cargando...";
-
-
-  /*
-     Primero usamos caché fresca.
-  */
-
-  if (!forzar) {
-
-    const cache =
-      leerCacheFutbol(false);
-
-    if (cache) {
-
-      renderFutbol(
-        cache
-      );
-
-      footballStatus.textContent =
-        `${cache[0]?.league?.name || "Fútbol"} · ${THESPORTSDB_SEASON}`;
-
-      return;
-
-    }
-
-  }
-
-
-  try {
-
-    const url =
-      `${THESPORTSDB_BASE}/eventsseason.php` +
-      `?id=${THESPORTSDB_LEAGUE}` +
-      `&s=${THESPORTSDB_SEASON}`;
-
-
-    console.log(
-      "THESPORTSDB:",
-      url
-    );
-
-
-    const response =
-      await fetch(
-        url,
-        {
-          method: "GET",
-
-          headers: {
-
-            "Accept":
-              "application/json"
-
-          },
-
-          cache:
-            "no-store"
-
-        }
-      );
-
-
-    let data =
-      null;
-
-
-    try {
-
-      data =
-        await response.json();
-
-    } catch {
-
-      throw new Error(
-        `TheSportsDB HTTP ${response.status}: respuesta no válida.`
-      );
-
-    }
-
-
-    console.log(
-      "THESPORTSDB RESPONSE:",
-      data
-    );
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        obtenerMensajeErrorFootball(
-          data,
-          response
-        )
-      );
-
-    }
-
-
-    const eventos =
-      Array.isArray(
-        data?.events
-      )
-        ? data.events
-        : [];
-
-
-    console.log(
-      "EVENTOS RECIBIDOS:",
-      eventos.length
-    );
-
-
-    const fixtures =
-      eventos
-        .map(
-          convertirEventoFootball
-        )
-        .filter(
-          partido =>
-            partido &&
-            partido.fixture &&
-            partido.fixture.id &&
-            partido.fixture.date
-        );
-
-
-    console.log(
-      "PARTIDOS CONVERTIDOS:",
-      fixtures.length
-    );
-
-
-    if (
-      fixtures.length === 0
-    ) {
-
-      const cacheVencida =
-        leerCacheFutbol(true);
-
-      if (
-        cacheVencida &&
-        cacheVencida.length > 0
-      ) {
-
-        renderFutbol(
-          cacheVencida
-        );
-
-        footballStatus.textContent =
-          "Datos guardados";
-
-        return;
-
-      }
-
-      footballContainer.innerHTML = `
-        <div class="news-empty">
-
-          La API respondió correctamente,
-          pero no devolvió partidos para:
-
-          <br><br>
-
-          Liga: ${THESPORTSDB_LEAGUE}<br>
-          Temporada: ${THESPORTSDB_SEASON}
-
-          <br><br>
-
-          <span style="font-size:10px;color:#697384;">
-            No hay partidos disponibles
-            para esta competencia y temporada.
-          </span>
-
+          <img class="album-art" src="https://via.placeholder.com/110" alt="Soda Stereo Album">
         </div>
-      `;
 
-      footballStatus.textContent =
-        "Sin partidos";
+        <!-- Simulated Waveform Visualizer -->
+        <div class="waveform-visualizer">
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+          <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+        </div>
 
-      return;
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill"></div>
+          </div>
+          <div class="progress-time">
+            <span>02:34</span>
+            <span>04:12</span>
+          </div>
+        </div>
 
-    }
+        <div class="player-controls">
+          <button class="control-btn"><i class="fa-regular fa-heart"></i></button>
+          <button id="prevButton" class="control-btn"><i class="fa-solid fa-backward-step"></i></button>
+          <button id="playButton" class="control-btn play-main"><i class="fa-solid fa-pause"></i></button>
+          <button id="nextButton" class="control-btn"><i class="fa-solid fa-forward-step"></i></button>
+          <button class="control-btn"><i class="fa-solid fa-volume-high"></i></button>
+          <button class="control-btn"><i class="fa-solid fa-ellipsis"></i></button>
+        </div>
+      </div>
+    </section>
 
-
-    /*
-       Ordenamos para que el render actual
-       pueda encontrar próximos y recientes.
-    */
-
-    fixtures.sort(
-      (a, b) =>
-        new Date(
-          a.fixture.date
-        ) -
-        new Date(
-          b.fixture.date
-        )
-    );
-
-
-    guardarCacheFutbol(
-      fixtures
-    );
-
-
-    renderFutbol(
-      fixtures
-    );
-
-
-    footballStatus.textContent =
-      `${
-        fixtures[0]?.league?.name ||
-        "Fútbol"
-      } · ${THESPORTSDB_SEASON}`;
-
-
-  } catch (error) {
-
-    console.error(
-      "ERROR COMPLETO THESPORTSDB:",
-      error
-    );
-
-
-    const cacheVencida =
-      leerCacheFutbol(true);
-
-
-    if (
-      cacheVencida &&
-      cacheVencida.length > 0
-    ) {
-
-      renderFutbol(
-        cacheVencida
-      );
-
-      footballStatus.textContent =
-        "Datos guardados";
-
-      console.warn(
-        "Se utilizaron datos guardados porque TheSportsDB falló:",
-        error.message
-      );
-
-      return;
-
-    }
-
-
-    const mensaje =
-      error &&
-      error.message
-        ? error.message
-        : "Error desconocido";
-
-
-    footballContainer.innerHTML = `
-
-      <div class="news-empty">
-
-        <strong>
-          No se pudieron cargar los partidos.
-        </strong>
-
-        <br><br>
-
-        <span
-          style="
-            color:#ff8585;
-            font-size:11px;
-            line-height:1.5;
-          "
-        >
-          ${escapeHtml(
-            mensaje
-          )}
-        </span>
-
-        <br><br>
-
-        <span
-          style="
-            color:#687384;
-            font-size:10px;
-            line-height:1.5;
-          "
-        >
-          Liga: ${THESPORTSDB_LEAGUE}<br>
-          Temporada: ${THESPORTSDB_SEASON}
-        </span>
-
+    <!-- TUS RADIOS FAVORITAS -->
+    <section>
+      <div class="section-header-flex">
+        <h3 class="section-title-icon">
+          <i class="fa-solid fa-star"></i> Tus radios favoritas
+        </h3>
+        <a href="#" class="see-all-link">Ver todas <i class="fa-solid fa-arrow-right"></i></a>
       </div>
 
-    `;
+      <div class="favorites-grid" id="favoritesContainer">
+        <!-- Tarjeta de Ejemplo 1 -->
+        <div class="favorite-card-modern">
+          <i class="fa-solid fa-heart fav-heart-badge"></i>
+          <div class="fav-logo-wrapper">
+            <img src="https://via.placeholder.com/90" alt="LA 100">
+          </div>
+          <div class="fav-title">LA 100</div>
+          <div class="fav-sub">Buenos Aires</div>
+          <button class="fav-play-btn"><i class="fa-solid fa-play"></i></button>
+        </div>
 
-    footballStatus.textContent =
-      "Error API";
+        <!-- Tarjeta de Ejemplo 2 -->
+        <div class="favorite-card-modern">
+          <i class="fa-solid fa-heart fav-heart-badge"></i>
+          <div class="fav-logo-wrapper">
+            <img src="https://via.placeholder.com/90" alt="ASPEN">
+          </div>
+          <div class="fav-title">ASPEN</div>
+          <div class="fav-sub">Buenos Aires</div>
+          <button class="fav-play-btn"><i class="fa-solid fa-play"></i></button>
+        </div>
 
-  }
+        <!-- Tarjeta de Ejemplo 3 -->
+        <div class="favorite-card-modern">
+          <i class="fa-solid fa-heart fav-heart-badge"></i>
+          <div class="fav-logo-wrapper">
+            <img src="https://via.placeholder.com/90" alt="POP RADIO">
+          </div>
+          <div class="fav-title">POP RADIO 101.5</div>
+          <div class="fav-sub">Buenos Aires</div>
+          <button class="fav-play-btn"><i class="fa-solid fa-play"></i></button>
+        </div>
 
-}
+        <!-- Tarjeta de Ejemplo 4 -->
+        <div class="favorite-card-modern">
+          <i class="fa-solid fa-heart fav-heart-badge"></i>
+          <div class="fav-logo-wrapper">
+            <img src="https://via.placeholder.com/90" alt="MITRE">
+          </div>
+          <div class="fav-title">MITRE</div>
+          <div class="fav-sub">Buenos Aires</div>
+          <button class="fav-play-btn"><i class="fa-solid fa-play"></i></button>
+        </div>
 
+        <!-- Tarjeta de Ejemplo 5 -->
+        <div class="favorite-card-modern">
+          <i class="fa-solid fa-heart fav-heart-badge"></i>
+          <div class="fav-logo-wrapper">
+            <img src="https://via.placeholder.com/90" alt="Rock & Pop">
+          </div>
+          <div class="fav-title">Rock & Pop</div>
+          <div class="fav-sub">Buenos Aires</div>
+          <button class="fav-play-btn"><i class="fa-solid fa-play"></i></button>
+        </div>
+      </div>
+    </section>
 
-/* ============================================================
-   SERVICE WORKER
-============================================================ */
+    <!-- ÚLTIMAS NOTICIAS -->
+    <section>
+      <div class="section-header-flex">
+        <h3 class="section-title-icon">
+          <i class="fa-regular fa-newspaper"></i> Últimas noticias
+        </h3>
+        <div class="news-pills">
+          <button class="news-pill active">Argentina</button>
+          <button class="news-pill">Deportes</button>
+          <button class="news-pill">Mundo</button>
+          <button class="news-pill">Corrientes</button>
+        </div>
+      </div>
 
-if (
-  "serviceWorker" in navigator
-) {
+      <!-- noticia principal -->
+      <article class="news-main-featured">
+        <img class="news-featured-img" src="https://via.placeholder.com/500x350" alt="Noticia Argentina">
+        <div class="news-featured-body">
+          <span class="news-cat-tag">ARGENTINA</span>
+          <h2 class="news-featured-title">El Gobierno anunció nuevas medidas para el sector productivo</h2>
+          <p class="news-featured-desc">El vocero presidencial confirmó los detalles del plan que busca impulsar la economía y generar empleo en todo el país.</p>
+          <div class="news-meta-flex">
+            <span><i class="fa-regular fa-clock"></i> Hace 32 min</span>
+            <a href="#" class="see-all-link">Ver más <i class="fa-solid fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </article>
 
-  navigator.serviceWorker
-    .register(
-      "service-worker.js"
-    )
-    .catch(
-      error => {
+      <!-- sub noticias secundarias -->
+      <div class="news-grid-secondary">
+        <article class="news-card-sub">
+          <img src="https://via.placeholder.com/70" alt="Deportes">
+          <div class="news-sub-content">
+            <span class="news-cat-tag">DEPORTES</span>
+            <div class="news-sub-title">La Selección argentina ya tiene rival para la próxima fecha</div>
+            <div class="news-meta-flex"><span>Hace 1 h</span></div>
+          </div>
+        </article>
 
-        console.warn(
-          "Service Worker:",
-          error
-        );
+        <article class="news-card-sub">
+          <img src="https://via.placeholder.com/70" alt="Mundo">
+          <div class="news-sub-content">
+            <span class="news-cat-tag">MUNDO</span>
+            <div class="news-sub-title">El clima en Corrientes: se viene una semana más cálida</div>
+            <div class="news-meta-flex"><span>Hace 2 h</span></div>
+          </div>
+        </article>
 
-      }
-    );
+        <article class="news-card-sub">
+          <img src="https://via.placeholder.com/70" alt="Corrientes">
+          <div class="news-sub-content">
+            <span class="news-cat-tag">CORRIENTES</span>
+            <div class="news-sub-title">Avanza la obra en la Ruta Nacional 12</div>
+            <div class="news-meta-flex"><span>Hace 3 h</span></div>
+          </div>
+        </article>
+      </div>
+    </section>
 
-}
+    <!-- SMG SMART AI ASSISTANT -->
+    <section class="ai-assistant-banner">
+      <div class="ai-brand-info">
+        <div class="ai-bot-avatar">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div class="ai-text">
+          <h3>SMG SMART</h3>
+          <p>¿Buscás una radio? Preguntale a SMG.</p>
+        </div>
+      </div>
+      <div class="ai-input-wrapper">
+        <i class="fa-regular fa-comment-dots chat-icon"></i>
+        <input type="text" placeholder='Ej: "Quiero escuchar rock argentino"'>
+        <button class="ai-send-btn"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </section>
 
+    <!-- FOOTER -->
+    <footer class="app-footer">
+      <div class="brand-icon" style="width: 24px; height: 24px; font-size: 10px;">
+        <i class="fa-solid fa-radio"></i>
+      </div>
+      <strong>Radio SMG</strong> • Tu música, tus radios
+    </footer>
 
-/* ============================================================
-   INICIO
-============================================================ */
+  </main>
 
-cargarCacheNoticias();
-
-cargarRadios();
-
-cargarNoticias();
-
-cargarFutbol();
-
-
-/* ============================================================
-   INTERVALOS
-============================================================ */
-
-setInterval(
-  mostrarNoticia,
-  10000
-);
-
-
-setInterval(
-  cargarNoticias,
-  NEWS_REFRESH_TIME
-);
-
-
-setInterval(
-  () => {
-
-    cargarFutbol(
-      true
-    );
-
-  },
-  FOOTBALL_CACHE_TIME
-);
-
-</script>
+  <audio id="player" preload="none" playsinline></audio>
 
 </body>
 </html>
