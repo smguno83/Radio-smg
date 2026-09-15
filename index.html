@@ -1162,7 +1162,7 @@ const THESPORTSDB_SEASON =
   "2026";
 
 const FOOTBALL_CACHE_KEY =
-  "radioSMGFootballFixturesTSDB";
+  "radioSMGFootballFixturesTSDB_v2";
 
 const FOOTBALL_CACHE_TIME =
   30 * 60 * 1000;
@@ -4713,222 +4713,130 @@ async function cargarFutbol(
   footballStatus.textContent =
     "Cargando...";
 
+  const ahora = Date.now();
+  const LIMITE_PASADO = 45 * 24 * 60 * 60 * 1000;
+  const LIMITE_FUTURO = 60 * 24 * 60 * 60 * 1000;
 
-  /*
-     Primero usamos caché fresca.
-  */
+  function esFechaUtil(partido) {
+    const fecha = new Date(
+      partido?.fixture?.date || 0
+    ).getTime();
 
-  if (!forzar) {
-
-    const cache =
-      leerCacheFutbol(false);
-
-    if (cache) {
-
-      renderFutbol(
-        cache
-      );
-
-      footballStatus.textContent =
-        `${cache[0]?.league?.name || "Fútbol"} · ${THESPORTSDB_SEASON}`;
-
-      return;
-
-    }
-
+    return fecha >= ahora - LIMITE_PASADO &&
+           fecha <= ahora + LIMITE_FUTURO;
   }
 
+  function limpiarPartidos(partidos) {
+    const mapa = new Map();
+
+    (partidos || []).forEach(partido => {
+      if (!partido?.fixture?.id) return;
+      if (!esFechaUtil(partido)) return;
+      mapa.set(String(partido.fixture.id), partido);
+    });
+
+    return [...mapa.values()].sort(
+      (a, b) => new Date(a.fixture.date) - new Date(b.fixture.date)
+    );
+  }
+
+  /* Rechaza automáticamente la caché vieja de enero. */
+  if (!forzar) {
+    const cache = limpiarPartidos(leerCacheFutbol(false));
+
+    if (cache.length > 0) {
+      renderFutbol(cache);
+      footballStatus.textContent =
+        `${cache[0]?.league?.name || "Fútbol"} · 2026`;
+      return;
+    }
+  }
 
   try {
 
-    const url =
-      `${THESPORTSDB_BASE}/eventsseason.php` +
-      `?id=${THESPORTSDB_LEAGUE}` +
-      `&s=${THESPORTSDB_SEASON}`;
+    /*
+       No usamos eventsseason.php como fuente principal porque
+       el plan gratuito devuelve solamente 15 eventos y puede
+       comenzar por partidos antiguos de la temporada.
+    */
+    const fechas = [-1, 0, 1].map(offset => {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().slice(0, 10);
+    });
 
-
-    console.log(
-      "THESPORTSDB:",
-      url
-    );
-
-
-    const response =
-      await fetch(
-        url,
-        {
-          method: "GET",
-
-          headers: {
-
-            "Accept":
-              "application/json"
-
-          },
-
-          cache:
-            "no-store"
-
-        }
-      );
-
-
-    let data =
-      null;
-
-
-    try {
-
-      data =
-        await response.json();
-
-    } catch {
-
-      throw new Error(
-        `TheSportsDB HTTP ${response.status}: respuesta no válida.`
-      );
-
-    }
-
-
-    console.log(
-      "THESPORTSDB RESPONSE:",
-      data
-    );
-
-
-    if (
-      !response.ok
-    ) {
-
-      throw new Error(
-        obtenerMensajeErrorFootball(
-          data,
-          response
-        )
-      );
-
-    }
-
-
-    const eventos =
-      Array.isArray(
-        data?.events
+    const urls = [
+      `${THESPORTSDB_BASE}/eventsnextleague.php?id=${THESPORTSDB_LEAGUE}`,
+      `${THESPORTSDB_BASE}/eventspastleague.php?id=${THESPORTSDB_LEAGUE}`,
+      ...fechas.map(fecha =>
+        `${THESPORTSDB_BASE}/eventsday.php?d=${fecha}&l=${THESPORTSDB_LEAGUE}`
       )
-        ? data.events
-        : [];
+    ];
 
-
-    console.log(
-      "EVENTOS RECIBIDOS:",
-      eventos.length
+    const respuestas = await Promise.allSettled(
+      urls.map(url =>
+        fetch(url, {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          },
+          cache: "no-store"
+        }).then(async response => {
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(
+              obtenerMensajeErrorFootball(data, response)
+            );
+          }
+          return data;
+        })
+      )
     );
 
+    const eventos = [];
 
-    const fixtures =
-      eventos
-        .map(
-          convertirEventoFootball
-        )
-        .filter(
-          partido =>
-            partido &&
-            partido.fixture &&
-            partido.fixture.id &&
-            partido.fixture.date
-        );
+    respuestas.forEach(resultado => {
+      if (resultado.status === "fulfilled" &&
+          Array.isArray(resultado.value?.events)) {
+        eventos.push(...resultado.value.events);
+      }
+    });
 
+    const fixtures = limpiarPartidos(
+      eventos.map(convertirEventoFootball)
+    );
 
     console.log(
-      "PARTIDOS CONVERTIDOS:",
+      "THESPORTSDB partidos actuales:",
       fixtures.length
     );
 
+    if (fixtures.length === 0) {
+      const cacheVencida = limpiarPartidos(
+        leerCacheFutbol(true)
+      );
 
-    if (
-      fixtures.length === 0
-    ) {
-
-      const cacheVencida =
-        leerCacheFutbol(true);
-
-      if (
-        cacheVencida &&
-        cacheVencida.length > 0
-      ) {
-
-        renderFutbol(
-          cacheVencida
-        );
-
-        footballStatus.textContent =
-          "Datos guardados";
-
+      if (cacheVencida.length > 0) {
+        renderFutbol(cacheVencida);
+        footballStatus.textContent = "Datos guardados";
         return;
-
       }
 
       footballContainer.innerHTML = `
         <div class="news-empty">
-
-          La API respondió correctamente,
-          pero no devolvió partidos para:
-
-          <br><br>
-
-          Liga: ${THESPORTSDB_LEAGUE}<br>
-          Temporada: ${THESPORTSDB_SEASON}
-
-          <br><br>
-
-          <span style="font-size:10px;color:#697384;">
-            No hay partidos disponibles
-            para esta competencia y temporada.
-          </span>
-
+          No se encontraron partidos recientes o próximos
+          para la Primera División.
         </div>
       `;
-
-      footballStatus.textContent =
-        "Sin partidos";
-
+      footballStatus.textContent = "Sin partidos actuales";
       return;
-
     }
 
-
-    /*
-       Ordenamos para que el render actual
-       pueda encontrar próximos y recientes.
-    */
-
-    fixtures.sort(
-      (a, b) =>
-        new Date(
-          a.fixture.date
-        ) -
-        new Date(
-          b.fixture.date
-        )
-    );
-
-
-    guardarCacheFutbol(
-      fixtures
-    );
-
-
-    renderFutbol(
-      fixtures
-    );
-
+    guardarCacheFutbol(fixtures);
+    renderFutbol(fixtures);
 
     footballStatus.textContent =
-      `${
-        fixtures[0]?.league?.name ||
-        "Fútbol"
-      } · ${THESPORTSDB_SEASON}`;
-
+      `${fixtures[0]?.league?.name || "Fútbol"} · 2026`;
 
   } catch (error) {
 
@@ -4937,84 +4845,27 @@ async function cargarFutbol(
       error
     );
 
+    const cacheVencida = limpiarPartidos(
+      leerCacheFutbol(true)
+    );
 
-    const cacheVencida =
-      leerCacheFutbol(true);
-
-
-    if (
-      cacheVencida &&
-      cacheVencida.length > 0
-    ) {
-
-      renderFutbol(
-        cacheVencida
-      );
-
-      footballStatus.textContent =
-        "Datos guardados";
-
-      console.warn(
-        "Se utilizaron datos guardados porque TheSportsDB falló:",
-        error.message
-      );
-
+    if (cacheVencida.length > 0) {
+      renderFutbol(cacheVencida);
+      footballStatus.textContent = "Datos guardados";
       return;
-
     }
 
-
-    const mensaje =
-      error &&
-      error.message
-        ? error.message
-        : "Error desconocido";
-
-
     footballContainer.innerHTML = `
-
       <div class="news-empty">
-
-        <strong>
-          No se pudieron cargar los partidos.
-        </strong>
-
+        No se pudieron actualizar los partidos.
         <br><br>
-
-        <span
-          style="
-            color:#ff8585;
-            font-size:11px;
-            line-height:1.5;
-          "
-        >
-          ${escapeHtml(
-            mensaje
-          )}
+        <span style="font-size:10px;color:#697384;">
+          Verificá tu conexión e intentá nuevamente.
         </span>
-
-        <br><br>
-
-        <span
-          style="
-            color:#687384;
-            font-size:10px;
-            line-height:1.5;
-          "
-        >
-          Liga: ${THESPORTSDB_LEAGUE}<br>
-          Temporada: ${THESPORTSDB_SEASON}
-        </span>
-
       </div>
-
     `;
-
-    footballStatus.textContent =
-      "Error API";
-
+    footballStatus.textContent = "Error al actualizar";
   }
-
 }
 
 
