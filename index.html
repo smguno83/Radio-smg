@@ -2343,6 +2343,9 @@ function playStation(radio) {
   nowPlaying.innerHTML =
     "";
 
+  // Indicamos inmediatamente que estamos conectando.
+  miniStatus.textContent = "Conectando...";
+
   const originalUrl =
     radio.enlace;
 
@@ -4712,19 +4715,7 @@ async function cargarFutbol(
 
 
   /*
-     La consulta anterior usaba eventsseason.php.
-     En el plan gratuito TheSportsDB ese endpoint devuelve
-     como máximo 15 partidos y puede devolver un bloque viejo
-     de la temporada.
-
-     Ahora consultamos partidos alrededor de HOY:
-       - partidos de hoy
-       - partidos de ayer
-       - partidos de mañana
-       - próximo partido de la liga
-       - último partido de la liga
-
-     Así evitamos quedar atrapados en enero.
+     Primero usamos caché fresca.
   */
 
   if (!forzar) {
@@ -4734,63 +4725,14 @@ async function cargarFutbol(
 
     if (cache) {
 
-      const cacheActual =
-        cache.filter(
-          partido => {
+      renderFutbol(
+        cache
+      );
 
-            const fecha =
-              new Date(
-                partido?.fixture?.date
-              );
+      footballStatus.textContent =
+        `${cache[0]?.league?.name || "Fútbol"} · ${THESPORTSDB_SEASON}`;
 
-            if (
-              Number.isNaN(
-                fecha.getTime()
-              )
-            ) {
-              return false;
-            }
-
-            /*
-               Permitimos caché solo si contiene
-               partidos cercanos a la fecha actual.
-            */
-
-            const ahora =
-              Date.now();
-
-            const diferencia =
-              Math.abs(
-                fecha.getTime() -
-                ahora
-              );
-
-            const dias =
-              1000 * 60 * 60 * 24;
-
-            return diferencia <=
-              dias * 10;
-
-          }
-        );
-
-      if (
-        cacheActual.length > 0
-      ) {
-
-        renderFutbol(
-          cacheActual
-        );
-
-        footballStatus.textContent =
-          `${
-            cacheActual[0]?.league?.name ||
-            "Fútbol"
-          } · ${THESPORTSDB_SEASON}`;
-
-        return;
-
-      }
+      return;
 
     }
 
@@ -4799,220 +4741,92 @@ async function cargarFutbol(
 
   try {
 
-    const ahora =
-      new Date();
+    const url =
+      `${THESPORTSDB_BASE}/eventsseason.php` +
+      `?id=${THESPORTSDB_LEAGUE}` +
+      `&s=${THESPORTSDB_SEASON}`;
 
 
-    /*
-       Fecha local en formato YYYY-MM-DD.
-       No usamos UTC porque los partidos argentinos
-       deben calcularse según la fecha local del usuario.
-    */
-
-    function fechaLocalFootball(
-      desplazamiento = 0
-    ) {
-
-      const fecha =
-        new Date(
-          ahora
-        );
-
-      fecha.setDate(
-        fecha.getDate() +
-        desplazamiento
-      );
-
-      const year =
-        fecha.getFullYear();
-
-      const month =
-        String(
-          fecha.getMonth() + 1
-        ).padStart(
-          2,
-          "0"
-        );
-
-      const day =
-        String(
-          fecha.getDate()
-        ).padStart(
-          2,
-          "0"
-        );
-
-      return `${year}-${month}-${day}`;
-
-    }
+    console.log(
+      "THESPORTSDB:",
+      url
+    );
 
 
-    /*
-       Consultamos varios días y dos endpoints de liga.
-       Promise.allSettled permite que si una consulta falla,
-       las demás sigan funcionando.
-    */
-
-    const consultas = [
-
-      /*
-         Hoy
-      */
-      fetch(
-        `${THESPORTSDB_BASE}/eventsday.php` +
-        `?d=${fechaLocalFootball(0)}` +
-        `&l=${THESPORTSDB_LEAGUE}`,
+    const response =
+      await fetch(
+        url,
         {
-          cache: "no-store"
+          method: "GET",
+
+          headers: {
+
+            "Accept":
+              "application/json"
+
+          },
+
+          cache:
+            "no-store"
+
         }
-      ),
-
-      /*
-         Ayer
-      */
-      fetch(
-        `${THESPORTSDB_BASE}/eventsday.php` +
-        `?d=${fechaLocalFootball(-1)}` +
-        `&l=${THESPORTSDB_LEAGUE}`,
-        {
-          cache: "no-store"
-        }
-      ),
-
-      /*
-         Mañana
-      */
-      fetch(
-        `${THESPORTSDB_BASE}/eventsday.php` +
-        `?d=${fechaLocalFootball(1)}` +
-        `&l=${THESPORTSDB_LEAGUE}`,
-        {
-          cache: "no-store"
-        }
-      ),
-
-      /*
-         Próximo partido de la liga.
-         En el plan gratuito devuelve el próximo evento.
-      */
-      fetch(
-        `${THESPORTSDB_BASE}/eventsnextleague.php` +
-        `?id=${THESPORTSDB_LEAGUE}`,
-        {
-          cache: "no-store"
-        }
-      ),
-
-      /*
-         Último partido de la liga.
-      */
-      fetch(
-        `${THESPORTSDB_BASE}/eventspastleague.php` +
-        `?id=${THESPORTSDB_LEAGUE}`,
-        {
-          cache: "no-store"
-        }
-      )
-
-    ];
-
-
-    const respuestas =
-      await Promise.allSettled(
-        consultas
       );
 
 
-    const eventos =
-      [];
+    let data =
+      null;
 
 
-    for (
-      const resultado of respuestas
-    ) {
+    try {
 
-      if (
-        resultado.status !==
-        "fulfilled"
-      ) {
-        continue;
-      }
+      data =
+        await response.json();
 
+    } catch {
 
-      const response =
-        resultado.value;
-
-
-      if (
-        !response.ok
-      ) {
-        continue;
-      }
-
-
-      try {
-
-        const data =
-          await response.json();
-
-
-        if (
-          Array.isArray(
-            data?.events
-          )
-        ) {
-
-          eventos.push(
-            ...data.events
-          );
-
-        }
-
-      } catch {
-
-        /*
-           Si una respuesta individual
-           viene inválida, seguimos con las demás.
-        */
-
-      }
+      throw new Error(
+        `TheSportsDB HTTP ${response.status}: respuesta no válida.`
+      );
 
     }
 
 
     console.log(
-      "THESPORTSDB EVENTOS ACTUALES:",
+      "THESPORTSDB RESPONSE:",
+      data
+    );
+
+
+    if (
+      !response.ok
+    ) {
+
+      throw new Error(
+        obtenerMensajeErrorFootball(
+          data,
+          response
+        )
+      );
+
+    }
+
+
+    const eventos =
+      Array.isArray(
+        data?.events
+      )
+        ? data.events
+        : [];
+
+
+    console.log(
+      "EVENTOS RECIBIDOS:",
       eventos.length
     );
 
 
-    /*
-       Eliminamos duplicados.
-    */
-
-    const eventosUnicos =
-      Array.from(
-        new Map(
-          eventos
-            .filter(
-              evento =>
-                evento &&
-                evento.idEvent
-            )
-            .map(
-              evento => [
-                String(
-                  evento.idEvent
-                ),
-                evento
-              ]
-            )
-        ).values()
-      );
-
-
     const fixtures =
-      eventosUnicos
+      eventos
         .map(
           convertirEventoFootball
         )
@@ -5025,23 +4839,8 @@ async function cargarFutbol(
         );
 
 
-    /*
-       Orden cronológico.
-    */
-
-    fixtures.sort(
-      (a, b) =>
-        new Date(
-          a.fixture.date
-        ) -
-        new Date(
-          b.fixture.date
-        )
-    );
-
-
     console.log(
-      "PARTIDOS ACTUALES CONVERTIDOS:",
+      "PARTIDOS CONVERTIDOS:",
       fixtures.length
     );
 
@@ -5050,92 +4849,41 @@ async function cargarFutbol(
       fixtures.length === 0
     ) {
 
-      /*
-         Si no pudimos actualizar, usamos caché vieja
-         solo como último recurso.
-      */
-
       const cacheVencida =
         leerCacheFutbol(true);
-
 
       if (
         cacheVencida &&
         cacheVencida.length > 0
       ) {
 
-        /*
-           Incluso la caché vieja se filtra para evitar
-           volver a mostrar enero indefinidamente.
-        */
+        renderFutbol(
+          cacheVencida
+        );
 
-        const recientes =
-          cacheVencida.filter(
-            partido => {
+        footballStatus.textContent =
+          "Datos guardados";
 
-              const fecha =
-                new Date(
-                  partido?.fixture?.date
-                );
-
-              if (
-                Number.isNaN(
-                  fecha.getTime()
-                )
-              ) {
-                return false;
-              }
-
-              const diferencia =
-                Math.abs(
-                  fecha.getTime() -
-                  ahora.getTime()
-                );
-
-              const dias =
-                1000 * 60 * 60 * 24;
-
-              return diferencia <=
-                dias * 14;
-
-            }
-          );
-
-
-        if (
-          recientes.length > 0
-        ) {
-
-          renderFutbol(
-            recientes
-          );
-
-          footballStatus.textContent =
-            "Datos guardados";
-
-          return;
-
-        }
+        return;
 
       }
-
 
       footballContainer.innerHTML = `
         <div class="news-empty">
 
-          No hay partidos recientes o próximos
-          disponibles en este momento.
+          La API respondió correctamente,
+          pero no devolvió partidos para:
 
           <br><br>
 
-          <span
-            style="
-              font-size:10px;
-              color:#697384;
-            "
-          >
-            Liga: ${THESPORTSDB_LEAGUE}<br>
-            Temporada: ${THESPORTSDB_SEASON}
+          Liga: ${THESPORTSDB_LEAGUE}<br>
+          Temporada: ${THESPORTSDB_SEASON}
+
+          <br><br>
+
+          <span style="font-size:10px;color:#697384;">
+            No hay partidos disponibles
+            para esta competencia y temporada.
           </span>
 
         </div>
@@ -5150,9 +4898,20 @@ async function cargarFutbol(
 
 
     /*
-       Guardamos solamente los partidos que acabamos
-       de consultar, nunca el bloque viejo de enero.
+       Ordenamos para que el render actual
+       pueda encontrar próximos y recientes.
     */
+
+    fixtures.sort(
+      (a, b) =>
+        new Date(
+          a.fixture.date
+        ) -
+        new Date(
+          b.fixture.date
+        )
+    );
+
 
     guardarCacheFutbol(
       fixtures
@@ -5171,9 +4930,7 @@ async function cargarFutbol(
       } · ${THESPORTSDB_SEASON}`;
 
 
-  } catch (
-    error
-  ) {
+  } catch (error) {
 
     console.error(
       "ERROR COMPLETO THESPORTSDB:",
@@ -5190,53 +4947,19 @@ async function cargarFutbol(
       cacheVencida.length > 0
     ) {
 
-      const recientes =
-        cacheVencida.filter(
-          partido => {
+      renderFutbol(
+        cacheVencida
+      );
 
-            const fecha =
-              new Date(
-                partido?.fixture?.date
-              );
+      footballStatus.textContent =
+        "Datos guardados";
 
-            if (
-              Number.isNaN(
-                fecha.getTime()
-              )
-            ) {
-              return false;
-            }
+      console.warn(
+        "Se utilizaron datos guardados porque TheSportsDB falló:",
+        error.message
+      );
 
-            const diferencia =
-              Math.abs(
-                fecha.getTime() -
-                Date.now()
-              );
-
-            const dias =
-              1000 * 60 * 60 * 24;
-
-            return diferencia <=
-              dias * 14;
-
-          }
-        );
-
-
-      if (
-        recientes.length > 0
-      ) {
-
-        renderFutbol(
-          recientes
-        );
-
-        footballStatus.textContent =
-          "Datos guardados";
-
-        return;
-
-      }
+      return;
 
     }
 
@@ -5253,7 +4976,7 @@ async function cargarFutbol(
       <div class="news-empty">
 
         <strong>
-          No se pudieron actualizar los partidos.
+          No se pudieron cargar los partidos.
         </strong>
 
         <br><br>
@@ -5293,6 +5016,7 @@ async function cargarFutbol(
   }
 
 }
+
 
 /* ============================================================
    SERVICE WORKER
